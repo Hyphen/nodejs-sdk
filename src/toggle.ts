@@ -1,11 +1,13 @@
+import {Hookified} from 'hookified';
 
 export type ToggleOptions = {
 	auth?: string;
 };
 
-export class Toggle {
+export class Toggle extends Hookified {
 	_options: ToggleOptions = {};
 	constructor(options?: ToggleOptions) {
+		super();
 		this._options = options ?? {};
 	}
 
