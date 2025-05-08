@@ -1,0 +1,45 @@
+{
+  "name": "@hyphen/sdk",
+  "version": "1.0.0",
+  "description": "Hyphen SDK for Node.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "types": "dist/node/index.d.ts",
+  "scripts": {
+    "test": "xo --fix && vitest run --coverage",
+    "test:ci": "xo && vitest run --coverage",
+    "build": "rimraf ./dist && tsup src/index.ts --format esm --dts --clean",
+    "clean": "rimraf ./dist",
+    "prepublishOnly": "rimraf ./dist && tsup src/index.ts --format esm --dts --clean"
+  },
+  "keywords": [
+    "hyphen",
+    "sdk",
+    "nodejs",
+    "javascript",
+    "typescript"
+  ],
+  "author": "Team Hyphen <hello@hyphen.ai>",
+  "license": "MIT",
+  "devDependencies": {
+    "@swc/core": "^1.11.24",
+    "@vitest/coverage-v8": "^3.1.3",
+    "rimraf": "^6.0.1",
+    "tsd": "^0.32.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3",
+    "xo": "^0.60.0"
+  },
+  "files": [
+    "dist",
+    "LICENSE"
+  ]
+}
