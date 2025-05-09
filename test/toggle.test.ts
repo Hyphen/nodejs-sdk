@@ -4,6 +4,7 @@ import {Toggle} from '../src/toggle.js';
 
 const defaultOptions = {
 	application: 'my-app',
+	publicKey: 'my-public-key',
 	environment: 'development',
 };
 
@@ -16,6 +17,7 @@ describe('Toggle', () => {
 	test('should have environment set by NODE_ENV', () => {
 		const toggle = new Toggle({
 			application: 'my-app',
+			publicKey: 'my-public-key',
 		});
 		expect(toggle.environment).toEqual('test');
 	});
