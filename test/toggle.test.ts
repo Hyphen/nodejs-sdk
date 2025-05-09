@@ -37,4 +37,18 @@ describe('Toggle', () => {
 		expect(toggle.application).toEqual('new-app');
 		expect(toggle.environment).toEqual('production');
 	});
+
+	test('should set the public key', () => {
+		const toggle = new Toggle(defaultOptions);
+		expect(toggle.publicKey).toEqual('my-public-key');
+		toggle.publicKey = 'new-public-key';
+		expect(toggle.publicKey).toEqual('new-public-key');
+	});
+
+	test('should be able to set context and reset client', async () => {
+		const toggle = new Toggle(defaultOptions);
+		toggle.setContext({userId: '123'});
+		const client = await toggle.getClient();
+		expect(client).toBeDefined();
+	});
 });

@@ -34,7 +34,7 @@ export type ToggleOptions = {
 		 * @default 60
 		 */
 		ttl?: number;
-	}
+	};
 };
 
 export class Toggle extends Hookified {
@@ -97,14 +97,21 @@ export class Toggle extends Hookified {
 
 	public async get<T>(key: string, defaultValue: T): Promise<T> {
 		switch (typeof defaultValue) {
-			case 'boolean':
+			case 'boolean': {
 				return this.getBoolean(key, defaultValue as boolean) as Promise<T>;
-			case 'string':
+			}
+
+			case 'string': {
 				return this.getString(key, defaultValue as string) as Promise<T>;
-			case 'number':
+			}
+
+			case 'number': {
 				return this.getNumber(key, defaultValue as number) as Promise<T>;
-			default:
+			}
+
+			default: {
 				return this.getObject(key, defaultValue as JsonValue) as Promise<T>;
+			}
 		}
 	}
 
