@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  HYPHEN_PUBLIC_API_KEY: ${{ secrets.HYPHEN_PUBLIC_API_KEY }}
+  HYPHEN_APPLICATION_ID: ${{ secrets.HYPHEN_APPLICATION_ID }}
+
 jobs:
   build:
 
@@ -34,7 +38,4 @@ jobs:
 
     - name: Testing    
       run: pnpm test
-      env:
-        HYPHEN_PUBLIC_API_KEY: ${{ secrets.HYPHEN_PUBLIC_API_KEY }}
-        HYPHEN_APPLICATION_ID: ${{ secrets.HYPHEN_APPLICATION_ID }}
 

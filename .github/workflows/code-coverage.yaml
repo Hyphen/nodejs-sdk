@@ -32,9 +32,6 @@ jobs:
     - name: Build    
       run: pnpm build
 
-    - name: What application id
-      run: echo $HYPHEN_APPLICATION_ID
-
     - name: Testing    
       run: pnpm test
       
