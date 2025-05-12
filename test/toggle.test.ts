@@ -12,8 +12,6 @@ const HYPHEN_APPLICATION_ID = process.env.HYPHEN_APPLICATION_ID;
 
 if (!HYPHEN_PUBLIC_API_KEY || !HYPHEN_APPLICATION_ID) {
 	throw new Error('HYPHEN_PUBLIC_API_KEY and HYPHEN_APPLICATION_ID must be set for tests to run.');
-} else {
-	console.log('HYPHEN_APPLICATION_ID:', HYPHEN_APPLICATION_ID);
 }
 
 const defaultOptions = {
