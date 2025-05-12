@@ -5,7 +5,26 @@
 [![npm](https://img.shields.io/npm/dm/@hyphen/sdk)](https://www.npmjs.com/package/@hyphen/sdk)
 [![license](https://img.shields.io/github/license/Hyphen/nodejs-sdk)](https://github.com/hyphen/nodejs-sdk/blob/main/LICENSE)
 
-Hyphen Node.js SDK
+# Hyphen Node.js SDK
+
+The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flagging and experimentation capabilities into their Node.js applications. With this SDK, you can manage feature flags more effectively, enabling you to control the rollout of new features and conduct A/B testing with ease.
+
+# Installation
+
+To install the Hyphen Node.js SDK, you can use npm or yarn. Run the following command in your terminal:
+
+```bash
+npm install @hyphen/sdk
+```
+
+# Usage
+
+There are many ways to use the Hyphen Node.js SDK. Because of this we have created examples for each of the different ways in each secton of the documentation.
+
+# Toggle
+
+[Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
+
 
 
 # Contributing
