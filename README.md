@@ -165,7 +165,7 @@ console.log('Boolean toggle value:', result); // true
 | *getBoolean* | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
 | *getNumber* | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
 | *getString* | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
-| *getObject* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
+| *getObject<Type>* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a object toggle. |
 
 # Contributing
 
