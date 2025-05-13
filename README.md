@@ -26,9 +26,9 @@ There are many ways to use the Hyphen Node.js SDK. Because of this we have creat
 [Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
 
 ```javascript
-import { Toggle, Context } from '@hyphen/sdk';
+import { Toggle, ToggleContext } from '@hyphen/sdk';
 
-const context: Context = {
+const context: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
@@ -61,9 +61,9 @@ console.log('Boolean toggle value:', result); // true
 if you want to set the context you can do it like this:
 
 ```javascript
-import { Toggle, Context } from '@hyphen/sdk';
+import { Toggle, ToggleContext } from '@hyphen/sdk';
 
-const context: Context = {
+const context: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
@@ -97,9 +97,9 @@ console.log('Boolean toggle value:', result); // true
 if you would like to override the context for a single request you can do it like this:
 
 ```javascript
-import { Toggle, Context } from '@hyphen/sdk';
+import { Toggle, ToggleContext } from '@hyphen/sdk';
 
-const context: Context = {
+const context: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
@@ -122,7 +122,7 @@ const toggleOptions = {
   context: context,
 };
 
-const overrideContext: Context = {
+const overrideContext: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
@@ -153,19 +153,19 @@ console.log('Boolean toggle value:', result); // true
 | *publicApiKey* | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
 | *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
 | *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
-| *context?* | `Context` | The context object that contains the user and custom attributes. This is optional. |
+| *context?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
 | *cache?* | `{ ttl: number}` | Whether to use the cache or not. |
 
 ## Toggle API
 
 | Method | Parameters | Description |
 |----------------|----------------|----------------|
-| *setContext* | `context: Context` | Set the context for the toggle. This is optional. |
-| *get<Type>* | `key: string, defaultValue: T, options?: { context?: Context }` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
-| *getBoolean* | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
-| *getNumber* | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
-| *getString* | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
-| *getObject<Type>* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a object toggle. |
+| *setContext* | `context: ToggleContext` | Set the context for the toggle. This is optional. |
+| *get<Type>* | `key: string, defaultValue: T, options?: ToggleRequestOptions` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| *getBoolean* | `key: string, defaultValue: boolean, options?: ToggleRequestOptions` | Get the value of a boolean toggle. |
+| *getNumber* | `key: string, defaultValue: number, options?: ToggleRequestOptions` | Get the value of a number toggle. |
+| *getString* | `key: string, defaultValue: string, options?: ToggleRequestOptions` | Get the value of a string toggle. |
+| *getObject<Type>* | `key: string, defaultValue: any, options?: ToggleRequestOptions` | Get the value of a object toggle. |
 
 ## Toggle Hooks
 
@@ -184,9 +184,9 @@ The following hooks are available for Toggle:
 You can use the hooks to modify the request or the response. For example, you can use the `beforeGetBoolean` hook to log the request before it is sent to the server.
 
 ```javascript
-import { Toggle, ToggleHooks, Context } from '@hyphen/sdk';
+import { Toggle, ToggleHooks, ToggleContext } from '@hyphen/sdk';
 
-const context: Context = {
+const context: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
