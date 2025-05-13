@@ -10,7 +10,6 @@
 The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flagging and experimentation capabilities into their Node.js applications. With this SDK, you can manage feature flags more effectively, enabling you to control the rollout of new features and conduct A/B testing with ease.
 
 # Table of Contents
-- [Hyphen Node.js SDK](#hyphen-nodejs-sdk)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
 - [Toggle](#toggle)
