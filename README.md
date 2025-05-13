@@ -19,7 +19,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Hooks](#toggle-hooks)
 	- [Toggle Error Handling](#toggle-error-handling)
 - [Contributing](#contributing)
-	- [Testing Your Changes](#testing-your-changes)
+- [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
 
 # Installation
@@ -314,6 +314,19 @@ try {
 # Contributing
 
 We welcome contributions to the Hyphen Node.js SDK! If you have an idea for a new feature, bug fix, or improvement, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Install `pnpm` by running `npm install -g pnpm` if you don't have it already.
+3. Run the installation and tests to ensure everything is working correctly `pnpm i && pnpm test`. 
+4. Make your changes and commit them with a clear message. In the following format:
+   - `feat: <describe the feature>`
+   - `fix: <describe the bug fix>`
+   - `chore: updgrading xxx to version x.x.x`
+
+5. Push your changes to your forked repository.
+6. Create a pull request to the main repository.
+7. Describe your changes and why they are necessary.
 
 ## Testing Your Changes
 
