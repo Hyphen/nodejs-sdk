@@ -17,7 +17,7 @@
     "test:ci": "xo && vitest run --coverage",
     "build": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean",
     "clean": "rimraf ./dist",
-    "prepublishOnly": "rimraf ./dist && tsup src/index.ts --format esm --dts --clean"
+    "prepublishOnly": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean"
   },
   "keywords": [
     "hyphen",
