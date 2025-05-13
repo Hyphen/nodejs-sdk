@@ -84,6 +84,14 @@ describe('Toggle', () => {
 		expect(toggle.environment).toEqual('production');
 	});
 
+	test('should set the uris', () => {
+		const options = {...defaultOptions, uris: ['https://toggle.hyphen.ai']};
+		const toggle = new Toggle(options);
+		expect(toggle.uris).toEqual(['https://toggle.hyphen.ai']);
+		toggle.uris = ['https://new-uri.com'];
+		expect(toggle.uris).toEqual(['https://new-uri.com']);
+	});
+
 	test('should set the public key', () => {
 		const toggle = new Toggle(defaultOptions);
 		expect(toggle.publicKey).toEqual('my-public-key');
