@@ -273,4 +273,24 @@ describe('Toggle Hooks', () => {
 		expect(value).toBe(true);
 		expect(beforeHookCalled).toBe(true);
 	});
+
+	test('should call afterGetBoolean hook', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+		});
+
+		let hookCalled = false;
+		const afterGetBooleanHook = (data: any) => {
+			data.result = false;
+			hookCalled = true;
+		};
+
+		toggle.onHook('afterGetBoolean', afterGetBooleanHook);
+
+		const value = await toggle.getBoolean('hyphen-sdk-boolean', false);
+		expect(value).toBe(false);
+		expect(hookCalled).toBe(true);
+	});
 });
