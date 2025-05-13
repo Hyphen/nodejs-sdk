@@ -8,8 +8,6 @@ import {HyphenProvider, type HyphenProviderOptions} from '@hyphen/openfeature-se
 export type Context = EvaluationContext;
 
 export enum ToggleHooks {
-	beforeGet = 'beforeGet',
-	afterGet = 'afterGet',
 	beforeGetBoolean = 'beforeGetBoolean',
 	afterGetBoolean = 'afterGetBoolean',
 	beforeGetString = 'beforeGetString',
