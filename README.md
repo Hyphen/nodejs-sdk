@@ -28,10 +28,40 @@ There are many ways to use the Hyphen Node.js SDK. Because of this we have creat
 ```javascript
 import { Toggle, Context } from '@hyphen/sdk';
 
+const context: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
 const toggleOptions = {
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
+  context: context,
 };
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+
+console.log('Boolean toggle value:', result); // true
+```
+
+if you want to set the context you can do it like this:
+
+```javascript
+import { Toggle, Context } from '@hyphen/sdk';
 
 const context: Context = {
 	targetingKey: 'user-123',
@@ -50,12 +80,68 @@ const context: Context = {
 	},
 };
 
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+};
+
 const toggle = new Toggle(toggleOptions);
 
-//set the default context
 toggle.setContext(context);
 
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+
+console.log('Boolean toggle value:', result); // true
+```
+
+if you would like to override the context for a single request you can do it like this:
+
+```javascript
+import { Toggle, Context } from '@hyphen/sdk';
+
+const context: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+};
+
+const overrideContext: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false, { context: overrideContext });
 
 console.log('Boolean toggle value:', result); // true
 ```
@@ -64,14 +150,22 @@ console.log('Boolean toggle value:', result); // true
 
 | Option | Type | Description |
 |----------------|----------------|----------------|
-| `publicApiKey` | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
-| `applicationId` | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
-| `environment?` | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
-| `context?` | `Context` | The context object that contains the user and custom attributes. This is optional. |
-| `cache?` | `{ ttl: number}` | Whether to use the cache or not. |
+| *publicApiKey* | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
+| *context?* | `Context` | The context object that contains the user and custom attributes. This is optional. |
+| *cache?* | `{ ttl: number}` | Whether to use the cache or not. |
 
 ## Toggle API
 
+| Method | Parameters | Description |
+|----------------|----------------|----------------|
+| *setContext* | `context: Context` | Set the context for the toggle. This is optional. |
+| *get<Type>* | `key: string, defaultValue: T, options?: { context?: Context }` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| *getBoolean* | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
+| *getNumber* | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
+| *getString* | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
+| *getObject* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
 
 # Contributing
 
