@@ -25,6 +25,52 @@ There are many ways to use the Hyphen Node.js SDK. Because of this we have creat
 
 [Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
 
+```javascript
+import { Toggle, Context } from '@hyphen/sdk';
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+};
+
+const context: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggle = new Toggle(toggleOptions);
+
+//set the default context
+toggle.setContext(context);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+
+console.log('Boolean toggle value:', result); // true
+```
+
+## Toggle Options
+
+| Option | Type | Description |
+|----------------|----------------|----------------|
+| `publicApiKey` | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| `applicationId` | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
+| `environment?` | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
+| `context?` | `Context` | The context object that contains the user and custom attributes. This is optional. |
+| `cache?` | `{ ttl: number}` | Whether to use the cache or not. |
+
+## Toggle API
 
 
 # Contributing
