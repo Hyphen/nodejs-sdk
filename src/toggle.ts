@@ -58,6 +58,14 @@ export type ToggleOptions = {
 	 * @default false
 	 */
 	throwErrors?: boolean;
+
+	/**
+	 * Horizon URIs to use for talking to Toggle. You can use this to override
+	 * the default URIs for testin or if you are using a self-hosted version.
+	 * @type {Array<string>}
+	 * @example ['https://toggle.hyphen.ai']
+	 */
+	uris?: string[];
 };
 
 export type ToggleRequestOptions = {
@@ -71,6 +79,7 @@ export class Toggle extends Hookified {
 	private _client: Client | undefined;
 	private _context: EvaluationContext | undefined;
 	private _throwErrors = false;
+	private _uris?: string[];
 	constructor(options: ToggleOptions) {
 		super();
 
@@ -79,6 +88,7 @@ export class Toggle extends Hookified {
 		this._environment = options.environment ?? process.env.NODE_ENV ?? 'development';
 		this._context = options.context;
 		this._throwErrors = options.throwErrors ?? false;
+		this._uris = options.uris;
 	}
 
 	public get applicationId(): string {
@@ -121,6 +131,14 @@ export class Toggle extends Hookified {
 		this._context = value;
 	}
 
+	public get uris(): string[] | undefined {
+		return this._uris;
+	}
+
+	public set uris(value: string[] | undefined) {
+		this._uris = value;
+	}
+
 	public setContext(context: ToggleContext): void {
 		this._context = context;
 		// Reset the client to force a new one to be created
@@ -133,6 +151,7 @@ export class Toggle extends Hookified {
 			const options = {
 				application: this._applicationId,
 				environment: this._environment,
+				horizonUrls: this._uris,
 			} as HyphenProviderOptions;
 			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicKey, options));
 			this._client = OpenFeature.getClient(this._context);

@@ -311,6 +311,83 @@ try {
 }
 ```
 
+## Toggle Self-Hosted
+
+Toggle uses [Horizon](https://hyphen.ai/horizon) to fetch the feature flags. If you are using a self-hosted version of Hyphen you can use the `uris` option in the constructor to set the url of your self-hosted version:
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+  uris: [
+	'https://your-self-hosted-horizon-url',
+  ],
+};
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
+If you want to use your self-hosted version of [Horizon](https://hyphen.ai/horizon) as a primary and fallback to our hosted version you can do it like this:
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+  uris: [
+	'https://your-self-hosted-horizon-url',
+	'https://toggle.hyphen.cloud',
+  ],
+};
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
 # Contributing
 
 We welcome contributions to the Hyphen Node.js SDK! If you have an idea for a new feature, bug fix, or improvement, please follow these steps:
