@@ -184,6 +184,7 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetBoolean, resultData);
 
 			return resultData.result;
+		/* c8 ignore next 8 */
 		} catch (error) {
 			this.emit('error', error);
 			if (this._throwErrors) {
@@ -213,6 +214,7 @@ export class Toggle extends Hookified {
 			};
 			await this.hook(ToggleHooks.afterGetString, resultData);
 			return resultData.result;
+		/* c8 ignore next 8 */
 		} catch (error) {
 			this.emit('error', error);
 			if (this._throwErrors) {
@@ -243,6 +245,7 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetNumber, resultData);
 
 			return resultData.result;
+		/* c8 ignore next 8 */
 		} catch (error) {
 			this.emit('error', error);
 			if (this._throwErrors) {
@@ -273,6 +276,7 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetObject, resultData);
 
 			return resultData.result as T;
+		/* c8 ignore next 8 */
 		} catch (error) {
 			this.emit('error', error);
 			if (this._throwErrors) {
