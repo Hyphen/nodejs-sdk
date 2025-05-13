@@ -158,6 +158,14 @@ console.log('Boolean toggle value:', result); // true
 
 ## Toggle API
 
+| Method | Parameters | Description |
+|----------------|----------------|----------------|
+| `setContext` | `context: Context` | Set the context for the toggle. This is optional. |
+| `get<T>` | `key: string, defaultValue: T, options?: { context?: Context }` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| `getBoolean` | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
+| `getNumber` | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
+| `getString` | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
+| `getObject` | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
 
 # Contributing
 
