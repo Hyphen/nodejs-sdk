@@ -4,7 +4,7 @@ import {Toggle} from '../src/index.js';
 describe('hyphen sdk', () => {
 	test('should create an instance of Toggle', () => {
 		const toggle = new Toggle({
-			application: 'my-app',
+			applicationId: 'my-app',
 			publicKey: 'my-public-key',
 			environment: 'development',
 		});
