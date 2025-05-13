@@ -91,6 +91,25 @@ describe('Toggle', () => {
 		expect(toggle.publicKey).toEqual('new-public-key');
 	});
 
+	test('should set the context', () => {
+		const toggle = new Toggle(defaultOptions);
+		toggle.context = context;
+		expect(toggle.context).toEqual(context);
+	});
+
+	test('should set throwErrors', () => {
+		const options = {
+			applicationId: 'my-app',
+			publicKey: 'my-public-key',
+			environment: 'development',
+			throwErrors: true,
+		};
+		const toggle = new Toggle(options);
+		expect(toggle.throwErrors).toEqual(true);
+		toggle.throwErrors = false;
+		expect(toggle.throwErrors).toEqual(false);
+	});
+
 	test('should be able to set context and reset client', async () => {
 		const toggle = new Toggle(defaultOptions);
 		toggle.setContext({userId: '123'});
