@@ -37,6 +37,23 @@ const context: Context = {
 	},
 };
 
+const overrideContext: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
 describe('Toggle', () => {
 	test('should create an instance of Toggle', () => {
 		const toggle = new Toggle(defaultOptions);
@@ -177,5 +194,61 @@ describe('Toggle Integration', () => {
 
 		const value = await toggle.get<number>('hyphen-sdk-number', 0);
 		expect(value).toEqual(42);
+	});
+});
+
+describe('Toggle Context', async () => {
+	test('should get a client with context and eval', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+			context,
+		});
+
+		const value = await toggle.getBoolean('hyphen-sdk-boolean', false);
+		expect(value).toBe(true);
+	});
+
+	test('should get a boolean with context override', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+		});
+
+		const value = await toggle.getBoolean('hyphen-sdk-boolean', false, {context: overrideContext});
+		expect(value).toBe(true);
+	});
+
+	test('should get a string with context override', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+		});
+
+		const value = await toggle.getString('hyphen-sdk-string', 'default', {context: overrideContext});
+		expect(value).toBe('Hyphen!');
+	});
+	test('should get a number with context override', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+		});
+
+		const value = await toggle.getNumber('hyphen-sdk-number', 0, {context: overrideContext});
+		expect(value).toBe(42);
+	});
+	test('should get a json with context override', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+		});
+
+		const value = await toggle.getObject('hyphen-sdk-json', {default: 'value'}, {context: overrideContext});
+		expect(value).toEqual({id: 'Hello World!'});
 	});
 });

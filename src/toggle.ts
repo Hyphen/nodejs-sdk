@@ -42,6 +42,10 @@ export type ToggleOptions = {
 	};
 };
 
+export type ToggleRequestOptions = {
+	context?: Context;
+};
+
 export class Toggle extends Hookified {
 	private _applicationId: string;
 	private _publicKey: string;
@@ -101,43 +105,43 @@ export class Toggle extends Hookified {
 		return this._client;
 	}
 
-	public async get<T>(key: string, defaultValue: T): Promise<T> {
+	public async get<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
 		switch (typeof defaultValue) {
 			case 'boolean': {
-				return this.getBoolean(key, defaultValue as boolean) as Promise<T>;
+				return this.getBoolean(key, defaultValue as boolean, options) as Promise<T>;
 			}
 
 			case 'string': {
-				return this.getString(key, defaultValue as string) as Promise<T>;
+				return this.getString(key, defaultValue as string, options) as Promise<T>;
 			}
 
 			case 'number': {
-				return this.getNumber(key, defaultValue as number) as Promise<T>;
+				return this.getNumber(key, defaultValue as number, options) as Promise<T>;
 			}
 
 			default: {
-				return this.getObject(key, defaultValue as JsonValue) as Promise<T>;
+				return this.getObject(key, defaultValue as JsonValue, options) as Promise<T>;
 			}
 		}
 	}
 
-	public async getBoolean(key: string, defaultValue: boolean): Promise<boolean> {
+	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleRequestOptions): Promise<boolean> {
 		const client = await this.getClient();
-		return client.getBooleanValue(key, defaultValue);
+		return client.getBooleanValue(key, defaultValue, options?.context);
 	}
 
-	public async getString(key: string, defaultValue: string): Promise<string> {
+	public async getString(key: string, defaultValue: string, options?: ToggleRequestOptions): Promise<string> {
 		const client = await this.getClient();
-		return client.getStringValue(key, defaultValue);
+		return client.getStringValue(key, defaultValue, options?.context);
 	}
 
-	public async getNumber(key: string, defaultValue: number): Promise<number> {
+	public async getNumber(key: string, defaultValue: number, options?: ToggleRequestOptions): Promise<number> {
 		const client = await this.getClient();
-		return client.getNumberValue(key, defaultValue);
+		return client.getNumberValue(key, defaultValue, options?.context);
 	}
 
-	public async getObject<T>(key: string, defaultValue: T): Promise<T> {
+	public async getObject<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
 		const client = await this.getClient();
-		return client.getObjectValue(key, defaultValue as JsonValue) as T;
+		return client.getObjectValue(key, defaultValue as JsonValue, options?.context) as T;
 	}
 }
