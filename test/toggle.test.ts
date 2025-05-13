@@ -1,7 +1,7 @@
 import process from 'node:process';
 import dotenv from 'dotenv';
 import {describe, expect, test} from 'vitest';
-import {Toggle, type Context} from '../src/toggle.js';
+import {Toggle, type ToggleContext} from '../src/toggle.js';
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ const defaultOptions = {
 	environment: 'development',
 };
 
-const context: Context = {
+const context: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {
@@ -37,7 +37,7 @@ const context: Context = {
 	},
 };
 
-const overrideContext: Context = {
+const overrideContext: ToggleContext = {
 	targetingKey: 'user-123',
 	ipAddress: '203.0.113.42',
 	customAttributes: {

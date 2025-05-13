@@ -5,7 +5,7 @@ import {
 } from '@openfeature/server-sdk';
 import {HyphenProvider, type HyphenProviderOptions} from '@hyphen/openfeature-server-provider';
 
-export type Context = EvaluationContext;
+export type ToggleContext = EvaluationContext;
 
 export enum ToggleHooks {
 	beforeGetBoolean = 'beforeGetBoolean',
@@ -40,9 +40,9 @@ export type ToggleOptions = {
 
 	/**
 	 * The context to use for evaluating feature flags
-	 * @type {Context}
+	 * @type {ToggleContext}
 	 */
-	context?: Context;
+	context?: ToggleContext;
 
 	caching?: {
 		/**
@@ -54,7 +54,7 @@ export type ToggleOptions = {
 };
 
 export type ToggleRequestOptions = {
-	context?: Context;
+	context?: ToggleContext;
 };
 
 export class Toggle extends Hookified {
@@ -96,7 +96,7 @@ export class Toggle extends Hookified {
 		this._environment = value;
 	}
 
-	public setContext(context: Context): void {
+	public setContext(context: ToggleContext): void {
 		this._context = context;
 		// Reset the client to force a new one to be created
 		this._client = undefined;
