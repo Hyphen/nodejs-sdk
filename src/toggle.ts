@@ -12,7 +12,7 @@ export type ToggleOptions = {
 	 * Your application name
 	 * @type {string}
 	 */
-	application: string;
+	applicationId: string;
 
 	/**
 	 * Your Hyphen API key
@@ -27,18 +27,23 @@ export type ToggleOptions = {
 	 */
 	environment?: string;
 
+	/**
+	 * The context to use for evaluating feature flags
+	 * @type {Context}
+	 */
+	context?: Context;
+
 	caching?: {
 		/**
 		 * The time in seconds to cache the feature flag values
-		 * @type {number}
-		 * @default 60
+		 * @type {number} - this is in milliseconds
 		 */
 		ttl?: number;
 	};
 };
 
 export class Toggle extends Hookified {
-	private _application: string;
+	private _applicationId: string;
 	private _publicKey: string;
 	private _environment: string;
 	private _client: Client | undefined;
@@ -46,17 +51,18 @@ export class Toggle extends Hookified {
 	constructor(options: ToggleOptions) {
 		super();
 
-		this._application = options.application;
+		this._applicationId = options.applicationId;
 		this._publicKey = options.publicKey;
 		this._environment = options.environment ?? process.env.NODE_ENV ?? 'development';
+		this._context = options.context;
 	}
 
-	public get application(): string {
-		return this._application;
+	public get applicationId(): string {
+		return this._applicationId;
 	}
 
-	public set application(value: string) {
-		this._application = value;
+	public set applicationId(value: string) {
+		this._applicationId = value;
 	}
 
 	public get publicKey(): string {
@@ -85,7 +91,7 @@ export class Toggle extends Hookified {
 		if (!this._client) {
 			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 			const options = {
-				application: this._application,
+				application: this._applicationId,
 				environment: this._environment,
 			} as HyphenProviderOptions;
 			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicKey, options));
