@@ -150,22 +150,22 @@ console.log('Boolean toggle value:', result); // true
 
 | Option | Type | Description |
 |----------------|----------------|----------------|
-| `publicApiKey` | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
-| `applicationId` | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
-| `environment?` | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
-| `context?` | `Context` | The context object that contains the user and custom attributes. This is optional. |
-| `cache?` | `{ ttl: number}` | Whether to use the cache or not. |
+| *publicApiKey* | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
+| *context?* | `Context` | The context object that contains the user and custom attributes. This is optional. |
+| *cache?* | `{ ttl: number}` | Whether to use the cache or not. |
 
 ## Toggle API
 
 | Method | Parameters | Description |
 |----------------|----------------|----------------|
-| `setContext` | `context: Context` | Set the context for the toggle. This is optional. |
-| `get<T>` | `key: string, defaultValue: T, options?: { context?: Context }` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
-| `getBoolean` | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
-| `getNumber` | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
-| `getString` | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
-| `getObject` | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
+| *setContext* | `context: Context` | Set the context for the toggle. This is optional. |
+| *get<Type>* | `key: string, defaultValue: T, options?: { context?: Context }` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| *getBoolean* | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
+| *getNumber* | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
+| *getString* | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
+| *getObject* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
 
 # Contributing
 
