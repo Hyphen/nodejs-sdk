@@ -51,6 +51,13 @@ export type ToggleOptions = {
 		 */
 		ttl?: number;
 	};
+
+	/**
+	 * Throw errors in addition to emitting them
+	 * @type {boolean}
+	 * @default false
+	 */
+	throwErrors?: boolean;
 };
 
 export type ToggleRequestOptions = {
@@ -63,6 +70,7 @@ export class Toggle extends Hookified {
 	private _environment: string;
 	private _client: Client | undefined;
 	private _context: EvaluationContext | undefined;
+	private _throwErrors = false;
 	constructor(options: ToggleOptions) {
 		super();
 
@@ -70,6 +78,7 @@ export class Toggle extends Hookified {
 		this._publicKey = options.publicKey;
 		this._environment = options.environment ?? process.env.NODE_ENV ?? 'development';
 		this._context = options.context;
+		this._throwErrors = options.throwErrors ?? false;
 	}
 
 	public get applicationId(): string {
@@ -94,6 +103,22 @@ export class Toggle extends Hookified {
 
 	public set environment(value: string) {
 		this._environment = value;
+	}
+
+	public get throwErrors(): boolean {
+		return this._throwErrors;
+	}
+
+	public set throwErrors(value: boolean) {
+		this._throwErrors = value;
+	}
+
+	public get context(): ToggleContext | undefined {
+		return this._context;
+	}
+
+	public set context(value: ToggleContext | undefined) {
+		this._context = value;
 	}
 
 	public setContext(context: ToggleContext): void {
@@ -137,88 +162,128 @@ export class Toggle extends Hookified {
 	}
 
 	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleRequestOptions): Promise<boolean> {
-		const data = {
-			key,
-			defaultValue,
-			options,
-		};
+		try {
+			const data = {
+				key,
+				defaultValue,
+				options,
+			};
 
-		await this.hook(ToggleHooks.beforeGetBoolean, data);
+			await this.hook(ToggleHooks.beforeGetBoolean, data);
 
-		const client = await this.getClient();
+			const client = await this.getClient();
 
-		const result = await client.getBooleanValue(data.key, data.defaultValue, data.options?.context);
+			const result = await client.getBooleanValue(data.key, data.defaultValue, data.options?.context);
 
-		const resultData = {
-			key,
-			defaultValue,
-			options,
-			result,
-		};
-		await this.hook(ToggleHooks.afterGetBoolean, resultData);
+			const resultData = {
+				key,
+				defaultValue,
+				options,
+				result,
+			};
+			await this.hook(ToggleHooks.afterGetBoolean, resultData);
 
-		return resultData.result;
+			return resultData.result;
+		/* c8 ignore next 8 */
+		} catch (error) {
+			this.emit('error', error);
+			if (this._throwErrors) {
+				throw error;
+			}
+		}
+
+		return defaultValue;
 	}
 
 	public async getString(key: string, defaultValue: string, options?: ToggleRequestOptions): Promise<string> {
-		const data = {
-			key,
-			defaultValue,
-			options,
-		};
-		await this.hook(ToggleHooks.beforeGetString, data);
-		const client = await this.getClient();
+		try {
+			const data = {
+				key,
+				defaultValue,
+				options,
+			};
+			await this.hook(ToggleHooks.beforeGetString, data);
+			const client = await this.getClient();
 
-		const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
-		const resultData = {
-			key,
-			defaultValue,
-			options,
-			result,
-		};
-		await this.hook(ToggleHooks.afterGetString, resultData);
-		return resultData.result;
+			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
+			const resultData = {
+				key,
+				defaultValue,
+				options,
+				result,
+			};
+			await this.hook(ToggleHooks.afterGetString, resultData);
+			return resultData.result;
+		/* c8 ignore next 8 */
+		} catch (error) {
+			this.emit('error', error);
+			if (this._throwErrors) {
+				throw error;
+			}
+		}
+
+		return defaultValue;
 	}
 
 	public async getNumber(key: string, defaultValue: number, options?: ToggleRequestOptions): Promise<number> {
-		const data = {
-			key,
-			defaultValue,
-			options,
-		};
-		await this.hook(ToggleHooks.beforeGetNumber, data);
-		const client = await this.getClient();
+		try {
+			const data = {
+				key,
+				defaultValue,
+				options,
+			};
+			await this.hook(ToggleHooks.beforeGetNumber, data);
+			const client = await this.getClient();
 
-		const result = await client.getNumberValue(data.key, data.defaultValue, data.options?.context);
-		const resultData = {
-			key,
-			defaultValue,
-			options,
-			result,
-		};
-		await this.hook(ToggleHooks.afterGetNumber, resultData);
+			const result = await client.getNumberValue(data.key, data.defaultValue, data.options?.context);
+			const resultData = {
+				key,
+				defaultValue,
+				options,
+				result,
+			};
+			await this.hook(ToggleHooks.afterGetNumber, resultData);
 
-		return resultData.result;
+			return resultData.result;
+		/* c8 ignore next 8 */
+		} catch (error) {
+			this.emit('error', error);
+			if (this._throwErrors) {
+				throw error;
+			}
+		}
+
+		return defaultValue;
 	}
 
 	public async getObject<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
-		const data = {
-			key,
-			defaultValue,
-			options,
-		};
-		await this.hook(ToggleHooks.beforeGetObject, data);
-		const client = await this.getClient();
+		try {
+			const data = {
+				key,
+				defaultValue,
+				options,
+			};
+			await this.hook(ToggleHooks.beforeGetObject, data);
+			const client = await this.getClient();
 
-		const result = await client.getObjectValue(key, defaultValue as JsonValue, data.options?.context);
-		const resultData = {
-			key,
-			defaultValue,
-			options,
-			result,
-		};
-		await this.hook(ToggleHooks.afterGetObject, resultData);
+			const result = await client.getObjectValue(key, defaultValue as JsonValue, data.options?.context);
+			const resultData = {
+				key,
+				defaultValue,
+				options,
+				result,
+			};
+			await this.hook(ToggleHooks.afterGetObject, resultData);
 
-		return resultData.result as T;
+			return resultData.result as T;
+		/* c8 ignore next 8 */
+		} catch (error) {
+			this.emit('error', error);
+			if (this._throwErrors) {
+				throw error;
+			}
+		}
+
+		return defaultValue;
 	}
 }

@@ -9,6 +9,19 @@
 
 The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flagging and experimentation capabilities into their Node.js applications. With this SDK, you can manage feature flags more effectively, enabling you to control the rollout of new features and conduct A/B testing with ease.
 
+# Table of Contents
+- [Hyphen Node.js SDK](#hyphen-nodejs-sdk)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Toggle](#toggle)
+	- [Toggle Options](#toggle-options)
+	- [Toggle API](#toggle-api)
+	- [Toggle Hooks](#toggle-hooks)
+	- [Toggle Error Handling](#toggle-error-handling)
+- [Contributing](#contributing)
+	- [Testing Your Changes](#testing-your-changes)
+- [License and Copyright](#license-and-copyright)
+
 # Installation
 
 To install the Hyphen Node.js SDK, you can use npm or yarn. Run the following command in your terminal:
@@ -17,7 +30,7 @@ To install the Hyphen Node.js SDK, you can use npm or yarn. Run the following co
 npm install @hyphen/sdk
 ```
 
-# Usage
+# Basic Usage
 
 There are many ways to use the Hyphen Node.js SDK. Because of this we have created examples for each of the different ways in each secton of the documentation.
 
@@ -218,6 +231,84 @@ toggle.onHook(ToggleHooks.beforeGetBoolean, (data) => {
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 
 console.log('Boolean toggle value:', result); // true
+```
+
+## Toggle Error Handling
+
+The SDK provides a way to handle errors that occur during the toggle request. You can use the `.on` method to handle errors globally.
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+};
+
+const toggle = new Toggle(toggleOptions);
+toggle.on('error', (error) => {
+  console.error('Error fetching toggle:', error);
+});
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
+If you would like to have the errors thrown you can use the `throwErrors` option in the constructor:
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+  throwErrors: true,
+};
+
+const toggle = new Toggle(toggleOptions);
+
+try {
+  const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+  console.log('Boolean toggle value:', result); // true
+} catch (error) {
+  console.error('Error fetching toggle:', error);
+}
 ```
 
 # Contributing
