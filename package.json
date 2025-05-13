@@ -41,8 +41,7 @@
   },
   "files": [
     "dist",
-    "LICENSE",
-    "logo.svg"
+    "LICENSE"
   ],
   "dependencies": {
     "@hyphen/openfeature-server-provider": "^1.0.7",
