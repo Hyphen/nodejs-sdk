@@ -1,45 +1,59 @@
-<svg width="201" height="175" viewBox="0 0 201 175" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_2017_505)">
-<path d="M165.198 51.6099C161.618 56.9699 94.8281 173.48 94.8281 173.48L137.278 174.31C146.618 174.31 153.138 170.29 156.908 163.76L200.998 87.3999C200.998 87.3999 184.068 57.3799 180.338 51.6099C176.608 45.8399 168.968 45.9699 165.198 51.6099Z" fill="url(#paint0_linear_2017_505)"/>
-<path d="M137.282 174.31C146.622 174.31 153.142 170.29 156.912 163.76L158.082 161.73C155.172 166.58 150.412 172.21 143.882 162.31C139.122 155.08 100.492 87.1602 100.492 87.1602L50.1719 174.32H137.272L137.282 174.31Z" fill="url(#paint1_linear_2017_505)"/>
-<path d="M35.8 122.7C39.39 117.32 106.22 0.74 106.22 0.74L63.72 0C54.38 0 47.86 4.02 44.09 10.55L0 86.92C0 86.92 16.93 116.94 20.66 122.71C24.39 128.48 32.03 128.35 35.8 122.71V122.7Z" fill="url(#paint2_linear_2017_505)"/>
-<path d="M63.7219 0C54.3819 0 47.8619 4.02 44.0919 10.55L42.9219 12.58C45.8319 7.73 50.5919 2.1 57.1219 12C61.8819 19.23 100.512 87.15 100.512 87.15L150.822 0H63.7219Z" fill="url(#paint3_linear_2017_505)"/>
-</g>
-<defs>
-<linearGradient id="paint0_linear_2017_505" x1="52.4081" y1="171.44" x2="282.308" y2="38.7099" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FA0A64"/>
-<stop offset="0.11" stop-color="#FA125F"/>
-<stop offset="0.28" stop-color="#FA2B52"/>
-<stop offset="0.49" stop-color="#FB533D"/>
-<stop offset="0.75" stop-color="#FD8920"/>
-<stop offset="1" stop-color="#FFC800"/>
-</linearGradient>
-<linearGradient id="paint1_linear_2017_505" x1="104.132" y1="173.69" x2="104.132" y2="0.110153" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFC800"/>
-<stop offset="0.11" stop-color="#FEBF04"/>
-<stop offset="0.28" stop-color="#FEA611"/>
-<stop offset="0.49" stop-color="#FD7E26"/>
-<stop offset="0.75" stop-color="#FB4843"/>
-<stop offset="1" stop-color="#FA0A64"/>
-</linearGradient>
-<linearGradient id="paint2_linear_2017_505" x1="148.69" y1="2.82" x2="-81.37" y2="135.64" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FA0A64"/>
-<stop offset="0.11" stop-color="#FA125F"/>
-<stop offset="0.28" stop-color="#FA2B52"/>
-<stop offset="0.49" stop-color="#FB533D"/>
-<stop offset="0.75" stop-color="#FD8920"/>
-<stop offset="1" stop-color="#FFC800"/>
-</linearGradient>
-<linearGradient id="paint3_linear_2017_505" x1="96.8719" y1="0.63" x2="96.8719" y2="174.2" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FFC800"/>
-<stop offset="0.11" stop-color="#FEBF04"/>
-<stop offset="0.28" stop-color="#FEA611"/>
-<stop offset="0.49" stop-color="#FD7E26"/>
-<stop offset="0.75" stop-color="#FB4843"/>
-<stop offset="1" stop-color="#FA0A64"/>
-</linearGradient>
-<clipPath id="clip0_2017_505">
-<rect width="201" height="174.31" fill="white"/>
-</clipPath>
-</defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 500 500">
+  <!-- Generator: Adobe Illustrator 29.5.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 137)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: url(#linear-gradient2);
+      }
+
+      .st1 {
+        fill: url(#linear-gradient1);
+      }
+
+      .st2 {
+        fill: url(#linear-gradient3);
+      }
+
+      .st3 {
+        fill: url(#linear-gradient);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="144.47" y1="67.13" x2="648.76" y2="358.29" gradientTransform="translate(0 502) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fa0a64"/>
+      <stop offset=".11" stop-color="#fa135f"/>
+      <stop offset=".28" stop-color="#fb2b52"/>
+      <stop offset=".49" stop-color="#fc533e"/>
+      <stop offset=".75" stop-color="#fd8a21"/>
+      <stop offset="1" stop-color="#ffc800"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient1" x1="-8270.41" y1="3296.5" x2="-8270.41" y2="2915.75" gradientTransform="translate(-8012.49 -2856.7) rotate(-180) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc800"/>
+      <stop offset=".11" stop-color="#ffbf05"/>
+      <stop offset=".28" stop-color="#fea712"/>
+      <stop offset=".49" stop-color="#fd7f26"/>
+      <stop offset=".75" stop-color="#fc4843"/>
+      <stop offset="1" stop-color="#fa0a64"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient2" x1="-6709.98" y1="2836.03" x2="-6205.33" y2="3127.38" gradientTransform="translate(-6354.31 -2771.03) rotate(-180) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fa0a64"/>
+      <stop offset=".11" stop-color="#fa135f"/>
+      <stop offset=".28" stop-color="#fb2b52"/>
+      <stop offset=".49" stop-color="#fc533e"/>
+      <stop offset=".75" stop-color="#fd8a21"/>
+      <stop offset="1" stop-color="#ffc800"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient3" x1="-1416.15" y1="527.47" x2="-1416.15" y2="146.72" gradientTransform="translate(1658.18 587.67) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffc800"/>
+      <stop offset=".11" stop-color="#ffbf05"/>
+      <stop offset=".28" stop-color="#fea712"/>
+      <stop offset=".49" stop-color="#fd7f26"/>
+      <stop offset=".75" stop-color="#fc4843"/>
+      <stop offset="1" stop-color="#fa0a64"/>
+    </linearGradient>
+  </defs>
+  <path class="st3" d="M391.88,172.03c-7.88,11.76-154.27,267.33-154.27,267.33l93.12,1.76c20.49,0,34.78-8.82,43.05-23.16l96.72-167.55s-37.23-65.68-45.41-78.39c-8.18-12.72-24.94-12.38-33.21,0Z"/>
+  <path class="st1" d="M330.64,441.18c20.49,0,34.78-8.82,43.05-23.16l2.57-4.46c-6.38,10.58-16.83,22.93-31.15,1.27-10.44-15.87-95.24-164.85-95.24-164.85l-110.32,191.2h191.07Z"/>
+  <path class="st0" d="M108.04,327.97c7.88-11.8,154.48-267.53,154.48-267.53l-93.24-1.62c-20.49,0-34.78,8.82-43.05,23.16L29.5,249.47s37.14,65.84,45.33,78.5,24.94,12.38,33.21,0Z"/>
+  <path class="st2" d="M169.27,58.82c-20.49,0-34.78,8.82-43.05,23.16l-2.57,4.46c6.38-10.58,16.83-22.93,31.15-1.27,10.44,15.87,95.24,164.85,95.24,164.85l110.39-191.18-191.14-.02Z"/>
 </svg>
