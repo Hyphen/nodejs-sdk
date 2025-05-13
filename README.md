@@ -165,7 +165,60 @@ console.log('Boolean toggle value:', result); // true
 | *getBoolean* | `key: string, defaultValue: boolean, options?: { context?: Context }` | Get the value of a boolean toggle. |
 | *getNumber* | `key: string, defaultValue: number, options?: { context?: Context }` | Get the value of a number toggle. |
 | *getString* | `key: string, defaultValue: string, options?: { context?: Context }` | Get the value of a string toggle. |
-| *getObject* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a json toggle. |
+| *getObject<Type>* | `key: string, defaultValue: any, options?: { context?: Context }` | Get the value of a object toggle. |
+
+## Toggle Hooks
+
+The following hooks are available for Toggle:
+| Hook | object | Description |
+|----------------|----------------|----------------|
+| *beforeGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleRequestOptions }` | Called before the boolean toggle is fetched. |
+| *afterGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleRequestOptions, result: boolean }` | Called after the boolean toggle is fetched. |
+| *beforeGetNumber* | `{ key: string, defaultValue:number, options?: ToggleRequestOptions }` | Called before the number toggle is fetched. |
+| *afterGetNumber* | `{ key: string, defaultValue:number, options?: ToggleRequestOptions, result: number }` | Called after the number toggle is fetched. |
+| *beforeGetString* | `{ key: string, defaultValue:string, options?: ToggleRequestOptions }` | Called before the string toggle is fetched. |
+| *afterGetString* | `{ key: string, defaultValue:string, options?: ToggleRequestOptions, result: string }` | Called after the string toggle is fetched. |
+| *beforeGetObject* | `{ key: string, defaultValue:any, options?: ToggleRequestOptions }` | Called before the object toggle is fetched. |
+| *afterGetObject* | `{ key: string, defaultValue:any, options?: ToggleRequestOptions, result: any }` | Called after the object toggle is fetched. |
+
+You can use the hooks to modify the request or the response. For example, you can use the `beforeGetBoolean` hook to log the request before it is sent to the server.
+
+```javascript
+import { Toggle, ToggleHooks, Context } from '@hyphen/sdk';
+
+const context: Context = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+};
+
+const toggle = new Toggle(toggleOptions);
+
+toggle.onHook(ToggleHooks.beforeGetBoolean, (data) => {
+  console.log('Before get boolean toggle:', data); // { key: 'hyphen-sdk-boolean', defaultValue: false }
+});
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+
+console.log('Boolean toggle value:', result); // true
+```
 
 # Contributing
 
@@ -200,3 +253,7 @@ Then run the tests with the following command:
 ```bash
 pnpm i && pnpm test
 ```
+
+# License and Copyright
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+The copyright for this project is held by Hyphen, Inc. All rights reserved.

@@ -7,6 +7,17 @@ import {HyphenProvider, type HyphenProviderOptions} from '@hyphen/openfeature-se
 
 export type Context = EvaluationContext;
 
+export enum ToggleHooks {
+	beforeGetBoolean = 'beforeGetBoolean',
+	afterGetBoolean = 'afterGetBoolean',
+	beforeGetString = 'beforeGetString',
+	afterGetString = 'afterGetString',
+	beforeGetNumber = 'beforeGetNumber',
+	afterGetNumber = 'afterGetNumber',
+	beforeGetObject = 'beforeGetObject',
+	afterGetObject = 'afterGetObject',
+}
+
 export type ToggleOptions = {
 	/**
 	 * Your application name
@@ -126,22 +137,88 @@ export class Toggle extends Hookified {
 	}
 
 	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleRequestOptions): Promise<boolean> {
+		const data = {
+			key,
+			defaultValue,
+			options,
+		};
+
+		await this.hook(ToggleHooks.beforeGetBoolean, data);
+
 		const client = await this.getClient();
-		return client.getBooleanValue(key, defaultValue, options?.context);
+
+		const result = await client.getBooleanValue(data.key, data.defaultValue, data.options?.context);
+
+		const resultData = {
+			key,
+			defaultValue,
+			options,
+			result,
+		};
+		await this.hook(ToggleHooks.afterGetBoolean, resultData);
+
+		return resultData.result;
 	}
 
 	public async getString(key: string, defaultValue: string, options?: ToggleRequestOptions): Promise<string> {
+		const data = {
+			key,
+			defaultValue,
+			options,
+		};
+		await this.hook(ToggleHooks.beforeGetString, data);
 		const client = await this.getClient();
-		return client.getStringValue(key, defaultValue, options?.context);
+
+		const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
+		const resultData = {
+			key,
+			defaultValue,
+			options,
+			result,
+		};
+		await this.hook(ToggleHooks.afterGetString, resultData);
+		return resultData.result;
 	}
 
 	public async getNumber(key: string, defaultValue: number, options?: ToggleRequestOptions): Promise<number> {
+		const data = {
+			key,
+			defaultValue,
+			options,
+		};
+		await this.hook(ToggleHooks.beforeGetNumber, data);
 		const client = await this.getClient();
-		return client.getNumberValue(key, defaultValue, options?.context);
+
+		const result = await client.getNumberValue(data.key, data.defaultValue, data.options?.context);
+		const resultData = {
+			key,
+			defaultValue,
+			options,
+			result,
+		};
+		await this.hook(ToggleHooks.afterGetNumber, resultData);
+
+		return resultData.result;
 	}
 
 	public async getObject<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
+		const data = {
+			key,
+			defaultValue,
+			options,
+		};
+		await this.hook(ToggleHooks.beforeGetObject, data);
 		const client = await this.getClient();
-		return client.getObjectValue(key, defaultValue as JsonValue, options?.context) as T;
+
+		const result = await client.getObjectValue(key, defaultValue as JsonValue, data.options?.context);
+		const resultData = {
+			key,
+			defaultValue,
+			options,
+			result,
+		};
+		await this.hook(ToggleHooks.afterGetObject, resultData);
+
+		return resultData.result as T;
 	}
 }
