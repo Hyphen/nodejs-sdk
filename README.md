@@ -18,6 +18,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle API](#toggle-api)
 	- [Toggle Hooks](#toggle-hooks)
 	- [Toggle Error Handling](#toggle-error-handling)
+	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
