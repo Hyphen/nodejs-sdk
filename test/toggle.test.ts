@@ -15,7 +15,7 @@ if (!HYPHEN_PUBLIC_API_KEY || !HYPHEN_APPLICATION_ID) {
 }
 
 const defaultOptions = {
-	application: 'my-app',
+	applicationId: 'my-app',
 	publicKey: 'my-public-key',
 	environment: 'development',
 };
@@ -45,7 +45,7 @@ describe('Toggle', () => {
 
 	test('should have environment set by NODE_ENV', () => {
 		const toggle = new Toggle({
-			application: 'my-app',
+			applicationId: 'my-app',
 			publicKey: 'my-public-key',
 		});
 		expect(toggle.environment).toEqual('test');
@@ -54,16 +54,16 @@ describe('Toggle', () => {
 	test('should set options correctly', () => {
 		const toggle = new Toggle(defaultOptions);
 		expect(toggle.environment).toEqual('development');
-		expect(toggle.application).toEqual('my-app');
+		expect(toggle.applicationId).toEqual('my-app');
 	});
 
 	test('should update application and environment properties', () => {
 		const toggle = new Toggle(defaultOptions);
-		expect(toggle.application).toEqual('my-app');
+		expect(toggle.applicationId).toEqual('my-app');
 		expect(toggle.environment).toEqual('development');
-		toggle.application = 'new-app';
+		toggle.applicationId = 'new-app';
 		toggle.environment = 'production';
-		expect(toggle.application).toEqual('new-app');
+		expect(toggle.applicationId).toEqual('new-app');
 		expect(toggle.environment).toEqual('production');
 	});
 
@@ -85,7 +85,7 @@ describe('Toggle', () => {
 describe('Toggle Integration', () => {
 	test('should get a client and evaluate a feature flag', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -97,7 +97,7 @@ describe('Toggle Integration', () => {
 
 	test('should get a string value from a feature flag', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -109,7 +109,7 @@ describe('Toggle Integration', () => {
 
 	test('should get a number value from a feature flag', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -121,7 +121,7 @@ describe('Toggle Integration', () => {
 
 	test('should get a json / object value from a feature flag', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -133,7 +133,7 @@ describe('Toggle Integration', () => {
 
 	test('should be able to use type inference for boolean', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -145,7 +145,7 @@ describe('Toggle Integration', () => {
 
 	test('should be able to use type inference for string', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -157,7 +157,7 @@ describe('Toggle Integration', () => {
 
 	test('should be able to use type inference for json', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
@@ -169,7 +169,7 @@ describe('Toggle Integration', () => {
 
 	test('should be able to use type inference for number', async () => {
 		const toggle = new Toggle({
-			application: HYPHEN_APPLICATION_ID,
+			applicationId: HYPHEN_APPLICATION_ID,
 			publicKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
