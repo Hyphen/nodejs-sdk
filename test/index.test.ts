@@ -5,7 +5,7 @@ describe('hyphen sdk', () => {
 	test('should create an instance of Toggle', () => {
 		const toggle = new Toggle({
 			applicationId: 'my-app',
-			publicKey: 'my-public-key',
+			publicApiKey: 'public_my-public-key',
 			environment: 'development',
 		});
 		expect(toggle).toBeInstanceOf(Toggle);

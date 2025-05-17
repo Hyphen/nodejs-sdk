@@ -26,10 +26,10 @@ export type ToggleOptions = {
 	applicationId: string;
 
 	/**
-	 * Your Hyphen API key
+	 * Your Hyphen Public API key
 	 * @type {string}
 	 */
-	publicKey: string;
+	publicApiKey: string;
 
 	/**
 	 * Your environment name such as development, production. Default is what is set at NODE_ENV
@@ -74,7 +74,7 @@ export type ToggleRequestOptions = {
 
 export class Toggle extends Hookified {
 	private _applicationId: string;
-	private _publicKey: string;
+	private _publicApiKey = '';
 	private _environment: string;
 	private _client: Client | undefined;
 	private _context: EvaluationContext | undefined;
@@ -84,7 +84,7 @@ export class Toggle extends Hookified {
 		super();
 
 		this._applicationId = options.applicationId;
-		this._publicKey = options.publicKey;
+		this.setPublicApiKey(options.publicApiKey);
 		this._environment = options.environment ?? process.env.NODE_ENV ?? 'development';
 		this._context = options.context;
 		this._throwErrors = options.throwErrors ?? false;
@@ -99,12 +99,12 @@ export class Toggle extends Hookified {
 		this._applicationId = value;
 	}
 
-	public get publicKey(): string {
-		return this._publicKey;
+	public get publicApiKey(): string {
+		return this._publicApiKey;
 	}
 
-	public set publicKey(value: string) {
-		this._publicKey = value;
+	public set publicApiKey(value: string) {
+		this.setPublicApiKey(value);
 	}
 
 	public get environment(): string {
@@ -153,7 +153,7 @@ export class Toggle extends Hookified {
 				environment: this._environment,
 				horizonUrls: this._uris,
 			} as HyphenProviderOptions;
-			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicKey, options));
+			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicApiKey, options));
 			this._client = OpenFeature.getClient(this._context);
 		}
 
@@ -304,5 +304,19 @@ export class Toggle extends Hookified {
 		}
 
 		return defaultValue;
+	}
+
+	public setPublicApiKey(key: string): void {
+		if (!key.startsWith('public_')) {
+			this.emit('error', new Error('Public API key should start with public_'));
+			if (process.env.NODE_ENV !== 'production') {
+				console.error('Public API key should start with public_');
+			}
+
+			return;
+		}
+
+		this._publicApiKey = key;
+		this._client = undefined;
 	}
 }
