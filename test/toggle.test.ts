@@ -1,6 +1,8 @@
 import process from 'node:process';
 import dotenv from 'dotenv';
-import {describe, expect, test} from 'vitest';
+import {
+	describe, expect, test, vi,
+} from 'vitest';
 import {Toggle, type ToggleContext} from '../src/toggle.js';
 
 dotenv.config();
@@ -16,7 +18,7 @@ if (!HYPHEN_PUBLIC_API_KEY || !HYPHEN_APPLICATION_ID) {
 
 const defaultOptions = {
 	applicationId: 'my-app',
-	publicKey: 'my-public-key',
+	publicApiKey: 'public_my-public-key',
 	environment: 'development',
 };
 
@@ -63,7 +65,7 @@ describe('Toggle', () => {
 	test('should have environment set by NODE_ENV', () => {
 		const toggle = new Toggle({
 			applicationId: 'my-app',
-			publicKey: 'my-public-key',
+			publicApiKey: 'public_my-public-key',
 		});
 		expect(toggle.environment).toEqual('test');
 	});
@@ -94,9 +96,15 @@ describe('Toggle', () => {
 
 	test('should set the public key', () => {
 		const toggle = new Toggle(defaultOptions);
-		expect(toggle.publicKey).toEqual('my-public-key');
-		toggle.publicKey = 'new-public-key';
-		expect(toggle.publicKey).toEqual('new-public-key');
+		expect(toggle.publicApiKey).toEqual('public_my-public-key');
+		toggle.publicApiKey = 'public_new-public-key';
+		expect(toggle.publicApiKey).toEqual('public_new-public-key');
+	});
+
+	test('should warn if it is not a public key', () => {
+		const toggle = new Toggle(defaultOptions);
+		toggle.setPublicApiKey('new-public-key');
+		expect(toggle.publicApiKey).toEqual('public_my-public-key');
 	});
 
 	test('should set the context', () => {
@@ -108,7 +116,7 @@ describe('Toggle', () => {
 	test('should set throwErrors', () => {
 		const options = {
 			applicationId: 'my-app',
-			publicKey: 'my-public-key',
+			publicApiKey: 'public_my-public-key',
 			environment: 'development',
 			throwErrors: true,
 		};
@@ -130,7 +138,7 @@ describe('Toggle Integration', () => {
 	test('should get a client and evaluate a feature flag', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -142,7 +150,7 @@ describe('Toggle Integration', () => {
 	test('should get a string value from a feature flag', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -154,7 +162,7 @@ describe('Toggle Integration', () => {
 	test('should get a number value from a feature flag', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -166,7 +174,7 @@ describe('Toggle Integration', () => {
 	test('should get a json / object value from a feature flag', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -178,7 +186,7 @@ describe('Toggle Integration', () => {
 	test('should be able to use type inference for boolean', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -190,7 +198,7 @@ describe('Toggle Integration', () => {
 	test('should be able to use type inference for string', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -202,7 +210,7 @@ describe('Toggle Integration', () => {
 	test('should be able to use type inference for json', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -214,7 +222,7 @@ describe('Toggle Integration', () => {
 	test('should be able to use type inference for number', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 		toggle.setContext(context);
@@ -228,7 +236,7 @@ describe('Toggle Context', async () => {
 	test('should get a client with context and eval', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 			context,
 		});
@@ -240,7 +248,7 @@ describe('Toggle Context', async () => {
 	test('should get a boolean with context override', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
@@ -251,7 +259,7 @@ describe('Toggle Context', async () => {
 	test('should get a string with context override', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
@@ -261,7 +269,7 @@ describe('Toggle Context', async () => {
 	test('should get a number with context override', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
@@ -271,7 +279,7 @@ describe('Toggle Context', async () => {
 	test('should get a json with context override', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
@@ -284,7 +292,7 @@ describe('Toggle Hooks', () => {
 	test('should call beforeGetBoolean hook', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
@@ -304,7 +312,7 @@ describe('Toggle Hooks', () => {
 	test('should call afterGetBoolean hook', async () => {
 		const toggle = new Toggle({
 			applicationId: HYPHEN_APPLICATION_ID,
-			publicKey: HYPHEN_PUBLIC_API_KEY,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
 			environment: 'production',
 		});
 
