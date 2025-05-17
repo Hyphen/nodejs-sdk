@@ -69,6 +69,10 @@ export type ToggleOptions = {
 };
 
 export type ToggleRequestOptions = {
+	/**
+	 * The context to use for evaluating feature flags
+	 * @type {ToggleContext}
+	 */
 	context?: ToggleContext;
 };
 
@@ -80,6 +84,10 @@ export class Toggle extends Hookified {
 	private _context: EvaluationContext | undefined;
 	private _throwErrors = false;
 	private _uris?: string[];
+	/*
+	 * Create a new Toggle instance. This will create a new client and set the options.
+	 * @param {ToggleOptions}
+	*/
 	constructor(options: ToggleOptions) {
 		super();
 
@@ -91,60 +99,139 @@ export class Toggle extends Hookified {
 		this._uris = options.uris;
 	}
 
+	/**
+	 * Get the application ID
+	 * @returns {string}
+	 */
 	public get applicationId(): string {
 		return this._applicationId;
 	}
 
+	/**
+	 * Set the application ID
+	 * @param {string} value
+	 */
 	public set applicationId(value: string) {
 		this._applicationId = value;
 	}
 
+	/**
+	 * Get the public API key
+	 * @returns {string}
+	 */
 	public get publicApiKey(): string {
 		return this._publicApiKey;
 	}
 
+	/**
+	 * Set the public API key
+	 * @param {string} value
+	 */
 	public set publicApiKey(value: string) {
 		this.setPublicApiKey(value);
 	}
 
+	/**
+	 * Get the environment
+	 * @returns {string}
+	 */
 	public get environment(): string {
 		return this._environment;
 	}
 
+	/**
+	 * Set the environment
+	 * @param {string} value
+	 */
 	public set environment(value: string) {
 		this._environment = value;
 	}
 
+	/**
+	 * Get the throwErrors. If true, errors will be thrown in addition to being emitted.
+	 * @returns {boolean}
+	 */
 	public get throwErrors(): boolean {
 		return this._throwErrors;
 	}
 
+	/**
+	 * Set the throwErrors. If true, errors will be thrown in addition to being emitted.
+	 * @param {boolean} value
+	 */
 	public set throwErrors(value: boolean) {
 		this._throwErrors = value;
 	}
 
+	/**
+	 * Get the current context. This is the default context used. You can override this at the get function level.
+	 * @returns {ToggleContext}
+	 */
 	public get context(): ToggleContext | undefined {
 		return this._context;
 	}
 
+	/**
+	 * Set the context. This is the default context used. You can override this at the get function level.
+	 * @param {ToggleContext} value
+	 */
 	public set context(value: ToggleContext | undefined) {
 		this._context = value;
 	}
 
+	/**
+	 * Get the URIs. This is used to override the default URIs for testing or if you are using a self-hosted version.
+	 * @returns {Array<string>}
+	 */
 	public get uris(): string[] | undefined {
 		return this._uris;
 	}
 
+	/**
+	 * Set the URIs. This is used to override the default URIs for testing or if you are using a self-hosted version.
+	 * @param {Array<string>} value
+	 */
 	public set uris(value: string[] | undefined) {
 		this._uris = value;
 	}
 
+	/**
+	 * This is a helper function to set the public API key. It will check if the key starts with public_ and set it. If it
+	 * does set it will also set the client to undefined to force a new one to be created. If it does not, 
+	 * it will emit an error and console warning and not set the key. Used by the constructor and publicApiKey setter.
+	 * @param key 
+	 * @returns 
+	 */
+	public setPublicApiKey(key: string): void {
+		if (!key.startsWith('public_')) {
+			this.emit('error', new Error('Public API key should start with public_'));
+			if (process.env.NODE_ENV !== 'production') {
+				console.error('Public API key should start with public_');
+			}
+
+			return;
+		}
+
+		this._publicApiKey = key;
+		this._client = undefined;
+	}
+
+	/**
+	 * Set the context. This is the default context used. You can override this at the get function level.
+	 * @param {ToggleContext} context
+	 */
 	public setContext(context: ToggleContext): void {
 		this._context = context;
 		// Reset the client to force a new one to be created
 		this._client = undefined;
 	}
 
+	/**
+	 * Helper function to get the client. This will create a new client if one does not exist. It will also set the
+	 * application ID, environment, and URIs if they are not set. This is used by the get function to get the client.
+	 * This is normally only used internally.
+	 * @returns {Promise<Client>}
+	 */
 	public async getClient(): Promise<Client> {
 		if (!this._client) {
 			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -160,6 +247,14 @@ export class Toggle extends Hookified {
 		return this._client;
 	}
 
+	/**
+	 * This is the main function to get a feature flag value. It will check the type of the default value and call the
+	 * appropriate function. It will also set the context if it is not set.
+	 * @param {string} key - The key of the feature flag
+	 * @param {T} defaultValue - The default value to return if the feature flag is not set or does not evaluate.
+	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
+	 * @returns {Promise<T>}
+	 */
 	public async get<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
 		switch (typeof defaultValue) {
 			case 'boolean': {
@@ -180,6 +275,14 @@ export class Toggle extends Hookified {
 		}
 	}
 
+	/**
+	 * Get a boolean value from the feature flag. This will check the type of the default value and call the
+	 * appropriate function. It will also set the context if it is not set.
+	 * @param {string} key - The key of the feature flag
+	 * @param {boolean} defaultValue - The default value to return if the feature flag is not set or does not evaluate.
+	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
+	 * @returns {Promise<boolean>} - The value of the feature flag
+	 */
 	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleRequestOptions): Promise<boolean> {
 		try {
 			const data = {
@@ -214,6 +317,13 @@ export class Toggle extends Hookified {
 		return defaultValue;
 	}
 
+	/**
+	 * Get a string value from the feature flag.
+	 * @param {string} key - The key of the feature flag
+	 * @param {string} defaultValue - The default value to return if the feature flag is not set or does not evaluate.
+	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
+	 * @returns {Promise<string>} - The value of the feature flag
+	 */
 	public async getString(key: string, defaultValue: string, options?: ToggleRequestOptions): Promise<string> {
 		try {
 			const data = {
@@ -275,6 +385,14 @@ export class Toggle extends Hookified {
 		return defaultValue;
 	}
 
+	/**
+	 * Get an object value from the feature flag. This will check the type of the default value and call the
+	 * appropriate function. It will also set the context if it is not set.
+	 * @param {string} key - The key of the feature flag
+	 * @param {T} defaultValue - The default value to return if the feature flag is not set or does not evaluate.
+	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
+	 * @returns {Promise<T>} - The value of the feature flag
+	 */
 	public async getObject<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
 		try {
 			const data = {
@@ -304,19 +422,5 @@ export class Toggle extends Hookified {
 		}
 
 		return defaultValue;
-	}
-
-	public setPublicApiKey(key: string): void {
-		if (!key.startsWith('public_')) {
-			this.emit('error', new Error('Public API key should start with public_'));
-			if (process.env.NODE_ENV !== 'production') {
-				console.error('Public API key should start with public_');
-			}
-
-			return;
-		}
-
-		this._publicApiKey = key;
-		this._client = undefined;
 	}
 }
