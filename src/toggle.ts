@@ -197,10 +197,10 @@ export class Toggle extends Hookified {
 
 	/**
 	 * This is a helper function to set the public API key. It will check if the key starts with public_ and set it. If it
-	 * does set it will also set the client to undefined to force a new one to be created. If it does not, 
+	 * does set it will also set the client to undefined to force a new one to be created. If it does not,
 	 * it will emit an error and console warning and not set the key. Used by the constructor and publicApiKey setter.
-	 * @param key 
-	 * @returns 
+	 * @param key
+	 * @returns
 	 */
 	public setPublicApiKey(key: string): void {
 		if (!key.startsWith('public_')) {
@@ -256,6 +256,7 @@ export class Toggle extends Hookified {
 	 * @returns {Promise<T>}
 	 */
 	public async get<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
+		// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 		switch (typeof defaultValue) {
 			case 'boolean': {
 				return this.getBoolean(key, defaultValue as boolean, options) as Promise<T>;

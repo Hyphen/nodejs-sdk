@@ -8,9 +8,9 @@ import {Toggle, type ToggleContext} from '../src/toggle.js';
 dotenv.config();
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const HYPHEN_PUBLIC_API_KEY = process.env.HYPHEN_PUBLIC_API_KEY;
+const {HYPHEN_PUBLIC_API_KEY} = process.env;
 // eslint-disable-next-line @typescript-eslint/naming-convention
-const HYPHEN_APPLICATION_ID = process.env.HYPHEN_APPLICATION_ID;
+const {HYPHEN_APPLICATION_ID} = process.env;
 
 if (!HYPHEN_PUBLIC_API_KEY || !HYPHEN_APPLICATION_ID) {
 	throw new Error('HYPHEN_PUBLIC_API_KEY and HYPHEN_APPLICATION_ID must be set for tests to run.');
