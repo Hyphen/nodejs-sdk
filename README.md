@@ -17,6 +17,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle API](#toggle-api)
 	- [Toggle Hooks](#toggle-hooks)
 	- [Toggle Error Handling](#toggle-error-handling)
+	- [Toggle Caching](#toggle-caching)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
@@ -167,7 +168,7 @@ console.log('Boolean toggle value:', result); // true
 | *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
 | *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
 | *context?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
-| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Whether to use the cache or not and a function to set the key |
+| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Whether to use the cache or not and a function to set the key. The `ttl` is in seconds |
 
 ## Toggle API
 
@@ -309,6 +310,89 @@ try {
 } catch (error) {
   console.error('Error fetching toggle:', error);
 }
+```
+
+## Toggle Caching
+The SDK supports caching of toggle values to improve performance and reduce the number of requests made to the server. You can enable caching by providing a `caching` option in the constructor.
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+  uris: [
+	'https://your-self-hosted-horizon-url',
+  ],
+  caching: {
+	ttl: 60, // Cache for 60 seconds
+};
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
+If you want to use a custom cache key generation function, you can provide a `generateCacheKeyFn` function in the `caching` option:
+
+```javascript
+import { Toggle, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const toggleOptions = {
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+  context: context,
+  uris: [
+	'https://your-self-hosted-horizon-url',
+  ],
+  caching: {
+	ttl: 60, // Cache for 60 seconds
+	generateCacheKeyFn: (context) => {
+		return `toggle-${context?.targetingKey || 'default'}-hyphen-sdk-boolean`;
+	},
+  },
+};
+
+const toggle = new Toggle(toggleOptions);
+
+const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
 ```
 
 ## Toggle Self-Hosted
