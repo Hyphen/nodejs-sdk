@@ -167,7 +167,7 @@ console.log('Boolean toggle value:', result); // true
 | *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
 | *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
 | *context?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
-| *cache?* | `{ ttl: number}` | Whether to use the cache or not. |
+| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Whether to use the cache or not and a function to set the key |
 
 ## Toggle API
 
