@@ -329,3 +329,50 @@ describe('Toggle Hooks', () => {
 		expect(hookCalled).toBe(true);
 	});
 });
+
+describe('Toggle Caching', () => {
+	test('should be able to set caching options', () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+			caching: {
+				ttl: 60_000, // 1 minute
+			},
+		});
+		expect(toggle.caching).toEqual({
+			ttl: 60_000,
+		});
+
+		toggle.caching = {
+			ttl: 120_000, // 2 minutes
+			generateCacheKeyFn(context?: {targetingKey?: string}) {
+				return `custom-cache-key-${context?.targetingKey ?? ''}`;
+			},
+		};
+
+		expect(toggle.caching).toEqual({
+			ttl: 120_000,
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			generateCacheKeyFn: expect.any(Function),
+		});
+	});
+	test('should cache boolean value', async () => {
+		const toggle = new Toggle({
+			applicationId: HYPHEN_APPLICATION_ID,
+			publicApiKey: HYPHEN_PUBLIC_API_KEY,
+			environment: 'production',
+			caching: {
+				ttl: 60_000, // 1 minute
+			},
+		});
+
+		toggle.setContext(context);
+
+		const value1 = await toggle.getBoolean('hyphen-sdk-boolean', false);
+		expect(value1).toBe(true);
+
+		const value2 = await toggle.getBoolean('hyphen-sdk-boolean', false);
+		expect(value2).toBe(true); // Should be cached
+	});
+});
