@@ -18,7 +18,7 @@ export enum ToggleHooks {
 	afterGetObject = 'afterGetObject',
 }
 
-export type ToggleCacheOptions = {
+export type ToggleCachingOptions = {
 	ttl?: number;
 	generateCacheKeyFn?: (context?: ToggleContext) => string;
 };
@@ -49,7 +49,11 @@ export type ToggleOptions = {
 	 */
 	context?: ToggleContext;
 
-	caching?: ToggleCacheOptions;
+	/**
+	 * Cache options to use for the request
+	 * @type {ToggleCachingOptions}
+	 */
+	caching?: ToggleCachingOptions;
 
 	/**
 	 * Throw errors in addition to emitting them
@@ -75,9 +79,9 @@ export type ToggleGetOptions = {
 	context?: ToggleContext;
 	/**
 	 * Cache options to use for the request
-	 * @type {ToggleCacheOptions}
+	 * @type {ToggleCachingOptions}
 	 */
-	cache?: ToggleCacheOptions;
+	caching?: ToggleCachingOptions;
 };
 
 export class Toggle extends Hookified {
@@ -87,7 +91,8 @@ export class Toggle extends Hookified {
 	private _client: Client | undefined;
 	private _context: EvaluationContext | undefined;
 	private _throwErrors = false;
-	private _uris?: string[];
+	private _uris: string[] | undefined;
+	private _caching: ToggleCachingOptions | undefined;
 	/*
 	 * Create a new Toggle instance. This will create a new client and set the options.
 	 * @param {ToggleOptions}
@@ -101,6 +106,7 @@ export class Toggle extends Hookified {
 		this._context = options.context;
 		this._throwErrors = options.throwErrors ?? false;
 		this._uris = options.uris;
+		this._caching = options.caching;
 	}
 
 	/**
@@ -200,6 +206,22 @@ export class Toggle extends Hookified {
 	}
 
 	/**
+	 * Get the caching options.
+	 * @returns {ToggleCachingOptions | undefined}
+	 */
+	public get caching(): ToggleCachingOptions | undefined {
+		return this._caching;
+	}
+
+	/**
+	 * Set the caching options.
+	 * @param {ToggleCachingOptions | undefined} value
+	 */
+	public set caching(value: ToggleCachingOptions | undefined) {
+		this._caching = value;
+	}
+
+	/**
 	 * This is a helper function to set the public API key. It will check if the key starts with public_ and set it. If it
 	 * does set it will also set the client to undefined to force a new one to be created. If it does not,
 	 * it will emit an error and console warning and not set the key. Used by the constructor and publicApiKey setter.
@@ -243,6 +265,7 @@ export class Toggle extends Hookified {
 				application: this._applicationId,
 				environment: this._environment,
 				horizonUrls: this._uris,
+				cache: this._caching,
 			} as HyphenProviderOptions;
 			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicApiKey, options));
 			this._client = OpenFeature.getClient(this._context);
