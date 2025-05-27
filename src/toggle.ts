@@ -77,11 +77,6 @@ export type ToggleGetOptions = {
 	 * @type {ToggleContext}
 	 */
 	context?: ToggleContext;
-	/**
-	 * Cache options to use for the request
-	 * @type {ToggleCachingOptions}
-	 */
-	caching?: ToggleCachingOptions;
 };
 
 export class Toggle extends Hookified {
