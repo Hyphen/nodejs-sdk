@@ -68,7 +68,7 @@ export type ToggleOptions = {
 	uris?: string[];
 };
 
-export type ToggleRequestOptions = {
+export type ToggleGetOptions = {
 	/**
 	 * The context to use for evaluating feature flags
 	 * @type {ToggleContext}
@@ -255,7 +255,7 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<T>}
 	 */
-	public async get<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
+	public async get<T>(key: string, defaultValue: T, options?: ToggleGetOptions): Promise<T> {
 		// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 		switch (typeof defaultValue) {
 			case 'boolean': {
@@ -284,7 +284,7 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<boolean>} - The value of the feature flag
 	 */
-	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleRequestOptions): Promise<boolean> {
+	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleGetOptions): Promise<boolean> {
 		try {
 			const data = {
 				key,
@@ -325,7 +325,7 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<string>} - The value of the feature flag
 	 */
-	public async getString(key: string, defaultValue: string, options?: ToggleRequestOptions): Promise<string> {
+	public async getString(key: string, defaultValue: string, options?: ToggleGetOptions): Promise<string> {
 		try {
 			const data = {
 				key,
@@ -355,7 +355,7 @@ export class Toggle extends Hookified {
 		return defaultValue;
 	}
 
-	public async getNumber(key: string, defaultValue: number, options?: ToggleRequestOptions): Promise<number> {
+	public async getNumber(key: string, defaultValue: number, options?: ToggleGetOptions): Promise<number> {
 		try {
 			const data = {
 				key,
@@ -394,7 +394,7 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<T>} - The value of the feature flag
 	 */
-	public async getObject<T>(key: string, defaultValue: T, options?: ToggleRequestOptions): Promise<T> {
+	public async getObject<T>(key: string, defaultValue: T, options?: ToggleGetOptions): Promise<T> {
 		try {
 			const data = {
 				key,

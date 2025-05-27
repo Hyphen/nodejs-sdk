@@ -174,25 +174,25 @@ console.log('Boolean toggle value:', result); // true
 | Method | Parameters | Description |
 |----------------|----------------|----------------|
 | *setContext* | `context: ToggleContext` | Set the context for the toggle. This is optional. |
-| *get<Type>* | `key: string, defaultValue: T, options?: ToggleRequestOptions` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
-| *getBoolean* | `key: string, defaultValue: boolean, options?: ToggleRequestOptions` | Get the value of a boolean toggle. |
-| *getNumber* | `key: string, defaultValue: number, options?: ToggleRequestOptions` | Get the value of a number toggle. |
-| *getString* | `key: string, defaultValue: string, options?: ToggleRequestOptions` | Get the value of a string toggle. |
-| *getObject<Type>* | `key: string, defaultValue: any, options?: ToggleRequestOptions` | Get the value of a object toggle. |
+| *get<Type>* | `key: string, defaultValue: T, options?: ToggleGetOptions` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| *getBoolean* | `key: string, defaultValue: boolean, options?: ToggleGetOptions` | Get the value of a boolean toggle. |
+| *getNumber* | `key: string, defaultValue: number, options?: ToggleGetOptions` | Get the value of a number toggle. |
+| *getString* | `key: string, defaultValue: string, options?: ToggleGetOptions` | Get the value of a string toggle. |
+| *getObject<Type>* | `key: string, defaultValue: any, options?: ToggleGetOptions` | Get the value of a object toggle. |
 
 ## Toggle Hooks
 
 The following hooks are available for Toggle:
 | Hook | object | Description |
 |----------------|----------------|----------------|
-| *beforeGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleRequestOptions }` | Called before the boolean toggle is fetched. |
-| *afterGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleRequestOptions, result: boolean }` | Called after the boolean toggle is fetched. |
-| *beforeGetNumber* | `{ key: string, defaultValue:number, options?: ToggleRequestOptions }` | Called before the number toggle is fetched. |
-| *afterGetNumber* | `{ key: string, defaultValue:number, options?: ToggleRequestOptions, result: number }` | Called after the number toggle is fetched. |
-| *beforeGetString* | `{ key: string, defaultValue:string, options?: ToggleRequestOptions }` | Called before the string toggle is fetched. |
-| *afterGetString* | `{ key: string, defaultValue:string, options?: ToggleRequestOptions, result: string }` | Called after the string toggle is fetched. |
-| *beforeGetObject* | `{ key: string, defaultValue:any, options?: ToggleRequestOptions }` | Called before the object toggle is fetched. |
-| *afterGetObject* | `{ key: string, defaultValue:any, options?: ToggleRequestOptions, result: any }` | Called after the object toggle is fetched. |
+| *beforeGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleGetOptions }` | Called before the boolean toggle is fetched. |
+| *afterGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleGetOptions, result: boolean }` | Called after the boolean toggle is fetched. |
+| *beforeGetNumber* | `{ key: string, defaultValue:number, options?: ToggleGetOptions }` | Called before the number toggle is fetched. |
+| *afterGetNumber* | `{ key: string, defaultValue:number, options?: ToggleGetOptions, result: number }` | Called after the number toggle is fetched. |
+| *beforeGetString* | `{ key: string, defaultValue:string, options?: ToggleGetOptions }` | Called before the string toggle is fetched. |
+| *afterGetString* | `{ key: string, defaultValue:string, options?: ToggleGetOptions, result: string }` | Called after the string toggle is fetched. |
+| *beforeGetObject* | `{ key: string, defaultValue:any, options?: ToggleGetOptions }` | Called before the object toggle is fetched. |
+| *afterGetObject* | `{ key: string, defaultValue:any, options?: ToggleGetOptions, result: any }` | Called after the object toggle is fetched. |
 
 You can use the hooks to modify the request or the response. For example, you can use the `beforeGetBoolean` hook to log the request before it is sent to the server.
 
