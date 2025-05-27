@@ -1,3 +1,3 @@
 export {
-	Toggle, type ToggleContext, ToggleHooks, type ToggleOptions, type ToggleGetOptions,
+	Toggle, type ToggleContext, ToggleHooks, type ToggleOptions, type ToggleGetOptions, type ToggleCacheOptions
 } from './toggle.js';

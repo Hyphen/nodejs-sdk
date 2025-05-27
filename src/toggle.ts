@@ -18,6 +18,11 @@ export enum ToggleHooks {
 	afterGetObject = 'afterGetObject',
 }
 
+export type ToggleCacheOptions = {
+	ttl?: number;
+	generateCacheKeyFn?: (context?: ToggleContext) => string;
+};
+
 export type ToggleOptions = {
 	/**
 	 * Your application name
@@ -44,13 +49,7 @@ export type ToggleOptions = {
 	 */
 	context?: ToggleContext;
 
-	caching?: {
-		/**
-		 * The time in seconds to cache the feature flag values
-		 * @type {number} - this is in milliseconds
-		 */
-		ttl?: number;
-	};
+	caching?: ToggleCacheOptions;
 
 	/**
 	 * Throw errors in addition to emitting them
@@ -74,6 +73,11 @@ export type ToggleGetOptions = {
 	 * @type {ToggleContext}
 	 */
 	context?: ToggleContext;
+	/**
+	 * Cache options to use for the request
+	 * @type {ToggleCacheOptions}
+	 */
+	cache?: ToggleCacheOptions;
 };
 
 export class Toggle extends Hookified {
@@ -335,7 +339,7 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.beforeGetString, data);
 			const client = await this.getClient();
 
-			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
+			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context, );
 			const resultData = {
 				key,
 				defaultValue,
