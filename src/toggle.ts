@@ -362,7 +362,7 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.beforeGetString, data);
 			const client = await this.getClient();
 
-			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context, );
+			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
 			const resultData = {
 				key,
 				defaultValue,
