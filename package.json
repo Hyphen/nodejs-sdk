@@ -1,6 +1,6 @@
 {
   "name": "@hyphen/sdk",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Hyphen SDK for Node.js",
   "type": "module",
   "main": "dist/index.cjs",
@@ -11,12 +11,12 @@
       "require": "./dist/index.cjs"
     }
   },
-  "types": "dist/node/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "xo --fix && vitest run --coverage",
     "test:ci": "xo && vitest run --coverage",
     "build": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean",
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./dist pnpm-lock.yaml node_modules coverage",
     "prepublishOnly": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean"
   },
   "keywords": [
