@@ -132,6 +132,37 @@ describe('Toggle', () => {
 		const client = await toggle.getClient();
 		expect(client).toBeDefined();
 	});
+
+	test('should throw an error if no applicationId is set', async () => {
+		const toggle = new Toggle();
+		toggle.applicationId = undefined;
+		toggle.throwErrors = true;
+		let didThrow = false;
+		try {
+			await toggle.getClient();
+		} catch (error) {
+			didThrow = true;
+			expect(error).toBeInstanceOf(Error);
+		}
+
+		expect(didThrow).toBe(true);
+	});
+
+	test('should throw an error if no publicApiKey is set', async () => {
+		const toggle = new Toggle();
+		toggle.applicationId = defaultOptions.applicationId;
+		toggle.publicApiKey = undefined;
+		toggle.throwErrors = true;
+		let didThrow = false;
+		try {
+			await toggle.getClient();
+		} catch (error) {
+			didThrow = true;
+			expect(error).toBeInstanceOf(Error);
+		}
+
+		expect(didThrow).toBe(true);
+	});
 });
 
 describe('Toggle Integration', () => {
