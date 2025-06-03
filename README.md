@@ -18,6 +18,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Hooks](#toggle-hooks)
 	- [Toggle Error Handling](#toggle-error-handling)
 	- [Toggle Caching](#toggle-caching)
+	- [Toggle Environment Variables](#toggle-environment-variables)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
@@ -394,6 +395,17 @@ const toggle = new Toggle(toggleOptions);
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 console.log('Boolean toggle value:', result); // true
 ```
+
+# Toggle Environment Variables
+
+You can also use environment variables to set the `publicApiKey` and `applicationId`. This is useful for keeping your API keys secure and not hardcoding them in your code. To do this just set your `.env` file with the following variables:
+
+```bash
+HYPHEN_PUBLIC_API_KEY=your_public_api_key
+HYPHEN_APPLICATION_ID=your_application_id
+```
+
+On initialization of the `Toggle` class, the SDK will automatically check for these environment variables and use them if they are set. If they are not set, you will need to provide them in the constructor.
 
 ## Toggle Self-Hosted
 

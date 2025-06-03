@@ -1,9 +1,12 @@
 import process from 'node:process';
 import {Hookified} from 'hookified';
+import dotenv from 'dotenv';
 import {
 	type JsonValue, OpenFeature, type Client, type EvaluationContext,
 } from '@openfeature/server-sdk';
 import {HyphenProvider, type HyphenProviderOptions} from '@hyphen/openfeature-server-provider';
+
+dotenv.config();
 
 export type ToggleContext = EvaluationContext;
 
@@ -25,16 +28,16 @@ export type ToggleCachingOptions = {
 
 export type ToggleOptions = {
 	/**
-	 * Your application name
+	 * Your application name. If this is not set it will look for the HYPHEN_APPLICATION_ID environment variable.
 	 * @type {string}
 	 */
-	applicationId: string;
+	applicationId?: string;
 
 	/**
-	 * Your Hyphen Public API key
+	 * Your Hyphen Public API key. If this is not set it will look for the HYPHEN_PUBLIC_API_KEY environment variable.
 	 * @type {string}
 	 */
-	publicApiKey: string;
+	publicApiKey?: string;
 
 	/**
 	 * Your environment name such as development, production. Default is what is set at NODE_ENV
@@ -80,8 +83,8 @@ export type ToggleGetOptions = {
 };
 
 export class Toggle extends Hookified {
-	private _applicationId: string;
-	private _publicApiKey = '';
+	private _applicationId: string | undefined = process.env.HYPHEN_APPLICATION_ID;
+	private _publicApiKey: string | undefined = process.env.HYPHEN_PUBLIC_API_KEY;
 	private _environment: string;
 	private _client: Client | undefined;
 	private _context: EvaluationContext | undefined;
@@ -92,31 +95,35 @@ export class Toggle extends Hookified {
 	 * Create a new Toggle instance. This will create a new client and set the options.
 	 * @param {ToggleOptions}
 	*/
-	constructor(options: ToggleOptions) {
+	constructor(options?: ToggleOptions) {
 		super();
 
-		this._applicationId = options.applicationId;
-		this.setPublicApiKey(options.publicApiKey);
-		this._environment = options.environment ?? process.env.NODE_ENV ?? 'development';
-		this._context = options.context;
-		this._throwErrors = options.throwErrors ?? false;
-		this._uris = options.uris;
-		this._caching = options.caching;
+		this._throwErrors = options?.throwErrors ?? false;
+
+		this._applicationId = options?.applicationId;
+		if (options?.publicApiKey) {
+			this.setPublicApiKey(options.publicApiKey);
+		}
+
+		this._environment = options?.environment ?? process.env.NODE_ENV ?? 'development';
+		this._context = options?.context;
+		this._uris = options?.uris;
+		this._caching = options?.caching;
 	}
 
 	/**
 	 * Get the application ID
-	 * @returns {string}
+	 * @returns {string | undefined}
 	 */
-	public get applicationId(): string {
+	public get applicationId(): string | undefined {
 		return this._applicationId;
 	}
 
 	/**
 	 * Set the application ID
-	 * @param {string} value
+	 * @param {string | undefined} value
 	 */
-	public set applicationId(value: string) {
+	public set applicationId(value: string | undefined) {
 		this._applicationId = value;
 	}
 
@@ -124,7 +131,7 @@ export class Toggle extends Hookified {
 	 * Get the public API key
 	 * @returns {string}
 	 */
-	public get publicApiKey(): string {
+	public get publicApiKey(): string | undefined {
 		return this._publicApiKey;
 	}
 
@@ -132,7 +139,13 @@ export class Toggle extends Hookified {
 	 * Set the public API key
 	 * @param {string} value
 	 */
-	public set publicApiKey(value: string) {
+	public set publicApiKey(value: string | undefined) {
+		if (!value) {
+			this._publicApiKey = undefined;
+			this._client = undefined;
+			return;
+		}
+
 		this.setPublicApiKey(value);
 	}
 
@@ -255,6 +268,15 @@ export class Toggle extends Hookified {
 	 */
 	public async getClient(): Promise<Client> {
 		if (!this._client) {
+			console.log('Application ID:', this._applicationId);
+			if (this._applicationId === undefined || this._applicationId.length === 0) {
+				const errorMessage = 'Application ID is not set. You must set it before using the client or have the HYPHEN_APPLICATION_ID environment variable set.';
+				this.emit('error', new Error(errorMessage));
+				if (this._throwErrors) {
+					throw new Error(errorMessage);
+				}
+			}
+
 			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 			const options = {
 				application: this._applicationId,
@@ -262,7 +284,16 @@ export class Toggle extends Hookified {
 				horizonUrls: this._uris,
 				cache: this._caching,
 			} as HyphenProviderOptions;
-			await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicApiKey, options));
+
+			if (this._publicApiKey && this._publicApiKey.length > 0) {
+				await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicApiKey, options));
+			} else {
+				this.emit('error', new Error('Public API key is not set. You must set it before using the client or have the HYPHEN_PUBLIC_API_KEY environment variable set.'));
+				if (this._throwErrors) {
+					throw new Error('Public API key is not set');
+				}
+			}
+
 			this._client = OpenFeature.getClient(this._context);
 		}
 
