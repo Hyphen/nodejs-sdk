@@ -353,7 +353,7 @@ describe('Toggle Caching', () => {
 
 		expect(toggle.caching).toEqual({
 			ttl: 120_000,
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 			generateCacheKeyFn: expect.any(Function),
 		});
 	});
