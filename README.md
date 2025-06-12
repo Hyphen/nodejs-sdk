@@ -7,7 +7,7 @@
 
 # Hyphen Node.js SDK
 
-The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flagging and experimentation capabilities into their Node.js applications. With this SDK, you can manage feature flags more effectively, enabling you to control the rollout of new features and conduct A/B testing with ease.
+The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flag service [Toggle](https://hyphen.ai/toggle) into their Node.js applications. In addition to Toggle, the SDK also provides ENV management capabilities such as loading environment variables from `.env` files, managing environment variables.
 
 # Table of Contents
 - [Installation](#installation)
@@ -482,6 +482,36 @@ const toggle = new Toggle(toggleOptions);
 
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 console.log('Boolean toggle value:', result); // true
+```
+
+# ENV
+
+Hyphens secret management service known as [ENV](https://hyphen.ai/env) allows you to manage your environment variables in a secure way. The Hyphen Node.js SDK provides a simple way to access your environment variables.
+
+## Loading Environment Variables
+To load your environment variables, you can use the `loadEnv` function from the SDK. This function will automatically load your environment variables from the `.env` file and then override them with the environment based environment file if it exists (ex: `.env.development`). This is useful for managing different environments such as development, staging, and production.
+
+```javascript
+import { loadEnv } from '@hyphen/sdk';
+
+//load your default environment variables and envrionment variables
+loadEnv();
+```
+
+If your environment variables are not stored in the root of your project you can specify the path to your `.env` file:
+
+```javascript
+import { loadEnv } from '@hyphen/sdk';
+//load your default environment variables and envrionment variables
+loadEnv({ path: '/path/to/your/env/files/' });
+```
+
+You can also specify the environment variables to load by passing an array of variable names:
+
+```javascript
+import { loadEnv } from '@hyphen/sdk';
+//load your default environment variables and envrionment variables
+loadEnv({ environment: 'development' });
 ```
 
 # Contributing
