@@ -268,7 +268,6 @@ export class Toggle extends Hookified {
 	 */
 	public async getClient(): Promise<Client> {
 		if (!this._client) {
-			console.log('Application ID:', this._applicationId);
 			if (this._applicationId === undefined || this._applicationId.length === 0) {
 				const errorMessage = 'Application ID is not set. You must set it before using the client or have the HYPHEN_APPLICATION_ID environment variable set.';
 				this.emit('error', new Error(errorMessage));
