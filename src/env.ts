@@ -4,7 +4,7 @@ import path from 'node:path';
 import {config} from 'dotenv';
 
 export type LoadEnvOptions = {
-	currentWorkingDirectory?: string;
+	path?: string;
 	environment?: string;
 };
 
@@ -19,7 +19,7 @@ export type LoadEnvOptions = {
  */
 export function loadEnv(options?: LoadEnvOptions): void {
 	// Set the current working directory if provided
-	const currentWorkingDirectory = options?.currentWorkingDirectory ?? process.cwd();
+	const currentWorkingDirectory = options?.path ?? process.cwd();
 
 	// Load the default .env file
 	const envPath = path.resolve(currentWorkingDirectory, '.env');
@@ -33,7 +33,6 @@ export function loadEnv(options?: LoadEnvOptions): void {
 	if (environment) {
 		const envSpecificPath = path.resolve(currentWorkingDirectory, `.env.${environment}`);
 		if (fs.existsSync(envSpecificPath)) {
-			console.log(`Loading environment variables from: ${envSpecificPath}`);
 			config({path: envSpecificPath, override: true});
 		}
 	}
