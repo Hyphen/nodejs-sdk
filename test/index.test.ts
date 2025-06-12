@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {describe, expect, test} from 'vitest';
 import {Toggle} from '../src/index.js';
 
