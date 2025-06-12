@@ -136,3 +136,5 @@ dist
 .pnp.*
 pnpm-lock.yaml
 .DS_Store
+
+!test/fixtures/**
