@@ -496,6 +496,8 @@ The following override path is:
 .env -> .env.local -> .env.<environment> -> .env.<environment>.local
 ```
 
+Here is an example of how to use the `loadEnv` function:
+
 ```javascript
 import { loadEnv } from '@hyphen/sdk';
 
@@ -524,7 +526,7 @@ if you want to turn off the local environment variables you can do it like this:
 ```javascript
 import { loadEnv } from '@hyphen/sdk';
 //load your default environment variables and envrionment variables
-loadEnv({ environment: 'development', local: false });
+loadEnv({ local: false });
 ```
 
 # Contributing
