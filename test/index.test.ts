@@ -2,7 +2,7 @@
 import {describe, expect, test} from 'vitest';
 import {Toggle} from '../src/index.js';
 
-describe('hyphen sdk', () => {
+describe('Hyphen sdk', () => {
 	test('should create an instance of Toggle', () => {
 		const toggle = new Toggle({
 			applicationId: 'my-app',

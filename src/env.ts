@@ -6,6 +6,7 @@ import {config} from 'dotenv';
 export type LoadEnvOptions = {
 	path?: string;
 	environment?: string;
+	local?: boolean;
 };
 
 /**
@@ -18,6 +19,8 @@ export type LoadEnvOptions = {
  * loadEnv();
  */
 export function loadEnv(options?: LoadEnvOptions): void {
+	const local = options?.local ?? true;
+
 	// Set the current working directory if provided
 	const currentWorkingDirectory = options?.path ?? process.cwd();
 
@@ -27,6 +30,14 @@ export function loadEnv(options?: LoadEnvOptions): void {
 		config({path: envPath});
 	}
 
+	// Load the .env.local file if it exists
+	if (local) {
+		const localEnvPath = path.resolve(currentWorkingDirectory, '.env.local');
+		if (fs.existsSync(localEnvPath)) {
+			config({path: localEnvPath, override: true});
+		}
+	}
+
 	// Load the environment specific .env file
 	const environment = options?.environment ?? process.env.NODE_ENV;
 
@@ -34,6 +45,14 @@ export function loadEnv(options?: LoadEnvOptions): void {
 		const envSpecificPath = path.resolve(currentWorkingDirectory, `.env.${environment}`);
 		if (fs.existsSync(envSpecificPath)) {
 			config({path: envSpecificPath, override: true});
+		}
+
+		// Load the environment specific .env.local file if it exists
+		if (local) {
+			const envLocalPath = path.resolve(currentWorkingDirectory, `.env.${environment}.local`);
+			if (fs.existsSync(envLocalPath)) {
+				config({path: envLocalPath, override: true});
+			}
 		}
 	}
 }
