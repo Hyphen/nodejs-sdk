@@ -20,6 +20,8 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Caching](#toggle-caching)
 	- [Toggle Environment Variables](#toggle-environment-variables)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
+- [ENV](#env)
+	- [Loading Environment Variables](#loading-environment-variables)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
