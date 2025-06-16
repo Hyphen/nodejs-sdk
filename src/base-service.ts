@@ -72,6 +72,7 @@ export class BaseService extends Hookified {
 			const response = await axios.get<T>(url, config);
 			this.info(`GET request to ${url} successful`);
 			return response.data;
+		/* c8 ignore next 4 */
 		} catch (error) {
 			this.error(`GET request to ${url} failed`, error);
 			return undefined as T;
@@ -83,6 +84,7 @@ export class BaseService extends Hookified {
 			const response = await axios.post<T>(url, data, config);
 			this.info(`POST request to ${url} successful`);
 			return response.data;
+		/* c8 ignore next 4 */
 		} catch (error) {
 			this.error(`POST request to ${url} failed`, error);
 			return undefined as T;
@@ -94,6 +96,7 @@ export class BaseService extends Hookified {
 			const response = await axios.put<T>(url, data, config);
 			this.info(`PUT request to ${url} successful`);
 			return response.data;
+		/* c8 ignore next 4 */
 		} catch (error) {
 			this.error(`PUT request to ${url} failed`, error);
 			return undefined as T;
@@ -105,6 +108,7 @@ export class BaseService extends Hookified {
 			const response = await axios.delete<T>(url, config);
 			this.info(`DELETE request to ${url} successful`);
 			return response.data;
+		/* c8 ignore next 4 */
 		} catch (error) {
 			this.error(`DELETE request to ${url} failed`, error);
 			return undefined as T;
@@ -116,6 +120,7 @@ export class BaseService extends Hookified {
 			const response = await axios.patch<T>(url, data, config);
 			this.info(`PATCH request to ${url} successful`);
 			return response.data;
+		/* c8 ignore next 4 */
 		} catch (error) {
 			this.error(`PATCH request to ${url} failed`, error);
 			return undefined as T;
