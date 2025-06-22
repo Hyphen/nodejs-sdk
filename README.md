@@ -568,9 +568,12 @@ Once you have created the project, added the toggles, and created your applicati
 
 
 ```bash
-HYPHEN_PUBLIC_API_KEY=your_api_key
+HYPHEN_PUBLIC_API_KEY=your_public_api_key
+HYPHEN_API_KEY=your_api_key
 HYPHEN_APPLICATION_ID=your_project_id
 ```
+
+The `HYPHEN_PUBLIC_API_KEY` is the public API key for your Hyphen project, `HYPHEN_API_KEY` is the API key used for things such as `NetInfo` and is located under settings in the dashboard, and `HYPHEN_APPLICATION_ID` is the application ID for your Hyphen project.
 
 Then run the tests with the following command:
 
