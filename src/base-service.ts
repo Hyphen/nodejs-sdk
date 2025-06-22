@@ -7,6 +7,11 @@ export type BaseServiceOptions = {
 	throwErrors?: boolean;
 } & HookifiedOptions;
 
+export enum ErrorMessages {
+	API_KEY_REQUIRED = 'API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.',
+	PUBLIC_API_KEY_SHOULD_NOT_BE_USED = 'The provided API key is a public API key. Please provide a valid non public API key for authentication.',
+}
+
 export class BaseService extends Hookified {
 	private _log: pino.Logger = pino();
 	private _cache = new Cacheable();

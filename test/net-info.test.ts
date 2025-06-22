@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
 import process from 'node:process';
 import {describe, expect, test} from 'vitest';
+import {ErrorMessages} from '../src/base-service.js';
 import {NetInfo} from '../src/net-info.js';
 
 describe('NetInfo', () => {
@@ -31,7 +32,7 @@ describe('NetInfo', () => {
 		try {
 			const netInfo = new NetInfo({throwErrors: true});
 		} catch (error) {
-			expect(error).toEqual(new Error('API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.'));
+			expect(error).toEqual(new Error(ErrorMessages.API_KEY_REQUIRED));
 			didThrow = true;
 		}
 
@@ -51,7 +52,7 @@ describe('NetInfo', () => {
 		try {
 			const netInfo = new NetInfo({throwErrors: true, apiKey: 'public_api_key'});
 		} catch (error) {
-			expect(error).toEqual(new Error('The provided API key is a public API key. Please provide a valid API key for authentication.'));
+			expect(error).toEqual(new Error(ErrorMessages.PUBLIC_API_KEY_SHOULD_NOT_BE_USED));
 			didThrow = true;
 		}
 
