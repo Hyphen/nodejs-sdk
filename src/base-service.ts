@@ -70,7 +70,6 @@ export class BaseService extends Hookified {
 	public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
 		try {
 			const response = await axios.get<T>(url, config);
-			this.info(`GET request to ${url} successful`);
 			return response.data;
 		/* c8 ignore next 4 */
 		} catch (error) {
@@ -82,7 +81,6 @@ export class BaseService extends Hookified {
 	public async post<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
 		try {
 			const response = await axios.post<T>(url, data, config);
-			this.info(`POST request to ${url} successful`);
 			return response.data;
 		/* c8 ignore next 4 */
 		} catch (error) {
@@ -94,7 +92,6 @@ export class BaseService extends Hookified {
 	public async put<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
 		try {
 			const response = await axios.put<T>(url, data, config);
-			this.info(`PUT request to ${url} successful`);
 			return response.data;
 		/* c8 ignore next 4 */
 		} catch (error) {
@@ -106,7 +103,7 @@ export class BaseService extends Hookified {
 	public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
 		try {
 			const response = await axios.delete<T>(url, config);
-			this.info(`DELETE request to ${url} successful`);
+
 			return response.data;
 		/* c8 ignore next 4 */
 		} catch (error) {
@@ -118,7 +115,6 @@ export class BaseService extends Hookified {
 	public async patch<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
 		try {
 			const response = await axios.patch<T>(url, data, config);
-			this.info(`PATCH request to ${url} successful`);
 			return response.data;
 		/* c8 ignore next 4 */
 		} catch (error) {
