@@ -24,6 +24,13 @@ describe('NetInfo', () => {
 		expect(netInfo.apiKey).toBe('test_api_key2');
 	});
 
+	test('should allow setting and getting baseUri', () => {
+		const netInfo = new NetInfo({baseUri: 'https://example.com'});
+		expect(netInfo.baseUri).toBe('https://example.com');
+		netInfo.baseUri = 'https://another-example.com';
+		expect(netInfo.baseUri).toBe('https://another-example.com');
+	});
+
 	test('should throw an error if apiKey is not set', () => {
 		// Ensure that the environment variable is not set for this test
 		const originalApiKey = process.env.HYPHEN_API_KEY;
@@ -62,5 +69,45 @@ describe('NetInfo', () => {
 		if (originalApiKey) {
 			process.env.HYPHEN_API_KEY = originalApiKey;
 		}
+	});
+
+	test('should fail to fetch IP info without API key', async () => {
+		// Ensure that the environment variable is not set for this test
+		const originalApiKey = process.env.HYPHEN_API_KEY;
+		delete process.env.HYPHEN_API_KEY;
+		let didThrow = false;
+		try {
+			const netInfo = new NetInfo({throwErrors: true});
+			netInfo.apiKey = undefined; // Explicitly set apiKey to undefined
+			await netInfo.getIpInfo('1.1.1.1');
+		} catch (error) {
+			expect(error).toEqual(new Error(ErrorMessages.API_KEY_REQUIRED));
+			didThrow = true;
+		}
+
+		expect(didThrow).toBe(true);
+		// Restore the original environment variable
+		if (originalApiKey) {
+			process.env.HYPHEN_API_KEY = originalApiKey;
+		}
+	});
+
+	test('should fetch IP info failure', async () => {
+		// API key should be set in the environment variable HYPHEN_API_KEY
+		const netInfo = new NetInfo();
+		const ipInfo = await netInfo.getIpInfo('127.0.5.8.4'); // Invalid IP
+		expect(ipInfo).toBeDefined();
+		expect(ipInfo).toHaveProperty('ip', '127.0.5.8.4');
+		expect(ipInfo).toHaveProperty('type', 'error');
+		expect(ipInfo).toHaveProperty('errorMessage');
+	});
+
+	test('should fetch IP info successfully', async () => {
+		// API key should be set in the environment variable HYPHEN_API_KEY
+		const netInfo = new NetInfo();
+		const ipInfo = await netInfo.getIpInfo('8.8.8.8');
+		expect(ipInfo).toBeDefined();
+		expect(ipInfo).toHaveProperty('ip', '8.8.8.8');
+		expect(ipInfo).toHaveProperty('location');
 	});
 });

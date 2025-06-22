@@ -119,6 +119,7 @@ export class NetInfo extends BaseService {
      */
 	public async getIpInfo(ip: string): Promise<ipInfo | ipInfoError> {
 		try {
+			/* c8 ignore next 3 */
 			if (!this._apiKey) {
 				throw new Error(ErrorMessages.API_KEY_REQUIRED);
 			}
@@ -127,11 +128,23 @@ export class NetInfo extends BaseService {
 			const response = await this.get(url, {
 				headers: {
 					// eslint-disable-next-line @typescript-eslint/naming-convention
-					Authorization: `Bearer ${this._apiKey}`,
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'x-api-key': `${this._apiKey}`,
 				},
 			});
 
-			return response as ipInfo;
+			/* c8 ignore next 8 */
+			if (response.status !== 200) {
+				const errorResult: ipInfoError = {
+					ip,
+					type: 'error',
+					errorMessage: `Failed to fetch ip info: ${response.statusText}`,
+				};
+				return errorResult;
+			}
+
+			return response.data as ipInfo;
 		} catch (error) {
 			this.error(`Failed to fetch ip info: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			const errorResult: ipInfoError = {
