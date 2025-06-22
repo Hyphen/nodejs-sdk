@@ -7,6 +7,11 @@ export type BaseServiceOptions = {
 	throwErrors?: boolean;
 } & HookifiedOptions;
 
+export enum ErrorMessages {
+	API_KEY_REQUIRED = 'API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.',
+	PUBLIC_API_KEY_SHOULD_NOT_BE_USED = 'The provided API key is a public API key. Please provide a valid non public API key for authentication.',
+}
+
 export class BaseService extends Hookified {
 	private _log: pino.Logger = pino();
 	private _cache = new Cacheable();
@@ -67,59 +72,23 @@ export class BaseService extends Hookified {
 		this.emit('info', message, ...args);
 	}
 
-	public async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-		try {
-			const response = await axios.get<T>(url, config);
-			return response.data;
-		/* c8 ignore next 4 */
-		} catch (error) {
-			this.error(`GET request to ${url} failed`, error);
-			return undefined as T;
-		}
+	public async get<T>(url: string, config?: AxiosRequestConfig) {
+		return axios.get<T>(url, config);
 	}
 
-	public async post<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
-		try {
-			const response = await axios.post<T>(url, data, config);
-			return response.data;
-		/* c8 ignore next 4 */
-		} catch (error) {
-			this.error(`POST request to ${url} failed`, error);
-			return undefined as T;
-		}
+	public async post<T>(url: string, data: any, config?: AxiosRequestConfig) {
+		return axios.post<T>(url, data, config);
 	}
 
-	public async put<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
-		try {
-			const response = await axios.put<T>(url, data, config);
-			return response.data;
-		/* c8 ignore next 4 */
-		} catch (error) {
-			this.error(`PUT request to ${url} failed`, error);
-			return undefined as T;
-		}
+	public async put<T>(url: string, data: any, config?: AxiosRequestConfig) {
+		return axios.put<T>(url, data, config);
 	}
 
-	public async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-		try {
-			const response = await axios.delete<T>(url, config);
-
-			return response.data;
-		/* c8 ignore next 4 */
-		} catch (error) {
-			this.error(`DELETE request to ${url} failed`, error);
-			return undefined as T;
-		}
+	public async delete<T>(url: string, config?: AxiosRequestConfig) {
+		return axios.delete<T>(url, config);
 	}
 
-	public async patch<T>(url: string, data: any, config?: AxiosRequestConfig): Promise<T> {
-		try {
-			const response = await axios.patch<T>(url, data, config);
-			return response.data;
-		/* c8 ignore next 4 */
-		} catch (error) {
-			this.error(`PATCH request to ${url} failed`, error);
-			return undefined as T;
-		}
+	public async patch<T>(url: string, data: any, config?: AxiosRequestConfig) {
+		return axios.patch<T>(url, data, config);
 	}
 }

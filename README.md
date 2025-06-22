@@ -7,7 +7,7 @@
 
 # Hyphen Node.js SDK
 
-The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flag service [Toggle](https://hyphen.ai/toggle) into their Node.js applications. In addition to Toggle, the SDK also provides ENV management capabilities such as loading environment variables from `.env` files, managing environment variables.
+The Hyphen Node.js SDK is a JavaScript library that allows developers to easily integrate Hyphen's feature flag service [Toggle](https://hyphen.ai/toggle), secret management service [ENV](https://hyphen.ai/env), and geo information service [Net Info](https://hyphen.ai/net-info) into their Node.js applications.
 
 # Table of Contents
 - [Installation](#installation)
@@ -22,6 +22,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [ENV](#env)
 	- [Loading Environment Variables](#loading-environment-variables)
+- [Net Info](#net-info)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -531,6 +532,27 @@ import { loadEnv } from '@hyphen/sdk';
 loadEnv({ local: false });
 ```
 
+# Net Info (https://net.info)
+
+The Hyphen Node.js SDK also provides a `NetInfo` class that allows you to fetch geo information about an IP address. This can be useful for debugging or logging purposes. You can read more about it:
+
+* [Website](https://hyphen.ai/net-info)
+* [Quick Start Guide](https://docs.hyphen.ai/docs/netinfo-quickstart)
+
+To use the `NetInfo` class, you can do the following:
+
+```javascript
+import { NetInfo } from '@hyphen/sdk';
+const netInfo = new NetInfo({
+  apiKey: 'your_api_key',
+});
+
+const ipInfo = await netInfo.getIpInfo('8.8.8.8');
+console.log('IP Info:', ipInfo);
+```
+
+You can also set the API key using the `HYPHEN_API_KEY` environment variable. This is useful for keeping your API key secure and not hardcoding it in your code.
+
 # Contributing
 
 We welcome contributions to the Hyphen Node.js SDK! If you have an idea for a new feature, bug fix, or improvement, please follow these steps:
@@ -568,9 +590,12 @@ Once you have created the project, added the toggles, and created your applicati
 
 
 ```bash
-HYPHEN_PUBLIC_API_KEY=your_api_key
+HYPHEN_PUBLIC_API_KEY=your_public_api_key
+HYPHEN_API_KEY=your_api_key
 HYPHEN_APPLICATION_ID=your_project_id
 ```
+
+The `HYPHEN_PUBLIC_API_KEY` is the public API key for your Hyphen project, `HYPHEN_API_KEY` is the API key used for things such as `NetInfo` and is located under settings in the dashboard, and `HYPHEN_APPLICATION_ID` is the application ID for your Hyphen project.
 
 Then run the tests with the following command:
 
