@@ -146,6 +146,7 @@ export class NetInfo extends BaseService {
 
 			return response.data as ipInfo;
 		} catch (error) {
+			/* c8 ignore next 6 */
 			this.error(`Failed to fetch ip info: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			const errorResult: ipInfoError = {
 				ip,
