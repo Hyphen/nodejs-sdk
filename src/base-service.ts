@@ -91,4 +91,16 @@ export class BaseService extends Hookified {
 	public async patch<T>(url: string, data: any, config?: AxiosRequestConfig) {
 		return axios.patch<T>(url, data, config);
 	}
+
+	public createHeaders(apiKey?: string): Record<string, string> {
+		const headers: Record<string, string> = {
+			'content-type': 'application/json',
+			accept: 'application/json',
+		};
+		if (apiKey) {
+			headers['x-api-key'] = apiKey;
+		}
+
+		return headers;
+	}
 }

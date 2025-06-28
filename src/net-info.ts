@@ -124,13 +124,9 @@ export class NetInfo extends BaseService {
 			}
 
 			const url = `${this._baseUri}/ip/${ip}`;
+			const headers = this.createHeaders(this._apiKey);
 			const response = await this.get(url, {
-				headers: {
-					// eslint-disable-next-line @typescript-eslint/naming-convention
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
-					'x-api-key': `${this._apiKey}`,
-				},
+				headers,
 			});
 
 			/* c8 ignore next 8 */
@@ -170,13 +166,9 @@ export class NetInfo extends BaseService {
 			}
 
 			const url = `${this._baseUri}/ip`;
+			const headers = this.createHeaders(this._apiKey);
 			const response = await this.post(url, ips, {
-				headers: {
-
-					accept: 'application/json',
-					'content-type': 'application/json',
-					'x-api-key': `${this._apiKey}`,
-				},
+				headers,
 			});
 
 			/* c8 ignore next 8 */
