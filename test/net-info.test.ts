@@ -16,7 +16,7 @@ const invalidIpAddresses = [
 	'::1',
 ];
 
-const mixedIpAddresses = validIpAddresses.concat(invalidIpAddresses);
+const mixedIpAddresses = [...validIpAddresses, ...invalidIpAddresses];
 
 describe('NetInfo', () => {
 	test('should create an instance of NetInfo', () => {
@@ -133,7 +133,7 @@ describe('NetInfo', () => {
 		const ipInfos = await netInfo.getIpInfos(mixedIpAddresses);
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(mixedIpAddresses.length);
-		ipInfos.forEach((ipInfo, index) => {
+		for (const [index, ipInfo] of ipInfos.entries()) {
 			expect(ipInfo).toHaveProperty('ip', mixedIpAddresses[index]);
 			if (validIpAddresses.includes(mixedIpAddresses[index])) {
 				expect(ipInfo).toHaveProperty('location');
@@ -141,6 +141,13 @@ describe('NetInfo', () => {
 				expect(ipInfo).toHaveProperty('type', 'error');
 				expect(ipInfo).toHaveProperty('errorMessage');
 			}
-		});
+		}
+	});
+
+	test('should handle empty IP array gracefully', async () => {
+		const netInfo = new NetInfo();
+		const ipInfos = await netInfo.getIpInfos([]);
+		expect(ipInfos).toBeDefined();
+		expect(ipInfos.length).toBe(0);
 	});
 });

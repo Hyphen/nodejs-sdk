@@ -159,6 +159,7 @@ export class NetInfo extends BaseService {
 	public async getIpInfos(ips: string[]): Promise<Array<ipInfo | ipInfoError>> {
 		if (!Array.isArray(ips) || ips.length === 0) {
 			this.error(NetInfoErrors.INVALID_IPS_ARRAY);
+			return [];
 		}
 
 		const errorResults: Array<ipInfo | ipInfoError> = [];
@@ -169,7 +170,7 @@ export class NetInfo extends BaseService {
 			}
 
 			const url = `${this._baseUri}/ip`;
-			const response = await this.post(url, ips,{
+			const response = await this.post(url, ips, {
 				headers: {
 					// eslint-disable-next-line @typescript-eslint/naming-convention
 					Accept: 'application/json',
@@ -178,7 +179,7 @@ export class NetInfo extends BaseService {
 				},
 			});
 
-			if( response.status !== 200) {
+			if (response.status !== 200) {
 				errorResults.push({
 					ip: '',
 					type: 'error',
@@ -187,7 +188,7 @@ export class NetInfo extends BaseService {
 				return errorResults;
 			}
 
-			const responseData = response?.data as { data: Array<ipInfo | ipInfoError> };
+			const responseData = response?.data as {data: Array<ipInfo | ipInfoError>};
 			return responseData.data;
 		} catch (error) {
 			this.error(`Failed to fetch ip infos: ${error instanceof Error ? error.message : 'Unknown error'}`);
