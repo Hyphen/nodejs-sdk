@@ -4,6 +4,20 @@ import {describe, expect, test} from 'vitest';
 import {ErrorMessages} from '../src/base-service.js';
 import {NetInfo} from '../src/net-info.js';
 
+const validIpAddresses = [
+	'1.1.1.1',
+	'8.8.8.8',
+	'2.2.2.2',
+];
+
+const invalidIpAddresses = [
+	'256.256.256.256',
+	'123.456.789.0',
+	'::1',
+];
+
+const mixedIpAddresses = [...validIpAddresses, ...invalidIpAddresses];
+
 describe('NetInfo', () => {
 	test('should create an instance of NetInfo', () => {
 		const netInfo = new NetInfo();
@@ -95,9 +109,10 @@ describe('NetInfo', () => {
 	test('should fetch IP info failure', async () => {
 		// API key should be set in the environment variable HYPHEN_API_KEY
 		const netInfo = new NetInfo();
-		const ipInfo = await netInfo.getIpInfo('127.0.5.8.4'); // Invalid IP
+		const invalidIpAddress = invalidIpAddresses[Math.floor(Math.random() * invalidIpAddresses.length)];
+		const ipInfo = await netInfo.getIpInfo(invalidIpAddress);
 		expect(ipInfo).toBeDefined();
-		expect(ipInfo).toHaveProperty('ip', '127.0.5.8.4');
+		expect(ipInfo).toHaveProperty('ip', invalidIpAddress);
 		expect(ipInfo).toHaveProperty('type', 'error');
 		expect(ipInfo).toHaveProperty('errorMessage');
 	});
@@ -105,9 +120,34 @@ describe('NetInfo', () => {
 	test('should fetch IP info successfully', async () => {
 		// API key should be set in the environment variable HYPHEN_API_KEY
 		const netInfo = new NetInfo();
-		const ipInfo = await netInfo.getIpInfo('8.8.8.8');
+		const validIpAddress = validIpAddresses[Math.floor(Math.random() * validIpAddresses.length)];
+		const ipInfo = await netInfo.getIpInfo(validIpAddress);
 		expect(ipInfo).toBeDefined();
-		expect(ipInfo).toHaveProperty('ip', '8.8.8.8');
+		expect(ipInfo).toHaveProperty('ip', validIpAddress);
 		expect(ipInfo).toHaveProperty('location');
+	});
+
+	test('should fetch multiple IP infos successfully', async () => {
+		// API key should be set in the environment variable HYPHEN_API_KEY
+		const netInfo = new NetInfo();
+		const ipInfos = await netInfo.getIpInfos(mixedIpAddresses);
+		expect(ipInfos).toBeDefined();
+		expect(ipInfos.length).toBe(mixedIpAddresses.length);
+		for (const [index, ipInfo] of ipInfos.entries()) {
+			expect(ipInfo).toHaveProperty('ip', mixedIpAddresses[index]);
+			if (validIpAddresses.includes(mixedIpAddresses[index])) {
+				expect(ipInfo).toHaveProperty('location');
+			} else {
+				expect(ipInfo).toHaveProperty('type', 'error');
+				expect(ipInfo).toHaveProperty('errorMessage');
+			}
+		}
+	});
+
+	test('should handle empty IP array gracefully', async () => {
+		const netInfo = new NetInfo();
+		const ipInfos = await netInfo.getIpInfos([]);
+		expect(ipInfos).toBeDefined();
+		expect(ipInfos.length).toBe(0);
 	});
 });

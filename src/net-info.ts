@@ -4,6 +4,10 @@ import {loadEnv} from './env.js';
 
 loadEnv();
 
+export enum NetInfoErrors {
+	INVALID_IPS_ARRAY = 'The provided IPs array is invalid. It should be a non-empty array of strings.',
+}
+
 export type NetInfoOptions = {
 	/**
      * API key for authentication. If this is not provided it will try to use `HYPHEN_API_KEY` environment variable.
@@ -42,11 +46,6 @@ export type ipInfoError = {
 	ip: string;
 	type: string;
 	errorMessage: string;
-};
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export type ipInfoResponse = {
-	data: Array<ipInfo | ipInfoError>;
 };
 
 export class NetInfo extends BaseService {
@@ -154,6 +153,53 @@ export class NetInfo extends BaseService {
 				errorMessage: error instanceof Error ? error.message : 'Unknown error',
 			};
 			return errorResult;
+		}
+	}
+
+	public async getIpInfos(ips: string[]): Promise<Array<ipInfo | ipInfoError>> {
+		if (!Array.isArray(ips) || ips.length === 0) {
+			this.error(NetInfoErrors.INVALID_IPS_ARRAY);
+			return [];
+		}
+
+		const errorResults: Array<ipInfo | ipInfoError> = [];
+		try {
+			/* c8 ignore next 3 */
+			if (!this._apiKey) {
+				throw new Error(ErrorMessages.API_KEY_REQUIRED);
+			}
+
+			const url = `${this._baseUri}/ip`;
+			const response = await this.post(url, ips, {
+				headers: {
+
+					accept: 'application/json',
+					'content-type': 'application/json',
+					'x-api-key': `${this._apiKey}`,
+				},
+			});
+
+			/* c8 ignore next 8 */
+			if (response.status !== 200) {
+				errorResults.push({
+					ip: '',
+					type: 'error',
+					errorMessage: `Failed to fetch ip infos: ${response.statusText}`,
+				});
+				return errorResults;
+			}
+
+			const responseData = response?.data as {data: Array<ipInfo | ipInfoError>};
+			return responseData.data;
+		/* c8 ignore next 10 */
+		} catch (error) {
+			this.error(`Failed to fetch ip infos: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			errorResults.push({
+				ip: '',
+				type: 'error',
+				errorMessage: error instanceof Error ? error.message : 'Unknown error',
+			});
+			return errorResults;
 		}
 	}
 }
