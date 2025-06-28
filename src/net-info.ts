@@ -172,9 +172,9 @@ export class NetInfo extends BaseService {
 			const url = `${this._baseUri}/ip`;
 			const response = await this.post(url, ips, {
 				headers: {
-					// eslint-disable-next-line @typescript-eslint/naming-convention
-					Accept: 'application/json',
-					'Content-Type': 'application/json',
+
+					accept: 'application/json',
+					'content-type': 'application/json',
 					'x-api-key': `${this._apiKey}`,
 				},
 			});
