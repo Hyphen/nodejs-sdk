@@ -532,11 +532,12 @@ import { loadEnv } from '@hyphen/sdk';
 loadEnv({ local: false });
 ```
 
-# Net Info (https://net.info)
+# Net Info
 
 The Hyphen Node.js SDK also provides a `NetInfo` class that allows you to fetch geo information about an IP address. This can be useful for debugging or logging purposes. You can read more about it:
 
 * [Website](https://hyphen.ai/net-info)
+* [https://net.info](https://net.info) - webservice uri used by the SDK
 * [Quick Start Guide](https://docs.hyphen.ai/docs/netinfo-quickstart)
 
 To use the `NetInfo` class, you can do the following:
@@ -549,6 +550,18 @@ const netInfo = new NetInfo({
 
 const ipInfo = await netInfo.getIpInfo('8.8.8.8');
 console.log('IP Info:', ipInfo);
+```
+
+If you want to fetch information for multiple IP addresses, you can do it like this:
+
+```javascript
+import { NetInfo } from '@hyphen/sdk';
+const netInfo = new NetInfo({
+  apiKey: 'your_api_key',
+});
+const ips = ['8.8.8.8', '1.1.1.1'];
+const ipInfos = await netInfo.getIpInfos(ips);
+console.log('IP Infos:', ipInfos);
 ```
 
 You can also set the API key using the `HYPHEN_API_KEY` environment variable. This is useful for keeping your API key secure and not hardcoding it in your code.
