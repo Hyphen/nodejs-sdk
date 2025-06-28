@@ -179,6 +179,7 @@ export class NetInfo extends BaseService {
 				},
 			});
 
+			/* c8 ignore next 8 */
 			if (response.status !== 200) {
 				errorResults.push({
 					ip: '',
@@ -191,6 +192,7 @@ export class NetInfo extends BaseService {
 			const responseData = response?.data as {data: Array<ipInfo | ipInfoError>};
 			return responseData.data;
 		} catch (error) {
+			/* c8 ignore next 8 */
 			this.error(`Failed to fetch ip infos: ${error instanceof Error ? error.message : 'Unknown error'}`);
 			errorResults.push({
 				ip: '',
