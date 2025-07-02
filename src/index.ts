@@ -3,3 +3,5 @@ export {
 } from './toggle.js';
 
 export {loadEnv} from './env.js';
+
+export {Hyphen, type HyphenOptions} from './hyphen.js';
