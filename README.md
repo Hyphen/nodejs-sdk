@@ -11,7 +11,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 
 # Table of Contents
 - [Installation](#installation)
-- [Basic Usage](#basic-usage)
+- [Basic Usage with Hyphen](#basic-usage-with-hyphen)
 - [Toggle](#toggle)
 	- [Toggle Options](#toggle-options)
 	- [Toggle API](#toggle-api)
@@ -35,9 +35,93 @@ To install the Hyphen Node.js SDK, you can use npm or yarn. Run the following co
 npm install @hyphen/sdk
 ```
 
-# Basic Usage
+# Basic Usage with Hyphen
 
-There are many ways to use the Hyphen Node.js SDK. Because of this we have created examples for each of the different ways in each secton of the documentation.
+There are many ways to use the Hyphen Node.js SDK. Because of this we have created examples for each of the different ways in each secton of the documentation. To get started, you can create an instance of the `Hyphen` class and use its methods to interact with the various services.
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen({
+	publicApiKey: 'your_public_api_key',
+	applicationId: 'your_application_id',
+});
+const result = await hyphen.toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
+You can also use `netInfo` to access the network information service.
+
+```javascript
+import { Hyphen, ToggleContext } from '@hyphen/sdk';
+
+const context: ToggleContext = {
+	targetingKey: 'user-123',
+	ipAddress: '203.0.113.42',
+	customAttributes: {
+		subscriptionLevel: 'premium',
+		region: 'us-east',
+	},
+	user: {
+		id: 'user-123',
+		email: 'john.doe@example.com',
+		name: 'John Doe',
+		customAttributes: {
+			role: 'admin',
+		},
+	},
+};
+
+const hyphen = new Hyphen({
+	publicApiKey: 'your_public_api_key',
+	toggle: {
+		applicationId: 'your_application_id',
+		context: context,
+	},
+});
+const result = await hyphen.toggle.getBoolean('hyphen-sdk-boolean', false);
+console.log('Boolean toggle value:', result); // true
+```
+
+You can also use `netInfo` to access the network information service.
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen({
+	apiKey: 'your_api_key',
+});
+const result = await hyphen.netInfo.getIpInfo('8.8.8.8');
+console.log('Geo IP information:', result);
+```
+
+If you need to set the `apiKey` or `publicApiKey` after initializing `Hyphen` you can do so and it will cascade the setting to the individual services:
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen();
+hyphen.apiKey = 'your_api_key';
+const result = await hyphen.netInfo.getIpInfo('8.8.8.8');
+console.log('Geo IP information:', result);
+```
+
+Finally, `error`, `warn`, and `info` emitters are enabled from each of the services and you can access them by doing the following example with `error`:
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen({ apiKey: 'your_api_key'});
+
+hyphen.on('error', (error) => {
+	console.log(error);
+});
+
+const result = await hyphen.netInfo.getIpInfo('8.8.8.8');
+console.log('Geo IP information:', result);
+```
+
+The rest of the examples for each service show you accessing the service instance directly. 
 
 # Toggle
 
