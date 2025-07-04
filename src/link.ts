@@ -24,13 +24,13 @@ export type LinkOptions = {
 
 export class Link extends BaseService {
 	private _uris: string[] = defaultLinkUris;
-	private _organizationId: string;
-	private _apiKey = '';
+	private _organizationId?: string;
+	private _apiKey?: string;
 
 	constructor(options?: LinkOptions) {
 		super(options);
 		this._uris = options?.uris ?? defaultLinkUris;
-		this._organizationId = options?.organizationId ?? '';
+		this._organizationId = options?.organizationId;
 		if (options?.apiKey) {
 			this.setApiKey(options.apiKey);
 		}
@@ -54,33 +54,33 @@ export class Link extends BaseService {
 
 	/**
      * Get the organization ID for the link service. This is required to access the link service.
-     * @returns {string} The organization ID.
+     * @returns {string | undefined} The organization ID.
      */
-	public get organizationId(): string {
+	public get organizationId(): string | undefined {
 		return this._organizationId;
 	}
 
 	/**
      * Set the organization ID for the link service. This is required to access the link service.
-     * @param {string} organizationId - The organization ID to set.
+     * @param {string | undefined} organizationId - The organization ID to set.
      */
-	public set organizationId(organizationId: string) {
+	public set organizationId(organizationId: string | undefined) {
 		this._organizationId = organizationId;
 	}
 
 	/**
      * Get the API key for the link service. This is required to access the link service.
-     * @returns {string} The API key.
+     * @returns {string | undefined} The API key.
      */
-	public get apiKey(): string {
+	public get apiKey(): string | undefined {
 		return this._apiKey;
 	}
 
 	/**
      * Set the API key for the link service. This is required to access the link service.
-     * @param {string} apiKey - The API key to set.
+     * @param {string | undefined} apiKey - The API key to set.
      */
-	public set apiKey(apiKey: string) {
+	public set apiKey(apiKey: string | undefined) {
 		this.setApiKey(apiKey);
 	}
 
@@ -89,11 +89,13 @@ export class Link extends BaseService {
      * This is to ensure that the API key is not a public key, which should not be used for authenticated requests.
      * @param {string} apiKey
      */
-	public setApiKey(apiKey: string): void {
-		if (apiKey.startsWith('public_')) {
+	public setApiKey(apiKey: string | undefined): void {
+		if (apiKey?.startsWith('public_')) {
 			throw new Error('API key cannot start with "public_"');
 		}
 
-		this._apiKey = apiKey;
+		if (apiKey) {
+			this._apiKey = apiKey;
+		}
 	}
 }
