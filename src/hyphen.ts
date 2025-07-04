@@ -1,18 +1,21 @@
 import {Hookified, type HookifiedOptions} from 'hookified';
 import {NetInfo, type NetInfoOptions} from './net-info.js';
 import {Toggle, type ToggleOptions} from './toggle.js';
+import {Link, type LinkOptions} from './link.js';
 
 export type HyphenOptions = {
 	publicApiKey?: string;
 	apiKey?: string;
 	throwErrors?: boolean;
-	toggle?: Omit<ToggleOptions, 'apiKey' | 'publicApiKey' | 'throwErrors'>; // Exclude apiKey and publicApiKey from ToggleOptions
-	netInfo?: Omit<NetInfoOptions, 'apiKey' | 'publicApiKey' | 'throwErrors'>; // Exclude apiKey and publicApiKey from NetInfoOptions
+	toggle?: Omit<ToggleOptions, 'publicApiKey' | 'throwErrors'>; // Exclude publicApiKey and throwErrors from ToggleOptions
+	netInfo?: Omit<NetInfoOptions, 'apiKey' | 'throwErrors'>; // Exclude apiKey and throwErrors from NetInfoOptions
+	link?: Omit<LinkOptions, 'apiKey' | 'throwErrors'>; // Exclude apiKey and throwErrors from LinkOptions
 } & HookifiedOptions;
 
 export class Hyphen extends Hookified {
 	private readonly _netInfo: NetInfo;
 	private readonly _toggle: Toggle;
+	private readonly _link: Link;
 
 	private _publicApiKey?: string;
 	private _apiKey?: string;
@@ -22,6 +25,7 @@ export class Hyphen extends Hookified {
 
 		const toggleOptions: ToggleOptions = options?.toggle ?? {};
 		const netInfoOptions: NetInfoOptions = options?.netInfo ?? {};
+		const linkOptions: LinkOptions = options?.link ?? {};
 
 		if (options?.publicApiKey) {
 			this._publicApiKey = options.publicApiKey;
@@ -55,6 +59,15 @@ export class Hyphen extends Hookified {
 		this._toggle.on('info', (message, ...args) => this.emit('info', message, ...args));
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._toggle.on('warn', (message, ...args) => this.emit('warn', message, ...args));
+
+		this._link = new Link(linkOptions);
+		// Set error, info, warn emitters for link
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		this._link.on('error', (message, ...args) => this.emit('error', message, ...args));
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		this._link.on('info', (message, ...args) => this.emit('info', message, ...args));
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+		this._link.on('warn', (message, ...args) => this.emit('warn', message, ...args));
 	}
 
 	public get netInfo(): NetInfo {
@@ -63,6 +76,10 @@ export class Hyphen extends Hookified {
 
 	public get toggle(): Toggle {
 		return this._toggle;
+	}
+
+	public get link(): Link {
+		return this._link;
 	}
 
 	public get publicApiKey(): string | undefined {
