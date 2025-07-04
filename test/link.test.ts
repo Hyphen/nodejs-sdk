@@ -2,10 +2,16 @@
 import process from 'node:process';
 import {describe, expect, test} from 'vitest';
 import {Link} from '../src/link.js';
+import {loadEnv} from '../src/env.js';
 
 const apiKey: string = process.env.HYPHEN_API_KEY ?? 'test-api-key';
 const organizationId: string = process.env.HYPHEN_ORGANIZATION_ID ?? 'test-organization-id';
 const linkDomain: string = process.env.HYPHEN_LINK_DOMAIN ?? 'test.domain.com';
+const longUrl = ['https://hyphen.ai', 'https://hyphen.ai/env', 'https://hyphen.ai/link', 'https://hyphen.ai/toggle', 'https://hyphen.ai/net-info'];
+
+export function getRandomLongUrl(): string {
+    return longUrl[Math.floor(Math.random() * longUrl.length)];
+}
 
 describe('Link', () => {
 	test('should create a Link instance with default URIs', () => {
@@ -48,4 +54,20 @@ describe('Link', () => {
 			link.setApiKey('public_test-api-key');
 		}).toThrow('API key cannot start with "public_"');
 	});
+
+    test('should create a short code with valid parameters', async () => {
+        const link = new Link({organizationId, apiKey});
+        const longUrl = getRandomLongUrl();
+        const domain = linkDomain;
+        const options = {};
+
+        console.log('apiKey:', link.apiKey, 'organizationId:', link.organizationId, 'longUrl:', longUrl, 'domain:', domain, 'options:', options);
+
+        const response = await link.createShortCode(longUrl, domain, options);
+        console.log(response);
+        expect(response).toBeDefined();
+        expect(response.code).toBe('test-code');
+        expect(response.long_url).toBe(longUrl);
+        expect(response.domain).toBe(domain);
+    });
 });

@@ -8,6 +8,38 @@ export const defaultLinkUris = [
 	'https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/',
 ];
 
+export type CreateShortCodeOptions = {
+	/**
+	 * The short code used for this link. If not provided, a random code will be generated.
+	 * @default undefined
+	 */
+	code?: string;
+	/**
+	 * The title of the link. This is used for display purposes.
+	 * @default undefined
+	 */
+	title?: string;
+	/**
+	 * The tags associated with the link. This is used for categorization purposes.
+	 * @default undefined
+	 */
+	tags?: string[];
+};
+
+export type CreateShortCodeResponse = {
+	id: string;
+	code: string;
+	long_url: string;
+	domain: string;
+	createdAt: string;
+	title?: string;
+	tags?: string[];
+	organizationId: {
+		id: string;
+		name: string;
+	}
+};
+
 export type LinkOptions = {
 	/**
 	 * The URIs to access the link service.
@@ -108,6 +140,35 @@ export class Link extends BaseService {
 
 		if (apiKey) {
 			this._apiKey = apiKey;
+		}
+	}
+
+	public async createShortCode(longUrl: string, domain: string, options?: CreateShortCodeOptions): Promise<CreateShortCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to create a short code.');
+		}
+
+		if (!this._apiKey) {
+			throw new Error('API key is required to create a short code.');
+		}
+
+		const url = this._uris[0].replace('{organizationId}', this._organizationId);
+		const body = {
+			long_url: longUrl,
+			domain,
+			code: options?.code,
+			title: options?.title,
+			tags: options?.tags,
+		};
+
+		const headers = this.createHeaders(this._apiKey);
+		headers['authorization'] = `Bearer ${this._apiKey}`;
+		const response = await this.post(url, body, headers);
+
+		if(response.status === 200) {
+			throw new Error(`Failed to create short code: ${response.statusText}`);
+		} else {
+			return response.data as CreateShortCodeResponse;
 		}
 	}
 }
