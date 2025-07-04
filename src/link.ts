@@ -1,4 +1,8 @@
+import process from 'node:process';
 import {BaseService, type BaseServiceOptions} from './base-service.js';
+import {loadEnv} from './env.js';
+
+loadEnv();
 
 export const defaultLinkUris = [
 	'https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/',
@@ -6,19 +10,19 @@ export const defaultLinkUris = [
 
 export type LinkOptions = {
 	/**
-     * The URIs to access the link service.
-     * @default ["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]
-     */
+	 * The URIs to access the link service.
+	 * @default ["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]
+	 */
 	uris?: string[];
 	/**
-     * The organization ID to use for the link service.
-     * @requires organizationId
-     */
+	 * The organization ID to use for the link service.
+	 * @requires organizationId
+	 */
 	organizationId?: string;
 
 	/**
-     * The API key to use for the link service. This should be provided as the service requires authentication.
-     */
+	 * The API key to use for the link service. This should be provided as the service requires authentication.
+	 */
 	apiKey?: string;
 } & BaseServiceOptions;
 
@@ -34,61 +38,69 @@ export class Link extends BaseService {
 		if (options?.apiKey) {
 			this.setApiKey(options.apiKey);
 		}
+
+		if (!this._apiKey && process.env.HYPHEN_API_KEY) {
+			this.setApiKey(process.env.HYPHEN_API_KEY);
+		}
+
+		if (!this._organizationId && process.env.HYPHEN_ORGANIZATION_ID) {
+			this._organizationId = process.env.HYPHEN_ORGANIZATION_ID;
+		}
 	}
 
 	/**
-     * Get the URIs for the link service. The default is `["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]`.
-     * @returns {string[]} The URIs for the link service.
-     */
+	 * Get the URIs for the link service. The default is `["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]`.
+	 * @returns {string[]} The URIs for the link service.
+	 */
 	public get uris(): string[] {
 		return this._uris;
 	}
 
 	/**
-     * Set the URIs for the link service. The default is `["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]`.
-     * @param {string[]} uris - The URIs to set.
-     */
+	 * Set the URIs for the link service. The default is `["https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/"]`.
+	 * @param {string[]} uris - The URIs to set.
+	 */
 	public set uris(uris: string[]) {
 		this._uris = uris;
 	}
 
 	/**
-     * Get the organization ID for the link service. This is required to access the link service.
-     * @returns {string | undefined} The organization ID.
-     */
+	 * Get the organization ID for the link service. This is required to access the link service.
+	 * @returns {string | undefined} The organization ID.
+	 */
 	public get organizationId(): string | undefined {
 		return this._organizationId;
 	}
 
 	/**
-     * Set the organization ID for the link service. This is required to access the link service.
-     * @param {string | undefined} organizationId - The organization ID to set.
-     */
+	 * Set the organization ID for the link service. This is required to access the link service.
+	 * @param {string | undefined} organizationId - The organization ID to set.
+	 */
 	public set organizationId(organizationId: string | undefined) {
 		this._organizationId = organizationId;
 	}
 
 	/**
-     * Get the API key for the link service. This is required to access the link service.
-     * @returns {string | undefined} The API key.
-     */
+	 * Get the API key for the link service. This is required to access the link service.
+	 * @returns {string | undefined} The API key.
+	 */
 	public get apiKey(): string | undefined {
 		return this._apiKey;
 	}
 
 	/**
-     * Set the API key for the link service. This is required to access the link service.
-     * @param {string | undefined} apiKey - The API key to set.
-     */
+	 * Set the API key for the link service. This is required to access the link service.
+	 * @param {string | undefined} apiKey - The API key to set.
+	 */
 	public set apiKey(apiKey: string | undefined) {
 		this.setApiKey(apiKey);
 	}
 
 	/**
-     * Set the API key for the link service. If the API key starts with 'public_', an error is thrown.
-     * This is to ensure that the API key is not a public key, which should not be used for authenticated requests.
-     * @param {string} apiKey
-     */
+	 * Set the API key for the link service. If the API key starts with 'public_', an error is thrown.
+	 * This is to ensure that the API key is not a public key, which should not be used for authenticated requests.
+	 * @param {string} apiKey
+	 */
 	public setApiKey(apiKey: string | undefined): void {
 		if (apiKey?.startsWith('public_')) {
 			throw new Error('API key cannot start with "public_"');

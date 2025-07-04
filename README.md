@@ -690,9 +690,19 @@ Once you have created the project, added the toggles, and created your applicati
 HYPHEN_PUBLIC_API_KEY=your_public_api_key
 HYPHEN_API_KEY=your_api_key
 HYPHEN_APPLICATION_ID=your_project_id
+HYPHEN_LINK_DOMAIN=your_link_domain
+HYPHEN_ORGANIZATION_ID=your_organization_id
 ```
 
-The `HYPHEN_PUBLIC_API_KEY` is the public API key for your Hyphen project, `HYPHEN_API_KEY` is the API key used for things such as `NetInfo` and is located under settings in the dashboard, and `HYPHEN_APPLICATION_ID` is the application ID for your Hyphen project.
+A bit more information about the environment variables:
+
+| Variable | Example Value | Description |
+|----------------|----------------|----------------|
+| *HYPHEN_PUBLIC_API_KEY* | `public_api_key` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_API_KEY* | `api_key` | The API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_APPLICATION_ID* | `application_id` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_LINK_DOMAIN* | `test.h4n.link` | The domain for the Link service. This is used for generating links. |
+| *HYPHEN_ORGANIZATION_ID* | `org_668575c0e169cde974a5c76a` | | The organization ID for your Hyphen project. This is used for the Link service. |
 
 Then run the tests with the following command:
 
