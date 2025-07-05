@@ -3,6 +3,7 @@ import {describe, test, expect} from 'vitest';
 import {Hyphen} from '../src/hyphen.js';
 import {NetInfo} from '../src/net-info.js';
 import {Toggle} from '../src/toggle.js';
+import {Link} from '../src/link.js';
 
 describe('Hyphen', () => {
 	test('should create an instance of Hyphen', () => {
@@ -26,6 +27,12 @@ describe('Hyphen', () => {
 		const hyphen = new Hyphen();
 		expect(hyphen.toggle).toBeDefined();
 		expect(hyphen.toggle).toBeInstanceOf(Toggle);
+	});
+
+	test('should have a link property', () => {
+		const hyphen = new Hyphen();
+		expect(hyphen.link).toBeDefined();
+		expect(hyphen.link).toBeInstanceOf(Link);
 	});
 
 	test('should allow setting and getting publicApiKey', () => {
