@@ -162,7 +162,6 @@ export class Link extends BaseService {
 		};
 
 		const headers = this.createHeaders(this._apiKey);
-		headers['authorization'] = `Bearer ${this._apiKey}`;
 		const response = await this.post(url, body, headers);
 
 		if(response.status === 200) {
