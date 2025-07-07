@@ -62,10 +62,33 @@ describe('Link', () => {
 		const options = {tags};
 
 		const response = await link.createShortCode(longUrl, domain, options);
-		
+
 		expect(response).toBeDefined();
 		expect(response.code).toBeDefined();
 		expect(response.long_url).toBe(longUrl);
 		expect(response.domain).toBe(domain);
+
+		if (response.id) {
+			const deleteResponse = await link.deleteShortCode(response.id);
+			expect(deleteResponse).toBe(true);
+		}
+	});
+
+	test('should throw on create a short code with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+
+		link.organizationId = undefined; // Clear organization ID to force an error
+		await expect(link.createShortCode(longUrl, domain, options)).rejects.toThrow();
+	});
+
+	test('should delete a short code with invalid organization Id', async () => {
+		const link = new Link({organizationId, apiKey});
+		const fakeCodeId = 'code_1234567890abcdef';
+
+		link.organizationId = undefined; // Clear organization ID to force an error
+		await expect(link.deleteShortCode(fakeCodeId)).rejects.toThrow();
 	});
 });

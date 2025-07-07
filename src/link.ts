@@ -148,10 +148,6 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to create a short code.');
 		}
 
-		if (!this._apiKey) {
-			throw new Error('API key is required to create a short code.');
-		}
-
 		const url = this._uris[0].replace('{organizationId}', this._organizationId);
 		const body = {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
@@ -166,10 +162,37 @@ export class Link extends BaseService {
 
 		const response = await this.post(url, body, {headers});
 
-		if (response.status === 200) {
-			throw new Error(`Failed to create short code: ${response.statusText}`);
-		} else {
+		if (response.status === 201) {
 			return response.data as CreateShortCodeResponse;
 		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to create short code: ${response.statusText}`);
+	}
+
+	/**
+	 * Delete a short code.
+	 * @param {string} code The short code to delete. Example: 'code_686bed403c3991bd676bba4d'
+	 * @returns {Promise<boolean>} A promise that resolves to true if the short code was deleted successfully, or false if it was not.
+	 */
+	public async deleteShortCode(code: string): Promise<boolean> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to delete a short code.');
+		}
+
+		let url = this._uris[0].replace('{organizationId}', this._organizationId);
+		url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+
+		const headers = this.createHeaders(this._apiKey);
+		delete headers['content-type']; // Remove content-type header for DELETE requests
+
+		const response = await this.delete(url, {headers});
+
+		if (response.status === 204) {
+			return true;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to delete short code: ${response.statusText}`);
 	}
 }
