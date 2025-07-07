@@ -12,7 +12,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 # Table of Contents
 - [Installation](#installation)
 - [Basic Usage with Hyphen](#basic-usage-with-hyphen)
-- [Toggle](#toggle)
+- [Toggle - Feature Flag Service](#toggle---feature-flag-service)
 	- [Toggle Options](#toggle-options)
 	- [Toggle API](#toggle-api)
 	- [Toggle Hooks](#toggle-hooks)
@@ -20,9 +20,10 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Caching](#toggle-caching)
 	- [Toggle Environment Variables](#toggle-environment-variables)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
-- [ENV](#env)
+- [ENV - Secret Management Service](#env---secret-management-service)
 	- [Loading Environment Variables](#loading-environment-variables)
-- [Net Info](#net-info)
+- [Net Info - Geo Information Service](#net-info---geo-information-service)
+- [Link - Short Code Service](#link---short-code-service)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -123,7 +124,7 @@ console.log('Geo IP information:', result);
 
 The rest of the examples for each service show you accessing the service instance directly. 
 
-# Toggle
+# Toggle - Feature Flag Service
 
 [Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
 
@@ -571,7 +572,7 @@ const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 console.log('Boolean toggle value:', result); // true
 ```
 
-# ENV
+# ENV - Secret Management Service
 
 Hyphens secret management service known as [ENV](https://hyphen.ai/env) allows you to manage your environment variables in a secure way. The Hyphen Node.js SDK provides a simple way to access your environment variables.
 
@@ -616,7 +617,7 @@ import { loadEnv } from '@hyphen/sdk';
 loadEnv({ local: false });
 ```
 
-# Net Info
+# Net Info - Geo Information Service
 
 The Hyphen Node.js SDK also provides a `NetInfo` class that allows you to fetch geo information about an IP address. This can be useful for debugging or logging purposes. You can read more about it:
 
@@ -649,6 +650,38 @@ console.log('IP Infos:', ipInfos);
 ```
 
 You can also set the API key using the `HYPHEN_API_KEY` environment variable. This is useful for keeping your API key secure and not hardcoding it in your code.
+
+# Link - Short Code Service
+
+The Hyphen Node.js SDK also provides a `Link` class that allows you to create and manage short codes. This can be useful for generating short links for your application. Here is an example of creating a short code:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const longUrl = 'https://hyphen.ai';
+const domain = 'test.h4n.link';
+const options = {
+  tags: ['sdk-test', 'unit-test'],
+};
+const response = await link.createShortCode(longUrl, domain, options);
+console.log('Short Code Response:', response);
+```
+
+if you want to delete a short code you can do it like this:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code you want to delete
+const response = await link.deleteShortCode(code);
+console.log('Delete Short Code Response:', response);
+```
 
 # Contributing
 
@@ -690,9 +723,19 @@ Once you have created the project, added the toggles, and created your applicati
 HYPHEN_PUBLIC_API_KEY=your_public_api_key
 HYPHEN_API_KEY=your_api_key
 HYPHEN_APPLICATION_ID=your_project_id
+HYPHEN_LINK_DOMAIN=your_link_domain
+HYPHEN_ORGANIZATION_ID=your_organization_id
 ```
 
-The `HYPHEN_PUBLIC_API_KEY` is the public API key for your Hyphen project, `HYPHEN_API_KEY` is the API key used for things such as `NetInfo` and is located under settings in the dashboard, and `HYPHEN_APPLICATION_ID` is the application ID for your Hyphen project.
+A bit more information about the environment variables:
+
+| Variable | Example Value | Description |
+|----------------|----------------|----------------|
+| *HYPHEN_PUBLIC_API_KEY* | `public_api_key` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_API_KEY* | `api_key` | The API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_APPLICATION_ID* | `application_id` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *HYPHEN_LINK_DOMAIN* | `test.h4n.link` | The domain for the Link service. This is used for generating links. |
+| *HYPHEN_ORGANIZATION_ID* | `org_668575c0e169cde974a5c76a` | | The organization ID for your Hyphen project. This is used for the Link service. |
 
 Then run the tests with the following command:
 
