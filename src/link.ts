@@ -37,7 +37,7 @@ export type CreateShortCodeResponse = {
 	organizationId: {
 		id: string;
 		name: string;
-	}
+	};
 };
 
 export type LinkOptions = {
@@ -154,6 +154,7 @@ export class Link extends BaseService {
 
 		const url = this._uris[0].replace('{organizationId}', this._organizationId);
 		const body = {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			long_url: longUrl,
 			domain,
 			code: options?.code,
@@ -162,9 +163,10 @@ export class Link extends BaseService {
 		};
 
 		const headers = this.createHeaders(this._apiKey);
-		const response = await this.post(url, body, headers);
 
-		if(response.status === 200) {
+		const response = await this.post(url, body, {headers});
+
+		if (response.status === 200) {
 			throw new Error(`Failed to create short code: ${response.statusText}`);
 		} else {
 			return response.data as CreateShortCodeResponse;
