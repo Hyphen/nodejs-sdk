@@ -650,6 +650,38 @@ console.log('IP Infos:', ipInfos);
 
 You can also set the API key using the `HYPHEN_API_KEY` environment variable. This is useful for keeping your API key secure and not hardcoding it in your code.
 
+# Link - Short Code Service
+
+The Hyphen Node.js SDK also provides a `Link` class that allows you to create and manage short codes. This can be useful for generating short links for your application. Here is an example of creating a short code:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const longUrl = 'https://hyphen.ai';
+const domain = 'test.h4n.link';
+const options = {
+  tags: ['sdk-test', 'unit-test'],
+};
+const response = await link.createShortCode(longUrl, domain, options);
+console.log('Short Code Response:', response);
+```
+
+if you want to delete a short code you can do it like this:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code you want to delete
+const response = await link.deleteShortCode(code);
+console.log('Delete Short Code Response:', response);
+```
+
 # Contributing
 
 We welcome contributions to the Hyphen Node.js SDK! If you have an idea for a new feature, bug fix, or improvement, please follow these steps:
