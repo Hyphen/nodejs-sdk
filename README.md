@@ -12,7 +12,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 # Table of Contents
 - [Installation](#installation)
 - [Basic Usage with Hyphen](#basic-usage-with-hyphen)
-- [Toggle](#toggle)
+- [Toggle - Feature Flag Service](#toggle---feature-flag-service)
 	- [Toggle Options](#toggle-options)
 	- [Toggle API](#toggle-api)
 	- [Toggle Hooks](#toggle-hooks)
@@ -20,9 +20,10 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Caching](#toggle-caching)
 	- [Toggle Environment Variables](#toggle-environment-variables)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
-- [ENV](#env)
+- [ENV - Secret Management Service](#env---secret-management-service)
 	- [Loading Environment Variables](#loading-environment-variables)
-- [Net Info](#net-info)
+- [Net Info - Geo Information Service](#net-info---geo-information-service)
+- [Link - Short Code Service](#link---short-code-service)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -123,7 +124,7 @@ console.log('Geo IP information:', result);
 
 The rest of the examples for each service show you accessing the service instance directly. 
 
-# Toggle
+# Toggle - Feature Flag Service
 
 [Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
 
@@ -571,7 +572,7 @@ const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 console.log('Boolean toggle value:', result); // true
 ```
 
-# ENV
+# ENV - Secret Management Service
 
 Hyphens secret management service known as [ENV](https://hyphen.ai/env) allows you to manage your environment variables in a secure way. The Hyphen Node.js SDK provides a simple way to access your environment variables.
 
@@ -616,7 +617,7 @@ import { loadEnv } from '@hyphen/sdk';
 loadEnv({ local: false });
 ```
 
-# Net Info
+# Net Info - Geo Information Service
 
 The Hyphen Node.js SDK also provides a `NetInfo` class that allows you to fetch geo information about an IP address. This can be useful for debugging or logging purposes. You can read more about it:
 
