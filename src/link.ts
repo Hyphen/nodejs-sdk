@@ -202,10 +202,9 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to get a short code.');
 		}
 
-		let url = this._uris[0].replace('{organizationId}', this._organizationId);
+		let url = this.getUri(this._organizationId, code);
 		const headers = this.createHeaders(this._apiKey);
 
-		url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
 		const response = await this.get(url, {headers});
 
 		if (response.status === 200) {
@@ -226,8 +225,7 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to delete a short code.');
 		}
 
-		let url = this._uris[0].replace('{organizationId}', this._organizationId);
-		url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		let url = this.getUri(this._organizationId, code);
 
 		const headers = this.createHeaders(this._apiKey);
 		delete headers['content-type']; // Remove content-type header for DELETE requests
