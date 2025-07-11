@@ -55,6 +55,26 @@ describe('Link', () => {
 		}).toThrow('API key cannot start with "public_"');
 	});
 
+	test('should get the uri based on organization ID', () => {
+		const link = new Link({organizationId, apiKey});
+		const uri = link.getUri(organizationId);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/`);
+	});
+
+	test('should handle if uri doesnt have forward slash and code is added', () => {
+		const link = new Link({organizationId, apiKey});
+		const code = 'code_1234567890abcdef';
+
+		const uri = link.getUri(organizationId, code);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+
+		link.uris = ['https://api.hyphen.ai/api/organizations/{organizationId}/link/codes'];
+		const uriWithoutSlash = link.getUri(organizationId, code);
+		expect(uriWithoutSlash).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+	});
+});
+
+describe('Link Create', () => {
 	test('should create a short code with valid parameters', async () => {
 		const link = new Link({organizationId, apiKey});
 		const longUrl = getRandomLongUrl();
@@ -64,9 +84,7 @@ describe('Link', () => {
 		const response = await link.createShortCode(longUrl, domain, options);
 
 		expect(response).toBeDefined();
-		expect(response.code).toBeDefined();
-		expect(response.long_url).toBe(longUrl);
-		expect(response.domain).toBe(domain);
+		expect(response.id).toBeDefined();
 
 		if (response.id) {
 			const deleteResponse = await link.deleteShortCode(response.id);
@@ -83,7 +101,43 @@ describe('Link', () => {
 		link.organizationId = undefined; // Clear organization ID to force an error
 		await expect(link.createShortCode(longUrl, domain, options)).rejects.toThrow();
 	});
+});
 
+describe('Link Get', () => {
+	test('should create a short code and get it by code', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.code).toBeDefined();
+		expect(createResponse.long_url).toBe(longUrl);
+		expect(createResponse.domain).toBe(domain);
+
+		// Retrieve the short code by ID
+		if (createResponse.id) {
+			const getResponse = await link.getShortCode(createResponse.id);
+			expect(getResponse).toEqual(createResponse);
+		}
+
+		if (createResponse.id) {
+			const getResponse = await link.getShortCode(createResponse.id);
+			expect(getResponse).toEqual(createResponse);
+		}
+	});
+
+	test('should throw on get if no organization ID is set', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+
+		await expect(link.getShortCode(fakeCodeId)).rejects.toThrow();
+	});
+});
+
+describe('Link Delete', () => {
 	test('should delete a short code with invalid organization Id', async () => {
 		const link = new Link({organizationId, apiKey});
 		const fakeCodeId = 'code_1234567890abcdef';

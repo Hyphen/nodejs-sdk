@@ -40,6 +40,8 @@ export type CreateShortCodeResponse = {
 	};
 };
 
+export type GetShortCodeResponse = CreateShortCodeResponse;
+
 export type LinkOptions = {
 	/**
 	 * The URIs to access the link service.
@@ -143,12 +145,32 @@ export class Link extends BaseService {
 		}
 	}
 
+	/**
+	 * Get the URI for a specific organization and code. This is used internally to construct the URI for the link service.
+	 * @param {string} organizationId The ID of the organization.
+	 * @param {string} code The code to include in the URI.
+	 * @returns {string} The constructed URI.
+	 */
+	public getUri(organizationId: string, code?: string): string {
+		/* c8 ignore next 3 */
+		if (!organizationId) {
+			throw new Error('Organization ID is required to get the URI.');
+		}
+
+		let url = this._uris[0].replace('{organizationId}', organizationId);
+		if (code) {
+			url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		}
+
+		return url;
+	}
+
 	public async createShortCode(longUrl: string, domain: string, options?: CreateShortCodeOptions): Promise<CreateShortCodeResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to create a short code.');
 		}
 
-		const url = this._uris[0].replace('{organizationId}', this._organizationId);
+		const url = this.getUri(this._organizationId);
 		const body = {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			long_url: longUrl,
@@ -171,6 +193,29 @@ export class Link extends BaseService {
 	}
 
 	/**
+	 * Get a short code by its code.
+	 * @param {string} code The short code to retrieve. Example: 'code_686bed403c3991bd676bba4d'
+	 * @returns {Promise<GetShortCodeResponse>} A promise that resolves to the short code details.
+	 */
+	public async getShortCode(code: string): Promise<GetShortCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get a short code.');
+		}
+
+		let url = this.getUri(this._organizationId, code);
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.get(url, {headers});
+
+		if (response.status === 200) {
+			return response.data as GetShortCodeResponse;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get short code: ${response.statusText}`);
+	}
+
+	/**
 	 * Delete a short code.
 	 * @param {string} code The short code to delete. Example: 'code_686bed403c3991bd676bba4d'
 	 * @returns {Promise<boolean>} A promise that resolves to true if the short code was deleted successfully, or false if it was not.
@@ -180,8 +225,7 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to delete a short code.');
 		}
 
-		let url = this._uris[0].replace('{organizationId}', this._organizationId);
-		url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		let url = this.getUri(this._organizationId, code);
 
 		const headers = this.createHeaders(this._apiKey);
 		delete headers['content-type']; // Remove content-type header for DELETE requests
