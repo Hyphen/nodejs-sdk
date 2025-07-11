@@ -40,6 +40,8 @@ export type CreateShortCodeResponse = {
 	};
 };
 
+export type GetShortCodeResponse = CreateShortCodeResponse;
+
 export type LinkOptions = {
 	/**
 	 * The URIs to access the link service.
@@ -168,6 +170,29 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to create short code: ${response.statusText}`);
+	}
+
+	/**
+	 * Get a short code by its code.
+	 * @param {string} code The short code to retrieve. Example: 'code_686bed403c3991bd676bba4d'
+	 * @returns {Promise<GetShortCodeResponse>} A promise that resolves to the short code details.
+	 */
+	public async getShortCode(code: string): Promise<GetShortCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get a short code.');
+		}
+
+		const url = this._uris[0].replace('{organizationId}', this._organizationId);
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.get(`${url}/${code}/`, {headers});
+
+		if (response.status === 200) {
+			return response.data as GetShortCodeResponse;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get short code: ${response.statusText}`);
 	}
 
 	/**

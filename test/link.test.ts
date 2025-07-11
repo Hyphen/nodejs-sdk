@@ -64,13 +64,35 @@ describe('Link', () => {
 		const response = await link.createShortCode(longUrl, domain, options);
 
 		expect(response).toBeDefined();
-		expect(response.code).toBeDefined();
-		expect(response.long_url).toBe(longUrl);
-		expect(response.domain).toBe(domain);
+		expect(response.id).toBeDefined();
+
+		// retrieve the short code by ID
+		if (response.id) {
+			const getResponse = await link.getShortCode(response.id);
+			expect(getResponse).toEqual(response);
+		}
 
 		if (response.id) {
 			const deleteResponse = await link.deleteShortCode(response.id);
 			expect(deleteResponse).toBe(true);
+		}
+	});
+
+	test('should create a short code and get it by code', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.code).toBeDefined();
+		expect(createResponse.long_url).toBe(longUrl);
+		expect(createResponse.domain).toBe(domain);
+
+		if (createResponse.id) {
+			const getResponse = await link.getShortCode(createResponse.id);
+			expect(getResponse).toEqual(createResponse);
 		}
 	});
 
