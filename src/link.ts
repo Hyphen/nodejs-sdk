@@ -145,12 +145,32 @@ export class Link extends BaseService {
 		}
 	}
 
+	/**
+	 * Get the URI for a specific organization and code. This is used internally to construct the URI for the link service.
+	 * @param {string} organizationId The ID of the organization.
+	 * @param {string} code The code to include in the URI.
+	 * @returns {string} The constructed URI.
+	 */
+	public getUri(organizationId: string, code?: string): string {
+		/* c8 ignore next 3 */
+		if (!organizationId) {
+			throw new Error('Organization ID is required to get the URI.');
+		}
+
+		let url = this._uris[0].replace('{organizationId}', organizationId);
+		if (code) {
+			url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		}
+
+		return url;
+	}
+
 	public async createShortCode(longUrl: string, domain: string, options?: CreateShortCodeOptions): Promise<CreateShortCodeResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to create a short code.');
 		}
 
-		const url = this._uris[0].replace('{organizationId}', this._organizationId);
+		const url = this.getUri(this._organizationId);
 		const body = {
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			long_url: longUrl,
@@ -182,10 +202,11 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to get a short code.');
 		}
 
-		const url = this._uris[0].replace('{organizationId}', this._organizationId);
+		let url = this._uris[0].replace('{organizationId}', this._organizationId);
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.get(`${url}/${code}/`, {headers});
+		url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		const response = await this.get(url, {headers});
 
 		if (response.status === 200) {
 			return response.data as GetShortCodeResponse;
