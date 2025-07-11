@@ -24,6 +24,9 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Loading Environment Variables](#loading-environment-variables)
 - [Net Info - Geo Information Service](#net-info---geo-information-service)
 - [Link - Short Code Service](#link---short-code-service)
+	- [Creating a Short Code](#creating-a-short-code)
+	- [Getting a Short Code](#getting-a-short-code)
+	- [Deleting a Short Code](#deleting-a-short-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -653,7 +656,14 @@ You can also set the API key using the `HYPHEN_API_KEY` environment variable. Th
 
 # Link - Short Code Service
 
-The Hyphen Node.js SDK also provides a `Link` class that allows you to create and manage short codes. This can be useful for generating short links for your application. Here is an example of creating a short code:
+The Hyphen Node.js SDK also provides a `Link` class that allows you to create and manage short codes. This can be useful for generating short links for your application.
+
+* [Website](https://hyphen.ai/link)
+* [Guides](https://docs.hyphen.ai/docs/create-short-link)
+* [API Reference](https://docs.hyphen.ai/reference/post_api-organizations-organizationid-link-codes)
+
+## Creating a Short Code
+To create a short code, you can use the `createShortCode` method:
 
 ```javascript
 import { Link } from '@hyphen/sdk';
@@ -670,6 +680,21 @@ const response = await link.createShortCode(longUrl, domain, options);
 console.log('Short Code Response:', response);
 ```
 
+## Getting a Short Code
+To get a short code, you can use the `getShortCode` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code you want to get
+const response = await link.getShortCode(code);
+console.log('Get Short Code Response:', response);
+```
+
+## Deleting a Short Code
 if you want to delete a short code you can do it like this:
 
 ```javascript
