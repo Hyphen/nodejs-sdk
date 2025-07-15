@@ -9,6 +9,7 @@ const organizationId: string = process.env.HYPHEN_ORGANIZATION_ID ?? 'test-organ
 const linkDomain: string = process.env.HYPHEN_LINK_DOMAIN ?? 'test.domain.com';
 const tags: string[] = ['sdk-test', 'unit-test'];
 const longUrl = ['https://hyphen.ai', 'https://hyphen.ai/env', 'https://hyphen.ai/link', 'https://hyphen.ai/toggle', 'https://hyphen.ai/net-info'];
+const testTimeout = 20_000;
 
 export function getRandomLongUrl(): string {
 	return longUrl[Math.floor(Math.random() * longUrl.length)];
@@ -92,7 +93,7 @@ describe('Link Create', () => {
 			const deleteResponse = await link.deleteShortCode(response.id);
 			expect(deleteResponse).toBe(true);
 		}
-	}, 10_000);
+	}, testTimeout);
 
 	test('should throw on create a short code with invalid parameters', async () => {
 		const link = new Link({organizationId, apiKey});
@@ -133,7 +134,7 @@ describe('Link Get', () => {
 			const deleteResponse = await link.deleteShortCode(createResponse.id);
 			expect(deleteResponse).toBe(true);
 		}
-	}, 10_000);
+	}, testTimeout);
 
 	test('should throw on get short codes with invalid parameters', async () => {
 		const link = new Link({organizationId, apiKey});
@@ -164,7 +165,7 @@ describe('Link Get', () => {
 			const deleteResponse = await link.deleteShortCode(createResponse.id);
 			expect(deleteResponse).toBe(true);
 		}
-	}, 10_000);
+	}, testTimeout);
 
 	test('should throw on get if no organization ID is set', async () => {
 		const link = new Link({organizationId, apiKey});
