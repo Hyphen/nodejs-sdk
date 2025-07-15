@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
 import process from 'node:process';
 import {describe, expect, test} from 'vitest';
+import {faker} from '@faker-js/faker';
 import {Link} from '../src/link.js';
 
 const apiKey: string = process.env.HYPHEN_API_KEY ?? 'test-api-key';
@@ -79,7 +80,8 @@ describe('Link Create', () => {
 		const link = new Link({organizationId, apiKey});
 		const longUrl = getRandomLongUrl();
 		const domain = linkDomain;
-		const options = {tags};
+		const title = faker.string.alpha(10);
+		const options = {tags, title};
 
 		const response = await link.createShortCode(longUrl, domain, options);
 
@@ -90,7 +92,7 @@ describe('Link Create', () => {
 			const deleteResponse = await link.deleteShortCode(response.id);
 			expect(deleteResponse).toBe(true);
 		}
-	});
+	}, 10_000);
 
 	test('should throw on create a short code with invalid parameters', async () => {
 		const link = new Link({organizationId, apiKey});
@@ -104,6 +106,41 @@ describe('Link Create', () => {
 });
 
 describe('Link Get', () => {
+	test('should get a list of short codes including tags and title', async () => {
+		// Create a link instance
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const title = faker.string.alpha(10) as string;
+		const options = {tags, title};
+
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+		expect(createResponse.title).toBe(title);
+		expect(createResponse.tags).toEqual(tags);
+
+		const response = await link.getShortCodes(title, tags);
+
+		expect(response).toBeDefined();
+		expect(response.total).toBeGreaterThan(0);
+		expect(response.pageNum).toBe(1);
+		expect(response.pageSize).toBe(100);
+
+		// Delete the created short code
+		if (createResponse.id) {
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+	}, 10_000);
+
+	test('should throw on get short codes with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		await expect(link.getShortCodes('invalid-title')).rejects.toThrow();
+	});
+
 	test('should create a short code and get it by code', async () => {
 		const link = new Link({organizationId, apiKey});
 		const longUrl = getRandomLongUrl();
@@ -115,6 +152,7 @@ describe('Link Get', () => {
 		expect(createResponse.code).toBeDefined();
 		expect(createResponse.long_url).toBe(longUrl);
 		expect(createResponse.domain).toBe(domain);
+		expect(createResponse.tags).toEqual(options.tags);
 
 		// Retrieve the short code by ID
 		if (createResponse.id) {
@@ -123,10 +161,10 @@ describe('Link Get', () => {
 		}
 
 		if (createResponse.id) {
-			const getResponse = await link.getShortCode(createResponse.id);
-			expect(getResponse).toEqual(createResponse);
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
 		}
-	});
+	}, 10_000);
 
 	test('should throw on get if no organization ID is set', async () => {
 		const link = new Link({organizationId, apiKey});
