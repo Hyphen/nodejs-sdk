@@ -40,6 +40,13 @@ export type CreateShortCodeResponse = {
 	};
 };
 
+export type GetShortCodesResponse = {
+	total: number;
+	pageNum: number;
+	pageSize: number;
+	data: GetShortCodeResponse[];
+};
+
 export type GetShortCodeResponse = CreateShortCodeResponse;
 
 export type LinkOptions = {
@@ -202,7 +209,7 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to get a short code.');
 		}
 
-		let url = this.getUri(this._organizationId, code);
+		const url = this.getUri(this._organizationId, code);
 		const headers = this.createHeaders(this._apiKey);
 
 		const response = await this.get(url, {headers});
@@ -215,6 +222,36 @@ export class Link extends BaseService {
 		throw new Error(`Failed to get short code: ${response.statusText}`);
 	}
 
+	public async getShortCodes(titleSearch: string, tags?: string[], pageNumber = 1, pageSize = 100): Promise<GetShortCodesResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get short codes.');
+		}
+
+		const url = this.getUri(this._organizationId);
+		const headers = this.createHeaders(this._apiKey);
+
+		const parameters: Record<string, string> = {};
+		if (titleSearch) {
+			parameters.title = titleSearch;
+		}
+
+		if (tags && tags.length > 0) {
+			parameters.tags = tags.join(',');
+		}
+
+		parameters.pageNum = pageNumber.toString();
+		parameters.pageSize = pageSize.toString();
+
+		const response = await this.get(url, {headers, params: parameters});
+
+		if (response.status === 200) {
+			return response.data as GetShortCodesResponse;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get short codes: ${response.statusText}`);
+	}
+
 	/**
 	 * Delete a short code.
 	 * @param {string} code The short code to delete. Example: 'code_686bed403c3991bd676bba4d'
@@ -225,7 +262,7 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to delete a short code.');
 		}
 
-		let url = this.getUri(this._organizationId, code);
+		const url = this.getUri(this._organizationId, code);
 
 		const headers = this.createHeaders(this._apiKey);
 		delete headers['content-type']; // Remove content-type header for DELETE requests

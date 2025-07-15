@@ -26,6 +26,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 - [Link - Short Code Service](#link---short-code-service)
 	- [Creating a Short Code](#creating-a-short-code)
 	- [Getting a Short Code](#getting-a-short-code)
+	- [Getting Short Codes](#getting-short-codes)
 	- [Deleting a Short Code](#deleting-a-short-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
@@ -692,6 +693,21 @@ const link = new Link({
 const code = 'code_1234567890'; // It is the code identifier for the short code you want to get
 const response = await link.getShortCode(code);
 console.log('Get Short Code Response:', response);
+```
+
+## Getting Short Codes
+To get a list of short codes, you can use the `getShortCodes` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const title = 'My Short Codes'; // Optional title to filter short codes
+const tags = ['sdk-test', 'unit-test']; // Optional tags to filter short codes
+const response = await link.getShortCodes(title, tags);
+console.log('Get Short Codes Response:', response);
 ```
 
 ## Deleting a Short Code
