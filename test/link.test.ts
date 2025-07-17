@@ -185,3 +185,41 @@ describe('Link Delete', () => {
 		await expect(link.deleteShortCode(fakeCodeId)).rejects.toThrow();
 	});
 });
+
+describe('Link Update', () => {
+	test('should throw on update short code with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		const fakeCodeId = 'code_1234567890abcdef';
+		const options = {title: 'Updated Title', tags: ['updated-tag']};
+
+		link.organizationId = undefined; // Clear organization ID to force an error
+		await expect(link.updateShortCode(fakeCodeId, options)).rejects.toThrow();
+	});
+
+	test('create a short code and update it', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const title = faker.string.alpha(10);
+		const options = {tags, title};
+
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			const updateOptions = {title: 'Updated Title', tags: ['updated-tag'], long_url: 'https://updated.url'};
+			const updateResponse = await link.updateShortCode(createResponse.id, updateOptions);
+
+			expect(updateResponse).toBeDefined();
+			expect(updateResponse.title).toBe('Updated Title');
+			expect(updateResponse.tags).toEqual(['updated-tag']);
+			expect(updateResponse.long_url).toBe('https://updated.url');
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+	}, testTimeout);
+});
