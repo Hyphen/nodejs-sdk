@@ -681,6 +681,27 @@ const response = await link.createShortCode(longUrl, domain, options);
 console.log('Short Code Response:', response);
 ```
 
+## Updating a Short Code
+To update a short code, you can use the `updateShortCode` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code you want to update
+const longUrl = 'https://hyphen.ai/updated';
+const options = {
+  title: 'Updated Short Code',
+  tags: ['sdk-test', 'unit-test'],
+  long_url: longUrl,
+};
+
+const updateResponse = await link.updateShortCode(code, options);
+console.log('Update Short Code Response:', updateResponse);
+```
+
 ## Getting a Short Code
 To get a short code, you can use the `getShortCode` method:
 
