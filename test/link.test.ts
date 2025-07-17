@@ -209,7 +209,7 @@ describe('Link Update', () => {
 		expect(createResponse.id).toBeDefined();
 
 		if (createResponse.id) {
-			const updateOptions = {title: 'Updated Title', tags: ['updated-tag'], longUrl: 'https://updated.url'};
+			const updateOptions = {title: 'Updated Title', tags: ['updated-tag'], long_url: 'https://updated.url'};
 			const updateResponse = await link.updateShortCode(createResponse.id, updateOptions);
 
 			expect(updateResponse).toBeDefined();
