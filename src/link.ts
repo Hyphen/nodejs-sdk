@@ -40,6 +40,26 @@ export type CreateShortCodeResponse = {
 	};
 };
 
+export type UpdateShortCodeResponse = CreateShortCodeResponse;
+
+export type UpdateShortCodeOptions = {
+	/**
+	 * The long URL that the short code will redirect to.
+	 * @default undefined
+	 */
+	long_url?: string;
+	/**
+	 * The title of the link. This is used for display purposes.
+	 * @default undefined
+	 */
+	title?: string;
+	/**
+	 * The tags associated with the link. This is used for categorization purposes.
+	 * @default undefined
+	 */
+	tags?: string[];
+};
+
 export type GetShortCodesResponse = {
 	total: number;
 	pageNum: number;
@@ -250,6 +270,24 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to get short codes: ${response.statusText}`);
+	}
+
+	public async updateShortCode(code: string, options: UpdateShortCodeOptions): Promise<UpdateShortCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to update a short code.');
+		}
+
+		const url = this.getUri(this._organizationId, code);
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.patch(url, options, {headers});
+
+		if (response.status === 200) {
+			return response.data as UpdateShortCodeResponse;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to update short code: ${response.statusText}`);
 	}
 
 	/**
