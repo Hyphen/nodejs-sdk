@@ -209,6 +209,7 @@ describe('Link Update', () => {
 		expect(createResponse.id).toBeDefined();
 
 		if (createResponse.id) {
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			const updateOptions = {title: 'Updated Title', tags: ['updated-tag'], long_url: 'https://updated.url'};
 			const updateResponse = await link.updateShortCode(createResponse.id, updateOptions);
 
