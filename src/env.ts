@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {config} from 'dotenv';
 
-export type LoadEnvOptions = {
+export type EnvOptions = {
 	path?: string;
 	environment?: string;
 	local?: boolean;
@@ -12,13 +12,13 @@ export type LoadEnvOptions = {
 /**
  * @description Helper function to load your environment variables based on your default .env file
  * and the current environment.
- * @param {LoadEnvOptions} [options] - Options to customize the loading of environment variables.
+ * @param {EnvOptions} [options] - Options to customize the loading of environment variables.
  * @returns {void}
  * @example
- * import { loadEnv } from '@hyphen/sdk';
- * loadEnv();
+ * import { env } from '@hyphen/sdk';
+ * env();
  */
-export function loadEnv(options?: LoadEnvOptions): void {
+export function env(options?: EnvOptions): void {
 	const local = options?.local ?? true;
 
 	// Set the current working directory if provided
@@ -56,3 +56,6 @@ export function loadEnv(options?: LoadEnvOptions): void {
 		}
 	}
 }
+
+export const loadEnv = env; // Alias for backward compatibility
+export type LoadEnvOptions = EnvOptions; // Alias for backward compatibility
