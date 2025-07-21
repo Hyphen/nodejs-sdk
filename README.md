@@ -582,44 +582,44 @@ console.log('Boolean toggle value:', result); // true
 Hyphens secret management service known as [ENV](https://hyphen.ai/env) allows you to manage your environment variables in a secure way. The Hyphen Node.js SDK provides a simple way to access your environment variables.
 
 ## Loading Environment Variables
-To load your environment variables, you can use the `loadEnv` function from the SDK. This function will automatically load your environment variables from the `.env` file and then override them with the environment based environment file if it exists (ex: `.env.development`). This is useful for managing different environments such as development, staging, and production. 
+To load your environment variables, you can use the `env()` function from the SDK. This function will automatically load your environment variables from the `.env` file and then override them with the environment based environment file if it exists (ex: `.env.development`). This is useful for managing different environments such as development, staging, and production. 
 
 The following override path is:
 ```
 .env -> .env.local -> .env.<environment> -> .env.<environment>.local
 ```
 
-Here is an example of how to use the `loadEnv` function:
+Here is an example of how to use the `env()` function:
 
 ```javascript
-import { loadEnv } from '@hyphen/sdk';
+import { env } from '@hyphen/sdk';
 
 //load your default environment variables and envrionment variables
-loadEnv();
+env();
 ```
 
 If your environment variables are not stored in the root of your project you can specify the path to your `.env` file:
 
 ```javascript
-import { loadEnv } from '@hyphen/sdk';
+import { env } from '@hyphen/sdk';
 //load your default environment variables and envrionment variables
-loadEnv({ path: '/path/to/your/env/files/' });
+env({ path: '/path/to/your/env/files/' });
 ```
 
 You can also specify the environment variables to load by passing an array of variable names:
 
 ```javascript
-import { loadEnv } from '@hyphen/sdk';
+import { env } from '@hyphen/sdk';
 //load your default environment variables and envrionment variables
-loadEnv({ environment: 'development' });
+env({ environment: 'development' });
 ```
 
 if you want to turn off the local environment variables you can do it like this:
 
 ```javascript
-import { loadEnv } from '@hyphen/sdk';
+import { env } from '@hyphen/sdk';
 //load your default environment variables and envrionment variables
-loadEnv({ local: false });
+env({ local: false });
 ```
 
 # Net Info - Geo Information Service
