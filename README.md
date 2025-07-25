@@ -31,6 +31,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Getting all Organization Tags](#getting-all-organization-tags)
 	- [Getting Short Code Stats](#getting-short-code-stats)
 	- [Deleting a Short Code](#deleting-a-short-code)
+	- [Creating a QR Code from a Short Code](#creating-a-qr-code-from-a-short-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -777,6 +778,53 @@ const link = new Link({
 const code = 'code_1234567890'; // It is the code identifier for the short code you want to delete
 const response = await link.deleteShortCode(code);
 console.log('Delete Short Code Response:', response);
+```
+
+## Creating a QR Code from a Short Code
+
+To create a QR code from a short code, you can use the `createQrCode` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code you want to create a QR code for
+const response = await link.createQrCode(code);
+console.log('Create QR Code Response:', response);
+```
+
+There are options that you can pass in to the `createQrCode` method to customize the QR code:
+
+```typescript
+export type CreateQrCodeOptions = {
+	/**
+	 * The title of the QR code. This is used for display purposes.
+	 * @default undefined
+	 */
+	title?: string;
+	/**
+	 * The background color of the QR code. This is a hex color code.
+	 * @default '#ffffff'
+	 */
+	backgroundColor?: string;
+	/**
+	 * The color of the QR code. This is a hex color code.
+	 * @default '#000000'
+	 */
+	color?: string;
+	/**
+	 * The size of the QR code. This can be 'small', 'medium', or 'large'.
+	 * @default QrSize.MEDIUM
+	 */
+	size?: QrSize;
+	/**
+	 * The logo to include in the QR code. This should be a base64 encoded string.
+	 * @default undefined
+	 */
+	logo?: string;
+};
 ```
 
 # Contributing

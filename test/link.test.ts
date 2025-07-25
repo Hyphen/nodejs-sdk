@@ -2,7 +2,7 @@
 import process from 'node:process';
 import {describe, expect, test} from 'vitest';
 import {faker} from '@faker-js/faker';
-import {Link} from '../src/link.js';
+import {type CreateQrCodeOptions, Link, QrSize} from '../src/link.js';
 
 const apiKey: string = process.env.HYPHEN_API_KEY ?? 'test-api-key';
 const organizationId: string = process.env.HYPHEN_ORGANIZATION_ID ?? 'test-organization-id';
@@ -266,5 +266,62 @@ describe('Link Stats', () => {
 		link.organizationId = undefined; // Clear organization ID to force an error
 		const fakeCodeId = 'code_1234567890abcdef';
 		await expect(link.getCodeStats(fakeCodeId, new Date(), new Date())).rejects.toThrow();
+	});
+});
+
+describe('Link QR Code', () => {
+	test('should create a QR code for a short code', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			const qrCodeResponse = await link.createQrCode(createResponse.id);
+			expect(qrCodeResponse).toBeDefined();
+			expect(qrCodeResponse.qrCode).toBeDefined();
+			expect(qrCodeResponse.qrLink).toBeDefined();
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+	}, testTimeout);
+
+	test('should create a QR code with custom options', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			const qrCodeOptions: CreateQrCodeOptions = {
+				title: 'Custom QR Code',
+				backgroundColor: '#ffffff',
+				color: '#000000',
+				size: QrSize.MEDIUM,
+			};
+			const qrCodeResponse = await link.createQrCode(createResponse.id, qrCodeOptions);
+			expect(qrCodeResponse).toBeDefined();
+			expect(qrCodeResponse.qrCode).toBeDefined();
+			expect(qrCodeResponse.qrLink).toBeDefined();
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+	});
+
+	test('should throw on create QR code with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		await expect(link.createQrCode(fakeCodeId)).rejects.toThrow();
 	});
 });
