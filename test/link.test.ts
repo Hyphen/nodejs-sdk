@@ -418,4 +418,36 @@ describe('Link QR Code', () => {
 		const fakeQrCodeId = 'qr_code_1234567890abcdef';
 		await expect(link.getQrCode(fakeCodeId, fakeQrCodeId)).rejects.toThrow();
 	});
+
+	test('should delete a QR code by ID', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			const qrCodeResponse = await link.createQrCode(createResponse.id);
+			expect(qrCodeResponse).toBeDefined();
+			expect(qrCodeResponse.qrCode).toBeDefined();
+			expect(qrCodeResponse.qrLink).toBeDefined();
+
+			const deleteQrCodeResponse = await link.deleteQrCode(createResponse.id, qrCodeResponse.id);
+			expect(deleteQrCodeResponse).toBe(true);
+
+			const deleteShortCodeResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteShortCodeResponse).toBe(true);
+		}
+	}, testTimeout);
+
+	test('should throw on delete QR code with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		const fakeQrCodeId = 'qr_code_1234567890abcdef';
+		await expect(link.deleteQrCode(fakeCodeId, fakeQrCodeId)).rejects.toThrow();
+	});
 });
