@@ -732,6 +732,20 @@ const response = await link.getShortCodes(title, tags);
 console.log('Get Short Codes Response:', response);
 ```
 
+## Getting all Organization Tags
+
+To get all tags for your organization, you can use the `getTags` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const response = await link.getTags();
+console.log('Get Tags Response:', response);
+```
+
 ## Deleting a Short Code
 if you want to delete a short code you can do it like this:
 
