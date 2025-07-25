@@ -32,6 +32,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Getting Short Code Stats](#getting-short-code-stats)
 	- [Deleting a Short Code](#deleting-a-short-code)
 	- [Creating a QR Code from a Short Code](#creating-a-qr-code-from-a-short-code)
+	- [Get QR Codes for a Short Code](#get-qr-codes-for-a-short-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -825,6 +826,21 @@ export type CreateQrCodeOptions = {
 	 */
 	logo?: string;
 };
+```
+
+## Get QR Codes for a Short Code
+
+To get all QR codes for a short code, you can use the `getQrCodes` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code
+const response = await link.getQrCodes(code);
+console.log('Get QR Codes Response:', response);
 ```
 
 # Contributing
