@@ -113,6 +113,13 @@ export type CreateQrCodeResponse = {
 	qrLink: string;
 };
 
+export type GetQrCodesResponse = {
+	total: number;
+	pageNum: number;
+	pageSize: number;
+	data: CreateQrCodeResponse[];
+};
+
 export type LinkOptions = {
 	/**
 	 * The URIs to access the link service.
@@ -483,5 +490,39 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to create QR code: ${response.statusText}`);
+	}
+
+	public async getQrCodes(code: string, pageNum?: number, pageSize?: number): Promise<GetQrCodesResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get QR codes.');
+		}
+
+		const url = this.getUri(this._organizationId, code, 'qrs');
+		const headers = this.createHeaders(this._apiKey);
+
+		const parameters: Record<string, string> = {};
+		if (pageNum) {
+			parameters.pageNum = pageNum.toString();
+		}
+		if (pageSize) {
+			parameters.pageSize = pageSize.toString();
+		}
+
+		const response = await this.get(url, {headers, params: parameters});
+
+		if (response.status === 200) {
+			const result = response.data as GetQrCodesResponse;
+			result.data.forEach((qrCode) => {
+				if (qrCode.qrCode) {
+					const buffer = Buffer.from(qrCode.qrCode, 'base64');
+					qrCode.qrCodeBytes = new Uint16Array(buffer);
+				}
+			});
+			return result;
+		/* c8 ignore next 1 */
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get QR codes: ${response.statusText}`);
 	}
 }

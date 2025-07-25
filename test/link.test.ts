@@ -324,4 +324,35 @@ describe('Link QR Code', () => {
 		const fakeCodeId = 'code_1234567890abcdef';
 		await expect(link.createQrCode(fakeCodeId)).rejects.toThrow();
 	});
+
+	test('should create multiple QR codes for a short code and get them', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			const qrCode1 = await link.createQrCode(createResponse.id);
+			expect(qrCode1).toBeDefined();
+			expect(qrCode1.qrCode).toBeDefined();
+			expect(qrCode1.qrLink).toBeDefined();
+
+			const qrCode2 = await link.createQrCode(createResponse.id);
+			expect(qrCode2).toBeDefined();
+			expect(qrCode2.qrCode).toBeDefined();
+			expect(qrCode2.qrLink).toBeDefined();
+
+			const qrCodes = await link.getQrCodes(createResponse.id);
+			expect(qrCodes).toBeDefined();
+			expect(qrCodes.data.length).toBeGreaterThanOrEqual(2);
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+
+	}, testTimeout);
 });
