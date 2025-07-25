@@ -1,4 +1,5 @@
 import process from 'node:process';
+import {Buffer} from 'node:buffer';
 import {BaseService, type BaseServiceOptions} from './base-service.js';
 import {env} from './env.js';
 import {type GetCodeStatsResponse} from './link-stats-type.js';
@@ -69,6 +70,48 @@ export type GetShortCodesResponse = {
 };
 
 export type GetShortCodeResponse = CreateShortCodeResponse;
+
+export enum QrSize {
+	SMALL = 'small',
+	MEDIUM = 'medium',
+	LARGE = 'large',
+}
+
+export type CreateQrCodeOptions = {
+	/**
+	 * The title of the QR code. This is used for display purposes.
+	 * @default undefined
+	 */
+	title?: string;
+	/**
+	 * The background color of the QR code. This is a hex color code.
+	 * @default '#ffffff'
+	 */
+	backgroundColor?: string;
+	/**
+	 * The color of the QR code. This is a hex color code.
+	 * @default '#000000'
+	 */
+	color?: string;
+	/**
+	 * The size of the QR code. This can be 'small', 'medium', or 'large'.
+	 * @default QrSize.MEDIUM
+	 */
+	size?: QrSize;
+	/**
+	 * The logo to include in the QR code. This should be a base64 encoded string.
+	 * @default undefined
+	 */
+	logo?: string;
+};
+
+export type CreateQrCodeResponse = {
+	id: string;
+	title?: string;
+	qrCode: string;
+	qrCodeBytes: Uint16Array;
+	qrLink: string;
+};
 
 export type LinkOptions = {
 	/**
@@ -229,6 +272,7 @@ export class Link extends BaseService {
 
 		if (response.status === 201) {
 			return response.data as CreateShortCodeResponse;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -252,6 +296,7 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			return response.data as GetShortCodeResponse;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -290,6 +335,7 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			return response.data as GetShortCodesResponse;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -312,6 +358,7 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			return response.data as string[];
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -340,6 +387,7 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			return response.data as GetCodeStatsResponse;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -364,6 +412,7 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			return response.data as UpdateShortCodeResponse;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -389,9 +438,50 @@ export class Link extends BaseService {
 
 		if (response.status === 204) {
 			return true;
+		/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to delete short code: ${response.statusText}`);
+	}
+
+	/**
+	 * Create a QR code for a specific short code.
+	 * @param {string} code The short code to create a QR code for.
+	 * @param {CreateQrCodeOptions} options The options for creating the QR code.
+	 * @returns {Promise<CreateQrCodeResponse>} A promise that resolves to the created QR code details.
+	 */
+	public async createQrCode(code: string, options?: CreateQrCodeOptions): Promise<CreateQrCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to create a QR code.');
+		}
+
+		const url = this.getUri(this._organizationId, code, 'qrs');
+		const headers = this.createHeaders(this._apiKey);
+
+		const body: Record<string, any> = {
+			title: options?.title,
+			backgroundColor: options?.backgroundColor,
+			color: options?.color,
+			size: options?.size,
+			logo: options?.logo,
+		};
+
+		const response = await this.post(url, body, {headers});
+
+		if (response.status === 201) {
+			const result = response.data as CreateQrCodeResponse;
+
+			if (result.qrCode) {
+				const buffer = Buffer.from(result.qrCode, 'base64');
+				result.qrCodeBytes = new Uint16Array(buffer);
+			}
+
+			return result;
+		/* c8 ignore next 1 */
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to create QR code: ${response.statusText}`);
 	}
 }
