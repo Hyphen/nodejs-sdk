@@ -33,6 +33,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Deleting a Short Code](#deleting-a-short-code)
 	- [Creating a QR Code from a Short Code](#creating-a-qr-code-from-a-short-code)
 	- [Get QR Codes for a Short Code](#get-qr-codes-for-a-short-code)
+	- [Deleting a QR Code](#deleting-a-qr-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -857,6 +858,22 @@ const link = new Link({
 const code = 'code_1234567890'; // It is the code identifier for the short code
 const response = await link.getQrCodes(code);
 console.log('Get QR Codes Response:', response);
+```
+
+## Deleting a QR Code
+
+To delete a QR code, you can use the `deleteQrCode` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code
+const qr = 'qr_1234567890'; // It is the ID of the QR code you want to delete
+const response = await link.deleteQrCode(code, qr);
+console.log('Delete QR Code Response:', response);
 ```
 
 # Contributing

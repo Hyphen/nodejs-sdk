@@ -443,7 +443,6 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId, code);
 
 		const headers = this.createHeaders(this._apiKey);
-		delete headers['content-type']; // Remove content-type header for DELETE requests
 
 		const response = await this.delete(url, {headers});
 
@@ -562,5 +561,31 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to get QR codes: ${response.statusText}`);
+	}
+
+	/**
+	 * Delete a QR code by its ID.
+	 * @param {string} code The short code associated with the QR code.
+	 * @param {string} qr The ID of the QR code to delete.
+	 * @returns {Promise<boolean>} A promise that resolves to true if the QR code was deleted successfully, or false if it was not.
+	 */
+	public async deleteQrCode(code: string, qr: string): Promise<boolean> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to delete a QR code.');
+		}
+
+		const url = this.getUri(this._organizationId, code, 'qrs', qr);
+
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.delete(url, {headers});
+
+		if (response.status === 204) {
+			return true;
+		/* c8 ignore next 1 */
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to delete QR code: ${response.statusText}`);
 	}
 }
