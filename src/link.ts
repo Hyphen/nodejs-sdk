@@ -192,6 +192,13 @@ export class Link extends BaseService {
 		return url;
 	}
 
+	/**
+	 * Create a short code for a long URL.
+	 * @param {string} longUrl The long URL to shorten.
+	 * @param {string} domain The domain to use for the short code.
+	 * @param {CreateShortCodeOptions} options Optional parameters for creating the short code.
+	 * @returns {Promise<CreateShortCodeResponse>} A promise that resolves to the created short code details.
+	 */
 	public async createShortCode(longUrl: string, domain: string, options?: CreateShortCodeOptions): Promise<CreateShortCodeResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to create a short code.');
@@ -242,6 +249,14 @@ export class Link extends BaseService {
 		throw new Error(`Failed to get short code: ${response.statusText}`);
 	}
 
+	/**
+	 * Get all short codes for the organization.
+	 * @param {string} titleSearch Optional search term to filter short codes by title.
+	 * @param {string[]} tags Optional tags to filter short codes.
+	 * @param {number} pageNumber The page number to retrieve. Default is 1.
+	 * @param {number} pageSize The number of short codes per page. Default is 100.
+	 * @returns {Promise<GetShortCodesResponse>} A promise that resolves to the list of short codes.
+	 */
 	public async getShortCodes(titleSearch: string, tags?: string[], pageNumber = 1, pageSize = 100): Promise<GetShortCodesResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to get short codes.');
@@ -272,6 +287,12 @@ export class Link extends BaseService {
 		throw new Error(`Failed to get short codes: ${response.statusText}`);
 	}
 
+	/**
+	 * Update a short code.
+	 * @param {string} code The short code to update. Example: 'code_686bed403c3991bd676bba4d'
+	 * @param {UpdateShortCodeOptions} options The options to update the short code with.
+	 * @returns {Promise<UpdateShortCodeResponse>} A promise that resolves to the updated short code details.
+	 */
 	public async updateShortCode(code: string, options: UpdateShortCodeOptions): Promise<UpdateShortCodeResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to update a short code.');
