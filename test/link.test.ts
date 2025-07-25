@@ -60,7 +60,7 @@ describe('Link', () => {
 	test('should get the uri based on organization ID', () => {
 		const link = new Link({organizationId, apiKey});
 		const uri = link.getUri(organizationId);
-		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/`);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes`);
 	});
 
 	test('should handle if uri doesnt have forward slash and code is added', () => {
@@ -68,11 +68,11 @@ describe('Link', () => {
 		const code = 'code_1234567890abcdef';
 
 		const uri = link.getUri(organizationId, code);
-		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}`);
 
 		link.uris = ['https://api.hyphen.ai/api/organizations/{organizationId}/link/codes'];
 		const uriWithoutSlash = link.getUri(organizationId, code);
-		expect(uriWithoutSlash).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+		expect(uriWithoutSlash).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}`);
 	});
 });
 

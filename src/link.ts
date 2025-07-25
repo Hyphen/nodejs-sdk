@@ -1,8 +1,9 @@
 import process from 'node:process';
 import {BaseService, type BaseServiceOptions} from './base-service.js';
-import {loadEnv} from './env.js';
+import {env} from './env.js';
+import {type GetCodeStatsResponse} from './link-stats-type.js';
 
-loadEnv();
+env();
 
 export const defaultLinkUris = [
 	'https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/',
@@ -178,15 +179,23 @@ export class Link extends BaseService {
 	 * @param {string} code The code to include in the URI.
 	 * @returns {string} The constructed URI.
 	 */
-	public getUri(organizationId: string, code?: string): string {
+	public getUri(organizationId: string, prefix1?: string, prefix2?: string): string {
 		/* c8 ignore next 3 */
 		if (!organizationId) {
 			throw new Error('Organization ID is required to get the URI.');
 		}
 
 		let url = this._uris[0].replace('{organizationId}', organizationId);
-		if (code) {
-			url = url.endsWith('/') ? `${url}${code}/` : `${url}/${code}/`;
+		if (prefix1) {
+			url = url.endsWith('/') ? `${url}${prefix1}/` : `${url}/${prefix1}/`;
+		}
+
+		if (prefix2) {
+			url = url.endsWith('/') ? `${url}${prefix2}/` : `${url}/${prefix2}/`;
+		}
+
+		if (url.endsWith('/')) {
+			url = url.slice(0, -1); // Remove trailing slash if present
 		}
 
 		return url;
@@ -296,12 +305,8 @@ export class Link extends BaseService {
 			throw new Error('Organization ID is required to get tags.');
 		}
 
-		let url = this.getUri(this._organizationId, 'tags');
+		const url = this.getUri(this._organizationId, 'tags');
 		const headers = this.createHeaders(this._apiKey);
-
-		if (url.endsWith('/')) {
-			url = url.slice(0, -1); // Remove trailing slash if present
-		}
 
 		console.log(`Fetching tags from: ${url}`);
 		const response = await this.get(url, {headers});
@@ -312,6 +317,29 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to get tags: ${response.statusText}`);
+	}
+
+	/**
+	 * Get statistics for a specific short code.
+	 * @param code The short code to retrieve statistics for.
+	 * @returns {Promise<GetCodeStatsResponse>} A promise that resolves to the code statistics.
+	 */
+	public async getCodeStats(code: string): Promise<GetCodeStatsResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get code stats.');
+		}
+
+		const url = this.getUri(this._organizationId, code, 'stats');
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.get(url, {headers});
+
+		if (response.status === 200) {
+			return response.data as GetCodeStatsResponse;
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get code stats: ${response.statusText}`);
 	}
 
 	/**
