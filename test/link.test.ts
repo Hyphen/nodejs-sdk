@@ -60,7 +60,7 @@ describe('Link', () => {
 	test('should get the uri based on organization ID', () => {
 		const link = new Link({organizationId, apiKey});
 		const uri = link.getUri(organizationId);
-		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/`);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes`);
 	});
 
 	test('should handle if uri doesnt have forward slash and code is added', () => {
@@ -68,11 +68,11 @@ describe('Link', () => {
 		const code = 'code_1234567890abcdef';
 
 		const uri = link.getUri(organizationId, code);
-		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+		expect(uri).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}`);
 
 		link.uris = ['https://api.hyphen.ai/api/organizations/{organizationId}/link/codes'];
 		const uriWithoutSlash = link.getUri(organizationId, code);
-		expect(uriWithoutSlash).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}/`);
+		expect(uriWithoutSlash).toBe(`https://api.hyphen.ai/api/organizations/${organizationId}/link/codes/${code}`);
 	});
 });
 
@@ -236,5 +236,35 @@ describe('Link Tags', () => {
 		const link = new Link({organizationId, apiKey});
 		link.organizationId = undefined; // Clear organization ID to force an error
 		await expect(link.getTags()).rejects.toThrow();
+	});
+});
+
+describe('Link Stats', () => {
+	test('should get code stats for a short code', async () => {
+		const link = new Link({organizationId, apiKey});
+
+		// Get all the short codes
+		const shortCodes = await link.getShortCodes('', [], 1, 10);
+		expect(shortCodes).toBeDefined();
+		expect(shortCodes.data.length).toBeGreaterThan(0);
+
+		// Select a random short code
+		const randomShortCode = shortCodes.data[Math.floor(Math.random() * shortCodes.data.length)];
+
+		const codeStats = await link.getCodeStats(randomShortCode.id, new Date(Date.now() - (24 * 60 * 60 * 1000)), new Date());
+
+		expect(codeStats).toBeDefined();
+		expect(codeStats.clicks).toBeDefined();
+		expect(codeStats.referrals).toBeDefined();
+		expect(codeStats.browsers).toBeDefined();
+		expect(codeStats.devices).toBeDefined();
+		expect(codeStats.locations).toBeDefined();
+	}, testTimeout);
+
+	test('should throw on get code stats with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		await expect(link.getCodeStats(fakeCodeId, new Date(), new Date())).rejects.toThrow();
 	});
 });

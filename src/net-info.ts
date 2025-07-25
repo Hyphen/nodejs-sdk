@@ -1,8 +1,8 @@
 import process from 'node:process';
 import {BaseService, ErrorMessages, type BaseServiceOptions} from './base-service.js';
-import {loadEnv} from './env.js';
+import {env} from './env.js';
 
-loadEnv();
+env();
 
 export enum NetInfoErrors {
 	INVALID_IPS_ARRAY = 'The provided IPs array is invalid. It should be a non-empty array of strings.',

@@ -28,6 +28,8 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Updating a Short Code](#updating-a-short-code)
 	- [Getting a Short Code](#getting-a-short-code)
 	- [Getting Short Codes](#getting-short-codes)
+	- [Getting all Organization Tags](#getting-all-organization-tags)
+	- [Getting Short Code Stats](#getting-short-code-stats)
 	- [Deleting a Short Code](#deleting-a-short-code)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
@@ -744,6 +746,23 @@ const link = new Link({
 });
 const response = await link.getTags();
 console.log('Get Tags Response:', response);
+```
+
+## Get Short Code Stats
+
+To get the stats for a short code, you can use the `getShortCodeStats` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code
+const startDate = new Date('2023-01-01'); // Optional start date for the stats
+const endDate = new Date('2023-12-31'); // Optional end date for the stats
+const response = await link.getShortCodeStats(code, startDate, endDate);
+console.log('Get Short Code Stats Response:', response);
 ```
 
 ## Deleting a Short Code
