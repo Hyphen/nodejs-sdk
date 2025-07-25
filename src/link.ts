@@ -288,6 +288,33 @@ export class Link extends BaseService {
 	}
 
 	/**
+	 * Get all tags associated with the organization's short codes.
+	 * @returns {Promise<string[]>} A promise that resolves to an array of tags.
+	 */
+	public async getTags(): Promise<string[]> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get tags.');
+		}
+
+		let url = this.getUri(this._organizationId, 'tags');
+		const headers = this.createHeaders(this._apiKey);
+
+		if (url.endsWith('/')) {
+			url = url.slice(0, -1); // Remove trailing slash if present
+		}
+
+		console.log(`Fetching tags from: ${url}`);
+		const response = await this.get(url, {headers});
+
+		if (response.status === 200) {
+			return response.data as string[];
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get tags: ${response.statusText}`);
+	}
+
+	/**
 	 * Update a short code.
 	 * @param {string} code The short code to update. Example: 'code_686bed403c3991bd676bba4d'
 	 * @param {UpdateShortCodeOptions} options The options to update the short code with.

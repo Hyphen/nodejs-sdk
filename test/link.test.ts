@@ -223,3 +223,18 @@ describe('Link Update', () => {
 		}
 	}, testTimeout);
 });
+
+describe('Link Tags', () => {
+	test('should get tags for the organization', async () => {
+		const link = new Link({organizationId, apiKey});
+		const tags = await link.getTags();
+		expect(tags).toBeDefined();
+		expect(Array.isArray(tags)).toBe(true);
+	});
+
+	test('should throw on get tags with invalid organization ID', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		await expect(link.getTags()).rejects.toThrow();
+	});
+});
