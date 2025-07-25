@@ -353,6 +353,37 @@ describe('Link QR Code', () => {
 			const deleteResponse = await link.deleteShortCode(createResponse.id);
 			expect(deleteResponse).toBe(true);
 		}
+	}, testTimeout);
 
+	test('should throw on get QR codes with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		await expect(link.getQrCodes(fakeCodeId)).rejects.toThrow();
+	});
+
+	test('should get QR codes for a short code with pagination', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			await link.createQrCode(createResponse.id);
+			await link.createQrCode(createResponse.id);
+
+			const qrCodes = await link.getQrCodes(createResponse.id, 1, 10);
+			expect(qrCodes).toBeDefined();
+			expect(qrCodes.data.length).toBeGreaterThanOrEqual(2);
+			expect(qrCodes.pageNum).toBe(1);
+			expect(qrCodes.pageSize).toBe(10);
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
 	}, testTimeout);
 });

@@ -492,7 +492,7 @@ export class Link extends BaseService {
 		throw new Error(`Failed to create QR code: ${response.statusText}`);
 	}
 
-	public async getQrCodes(code: string, pageNum?: number, pageSize?: number): Promise<GetQrCodesResponse> {
+	public async getQrCodes(code: string, pageNumber?: number, pageSize?: number): Promise<GetQrCodesResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to get QR codes.');
 		}
@@ -501,9 +501,10 @@ export class Link extends BaseService {
 		const headers = this.createHeaders(this._apiKey);
 
 		const parameters: Record<string, string> = {};
-		if (pageNum) {
-			parameters.pageNum = pageNum.toString();
+		if (pageNumber) {
+			parameters.pageNum = pageNumber.toString();
 		}
+
 		if (pageSize) {
 			parameters.pageSize = pageSize.toString();
 		}
@@ -512,12 +513,13 @@ export class Link extends BaseService {
 
 		if (response.status === 200) {
 			const result = response.data as GetQrCodesResponse;
-			result.data.forEach((qrCode) => {
+			for (const qrCode of result.data) {
 				if (qrCode.qrCode) {
 					const buffer = Buffer.from(qrCode.qrCode, 'base64');
 					qrCode.qrCodeBytes = new Uint16Array(buffer);
 				}
-			});
+			}
+
 			return result;
 		/* c8 ignore next 1 */
 		}
