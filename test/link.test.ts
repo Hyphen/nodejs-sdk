@@ -316,7 +316,7 @@ describe('Link QR Code', () => {
 			const deleteResponse = await link.deleteShortCode(createResponse.id);
 			expect(deleteResponse).toBe(true);
 		}
-	});
+	}, testTimeout);
 
 	test('should throw on create QR code with invalid parameters', async () => {
 		const link = new Link({organizationId, apiKey});
