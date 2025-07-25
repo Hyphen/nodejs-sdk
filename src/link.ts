@@ -274,19 +274,19 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId);
 		const headers = this.createHeaders(this._apiKey);
 
-		const params: Record<string, string> = {};
+		const parameters: Record<string, string> = {};
 		if (titleSearch) {
-			params.title = titleSearch;
+			parameters.title = titleSearch;
 		}
 
 		if (tags && tags.length > 0) {
-			params.tags = tags.join(',');
+			parameters.tags = tags.join(',');
 		}
 
-		params.pageNum = pageNumber.toString();
-		params.pageSize = pageSize.toString();
+		parameters.pageNum = pageNumber.toString();
+		parameters.pageSize = pageSize.toString();
 
-		const response = await this.get(url, {headers, params});
+		const response = await this.get(url, {headers, params: parameters});
 
 		if (response.status === 200) {
 			return response.data as GetShortCodesResponse;
@@ -331,12 +331,12 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId, code, 'stats');
 		const headers = this.createHeaders(this._apiKey);
 
-		const params: Record<string, string> = {
+		const parameters: Record<string, string> = {
 			startDate: startDate.toISOString(),
 			endDate: endDate.toISOString(),
 		};
 
-		const response = await this.get(url, {headers, params});
+		const response = await this.get(url, {headers, params: parameters});
 
 		if (response.status === 200) {
 			return response.data as GetCodeStatsResponse;
