@@ -274,19 +274,19 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId);
 		const headers = this.createHeaders(this._apiKey);
 
-		const parameters: Record<string, string> = {};
+		const params: Record<string, string> = {};
 		if (titleSearch) {
-			parameters.title = titleSearch;
+			params.title = titleSearch;
 		}
 
 		if (tags && tags.length > 0) {
-			parameters.tags = tags.join(',');
+			params.tags = tags.join(',');
 		}
 
-		parameters.pageNum = pageNumber.toString();
-		parameters.pageSize = pageSize.toString();
+		params.pageNum = pageNumber.toString();
+		params.pageSize = pageSize.toString();
 
-		const response = await this.get(url, {headers, params: parameters});
+		const response = await this.get(url, {headers, params});
 
 		if (response.status === 200) {
 			return response.data as GetShortCodesResponse;
@@ -308,7 +308,6 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId, 'tags');
 		const headers = this.createHeaders(this._apiKey);
 
-		console.log(`Fetching tags from: ${url}`);
 		const response = await this.get(url, {headers});
 
 		if (response.status === 200) {
@@ -324,7 +323,7 @@ export class Link extends BaseService {
 	 * @param code The short code to retrieve statistics for.
 	 * @returns {Promise<GetCodeStatsResponse>} A promise that resolves to the code statistics.
 	 */
-	public async getCodeStats(code: string): Promise<GetCodeStatsResponse> {
+	public async getCodeStats(code: string, startDate: Date, endDate: Date): Promise<GetCodeStatsResponse> {
 		if (!this._organizationId) {
 			throw new Error('Organization ID is required to get code stats.');
 		}
@@ -332,7 +331,12 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId, code, 'stats');
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.get(url, {headers});
+		const params: Record<string, string> = {
+			startDate: startDate.toISOString(),
+			endDate: endDate.toISOString(),
+		};
+
+		const response = await this.get(url, {headers, params});
 
 		if (response.status === 200) {
 			return response.data as GetCodeStatsResponse;

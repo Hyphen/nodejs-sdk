@@ -238,3 +238,34 @@ describe('Link Tags', () => {
 		await expect(link.getTags()).rejects.toThrow();
 	});
 });
+
+describe('Link Stats', () => {
+	test('should get code stats for a short code', async () => {
+		const link = new Link({organizationId, apiKey});
+
+		// get all the short codes
+		const shortCodes = await link.getShortCodes('', [], 1, 10);
+		expect(shortCodes).toBeDefined();
+		expect(shortCodes.data.length).toBeGreaterThan(0);
+
+		// select a random short code
+		const randomShortCode = shortCodes.data[Math.floor(Math.random() * shortCodes.data.length)];
+
+		const codeStats = await link.getCodeStats(randomShortCode.id, new Date(Date.now() - 24 * 60 * 60 * 1000), new Date());
+		
+		expect(codeStats).toBeDefined();
+		expect(codeStats.clicks).toBeDefined();
+		expect(codeStats.referrals).toBeDefined();
+		expect(codeStats.browsers).toBeDefined();
+		expect(codeStats.devices).toBeDefined();
+		expect(codeStats.locations).toBeDefined();
+
+	}, testTimeout);
+
+	test('should throw on get code stats with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		await expect(link.getCodeStats(fakeCodeId, new Date(), new Date())).rejects.toThrow();
+	});
+});
