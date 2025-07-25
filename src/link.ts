@@ -229,7 +229,7 @@ export class Link extends BaseService {
 	 * @param {string} code The code to include in the URI.
 	 * @returns {string} The constructed URI.
 	 */
-	public getUri(organizationId: string, prefix1?: string, prefix2?: string): string {
+	public getUri(organizationId: string, prefix1?: string, prefix2?: string, prefix3?: string): string {
 		/* c8 ignore next 3 */
 		if (!organizationId) {
 			throw new Error('Organization ID is required to get the URI.');
@@ -237,11 +237,15 @@ export class Link extends BaseService {
 
 		let url = this._uris[0].replace('{organizationId}', organizationId);
 		if (prefix1) {
-			url = url.endsWith('/') ? `${url}${prefix1}/` : `${url}/${prefix1}/`;
+			url = url.endsWith('/') ? `${url}${prefix1}/` : `${url}/${prefix1}`;
 		}
 
 		if (prefix2) {
-			url = url.endsWith('/') ? `${url}${prefix2}/` : `${url}/${prefix2}/`;
+			url = url.endsWith('/') ? `${url}${prefix2}/` : `${url}/${prefix2}`;
+		}
+
+		if (prefix3) {
+			url = url.endsWith('/') ? `${url}${prefix3}/` : `${url}/${prefix3}`;
 		}
 
 		if (url.endsWith('/')) {
@@ -490,6 +494,38 @@ export class Link extends BaseService {
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to create QR code: ${response.statusText}`);
+	}
+
+	/**
+	 * Get a QR code by its ID.
+	 * @param code The short code associated with the QR code.
+	 * @param qr The ID of the QR code to retrieve.
+	 * @returns The details of the requested QR code.
+	 */
+	public async getQrCode(code: string, qr: string): Promise<CreateQrCodeResponse> {
+		if (!this._organizationId) {
+			throw new Error('Organization ID is required to get a QR code.');
+		}
+
+		const url = this.getUri(this._organizationId, code, 'qrs', qr);
+		const headers = this.createHeaders(this._apiKey);
+
+		const response = await this.get(url, {headers});
+
+		if (response.status === 200) {
+			const result = response.data as CreateQrCodeResponse;
+
+			if (result.qrCode) {
+				const buffer = Buffer.from(result.qrCode, 'base64');
+				result.qrCodeBytes = new Uint16Array(buffer);
+			}
+
+			return result;
+		/* c8 ignore next 1 */
+		}
+
+		/* c8 ignore next 1 */
+		throw new Error(`Failed to get QR code: ${response.statusText}`);
 	}
 
 	public async getQrCodes(code: string, pageNumber?: number, pageSize?: number): Promise<GetQrCodesResponse> {
