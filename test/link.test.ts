@@ -410,4 +410,12 @@ describe('Link QR Code', () => {
 			expect(deleteResponse).toBe(true);
 		}
 	}, testTimeout);
+
+	test('should throw on get QR code by ID with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		const fakeQrCodeId = 'qr_code_1234567890abcdef';
+		await expect(link.getQrCode(fakeCodeId, fakeQrCodeId)).rejects.toThrow();
+	});
 });
