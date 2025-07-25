@@ -828,6 +828,22 @@ export type CreateQrCodeOptions = {
 };
 ```
 
+## Get a QR Code By Id
+
+To get a specific QR code by its ID, you can use the `getQrCode` method:
+
+```javascript
+import { Link } from '@hyphen/sdk';
+const link = new Link({
+  organizationId: 'your_organization_id',
+  apiKey: 'your_api_key',
+});
+const code = 'code_1234567890'; // It is the code identifier for the short code
+const qr = 'qr_1234567890'; // It is the ID of the QR code you want to retrieve
+const response = await link.getQrCode(code, qr);
+console.log('Get QR Code Response:', response);
+```
+
 ## Get QR Codes for a Short Code
 
 To get all QR codes for a short code, you can use the `getQrCodes` method:

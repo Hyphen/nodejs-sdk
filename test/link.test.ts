@@ -386,4 +386,36 @@ describe('Link QR Code', () => {
 			expect(deleteResponse).toBe(true);
 		}
 	}, testTimeout);
+
+	test('should create a QR code and then get it by ID', async () => {
+		const link = new Link({organizationId, apiKey});
+		const longUrl = getRandomLongUrl();
+		const domain = linkDomain;
+		const options = {tags};
+		const createResponse = await link.createShortCode(longUrl, domain, options);
+
+		expect(createResponse).toBeDefined();
+		expect(createResponse.id).toBeDefined();
+
+		if (createResponse.id) {
+			const qrCodeResponse = await link.createQrCode(createResponse.id);
+			expect(qrCodeResponse).toBeDefined();
+			expect(qrCodeResponse.qrCode).toBeDefined();
+			expect(qrCodeResponse.qrLink).toBeDefined();
+
+			const qrCodeById = await link.getQrCode(createResponse.id, qrCodeResponse.id);
+			expect(qrCodeById.id).toEqual(qrCodeResponse.id);
+
+			const deleteResponse = await link.deleteShortCode(createResponse.id);
+			expect(deleteResponse).toBe(true);
+		}
+	}, testTimeout);
+
+	test('should throw on get QR code by ID with invalid parameters', async () => {
+		const link = new Link({organizationId, apiKey});
+		link.organizationId = undefined; // Clear organization ID to force an error
+		const fakeCodeId = 'code_1234567890abcdef';
+		const fakeQrCodeId = 'qr_code_1234567890abcdef';
+		await expect(link.getQrCode(fakeCodeId, fakeQrCodeId)).rejects.toThrow();
+	});
 });
