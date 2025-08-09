@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
 import process from "node:process";
 import { faker } from "@faker-js/faker";
 import { describe, expect, test } from "vitest";
@@ -255,7 +254,6 @@ describe("Link Update", () => {
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				// eslint-disable-next-line @typescript-eslint/naming-convention
 				const updateOptions = {
 					title: "Updated Title",
 					tags: ["updated-tag"],

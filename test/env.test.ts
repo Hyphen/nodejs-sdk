@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import process from "node:process";
 import { describe, expect, test } from "vitest";
 import { env, loadEnv } from "../src/env.js";

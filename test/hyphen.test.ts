@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { describe, expect, test } from "vitest";
 import { Hyphen } from "../src/hyphen.js";
 import { Link } from "../src/link.js";

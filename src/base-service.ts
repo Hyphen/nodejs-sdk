@@ -50,9 +50,8 @@ export class BaseService extends Hookified {
 	}
 
 	public error(message: string, ...args: any[]): void {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._log.error(message, ...args);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this.emit("error", message, ...args);
 		if (this.throwErrors) {
 			throw new Error(message);
@@ -60,9 +59,8 @@ export class BaseService extends Hookified {
 	}
 
 	public warn(message: string, ...args: any[]): void {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._log.warn(message, ...args);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this.emit("warn", message, ...args);
 	}
 

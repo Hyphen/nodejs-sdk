@@ -77,45 +77,45 @@ export class Hyphen extends Hookified {
 
 		this._netInfo = new NetInfo(netInfoOptions);
 		// Set error, info, warn emitters for netInfo
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._netInfo.on("error", (message, ...args) =>
 			this.emit("error", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._netInfo.on("info", (message, ...args) =>
 			this.emit("info", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._netInfo.on("warn", (message, ...args) =>
 			this.emit("warn", message, ...args),
 		);
 
 		this._toggle = new Toggle(toggleOptions);
 		// Set error, info, warn emitters for toggle
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._toggle.on("error", (message, ...args) =>
 			this.emit("error", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._toggle.on("info", (message, ...args) =>
 			this.emit("info", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._toggle.on("warn", (message, ...args) =>
 			this.emit("warn", message, ...args),
 		);
 
 		this._link = new Link(linkOptions);
 		// Set error, info, warn emitters for link
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._link.on("error", (message, ...args) =>
 			this.emit("error", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._link.on("info", (message, ...args) =>
 			this.emit("info", message, ...args),
 		);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
 		this._link.on("warn", (message, ...args) =>
 			this.emit("warn", message, ...args),
 		);

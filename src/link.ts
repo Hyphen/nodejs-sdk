@@ -278,7 +278,6 @@ export class Link extends BaseService {
 
 		const url = this.getUri(this._organizationId);
 		const body = {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
 			long_url: longUrl,
 			domain,
 			code: options?.code,

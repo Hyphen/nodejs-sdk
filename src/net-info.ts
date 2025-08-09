@@ -28,7 +28,6 @@ export type NetInfoOptions = {
 	baseUri?: string;
 } & BaseServiceOptions;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ipInfo = {
 	ip: string;
 	type: string;
@@ -44,7 +43,6 @@ export type ipInfo = {
 	};
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export type ipInfoError = {
 	ip: string;
 	type: string;

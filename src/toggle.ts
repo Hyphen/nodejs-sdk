@@ -288,7 +288,6 @@ export class Toggle extends Hookified {
 				}
 			}
 
-			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 			const options = {
 				application: this._applicationId,
 				environment: this._environment,
@@ -331,7 +330,6 @@ export class Toggle extends Hookified {
 		defaultValue: T,
 		options?: ToggleGetOptions,
 	): Promise<T> {
-		// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 		switch (typeof defaultValue) {
 			case "boolean": {
 				return this.getBoolean(

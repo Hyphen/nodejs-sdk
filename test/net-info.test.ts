@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
 import process from "node:process";
 import { describe, expect, test } from "vitest";
 import { ErrorMessages } from "../src/base-service.js";
