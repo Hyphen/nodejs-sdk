@@ -1,7 +1,7 @@
-import {Hookified, type HookifiedOptions} from 'hookified';
-import {NetInfo, type NetInfoOptions} from './net-info.js';
-import {Toggle, type ToggleOptions} from './toggle.js';
-import {Link, type LinkOptions} from './link.js';
+import { Hookified, type HookifiedOptions } from "hookified";
+import { Link, type LinkOptions } from "./link.js";
+import { NetInfo, type NetInfoOptions } from "./net-info.js";
+import { Toggle, type ToggleOptions } from "./toggle.js";
 
 export type HyphenOptions = {
 	/**
@@ -26,21 +26,21 @@ export type HyphenOptions = {
 	 * @see ToggleOptions
 	 * @default {Toggle}
 	 */
-	toggle?: Omit<ToggleOptions, 'publicApiKey' | 'throwErrors'>;
+	toggle?: Omit<ToggleOptions, "publicApiKey" | "throwErrors">;
 	/**
 	 * Options for the NetInfo service.
 	 * Excludes apiKey and throwErrors from NetInfoOptions.
 	 * @see NetInfoOptions
 	 * @default {NetInfo}
 	 */
-	netInfo?: Omit<NetInfoOptions, 'apiKey' | 'throwErrors'>;
+	netInfo?: Omit<NetInfoOptions, "apiKey" | "throwErrors">;
 	/**
 	 * Options for the Link service.
 	 * Excludes apiKey and throwErrors from LinkOptions.
 	 * @see LinkOptions
 	 * @default {Link}
 	 */
-	link?: Omit<LinkOptions, 'apiKey' | 'throwErrors'>;
+	link?: Omit<LinkOptions, "apiKey" | "throwErrors">;
 } & HookifiedOptions;
 
 export class Hyphen extends Hookified {
@@ -77,30 +77,48 @@ export class Hyphen extends Hookified {
 
 		this._netInfo = new NetInfo(netInfoOptions);
 		// Set error, info, warn emitters for netInfo
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._netInfo.on('error', (message, ...args) => this.emit('error', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._netInfo.on('info', (message, ...args) => this.emit('info', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._netInfo.on('warn', (message, ...args) => this.emit('warn', message, ...args));
+
+		this._netInfo.on("error", (message, ...args) =>
+			this.emit("error", message, ...args),
+		);
+
+		this._netInfo.on("info", (message, ...args) =>
+			this.emit("info", message, ...args),
+		);
+
+		this._netInfo.on("warn", (message, ...args) =>
+			this.emit("warn", message, ...args),
+		);
 
 		this._toggle = new Toggle(toggleOptions);
 		// Set error, info, warn emitters for toggle
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._toggle.on('error', (message, ...args) => this.emit('error', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._toggle.on('info', (message, ...args) => this.emit('info', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._toggle.on('warn', (message, ...args) => this.emit('warn', message, ...args));
+
+		this._toggle.on("error", (message, ...args) =>
+			this.emit("error", message, ...args),
+		);
+
+		this._toggle.on("info", (message, ...args) =>
+			this.emit("info", message, ...args),
+		);
+
+		this._toggle.on("warn", (message, ...args) =>
+			this.emit("warn", message, ...args),
+		);
 
 		this._link = new Link(linkOptions);
 		// Set error, info, warn emitters for link
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._link.on('error', (message, ...args) => this.emit('error', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._link.on('info', (message, ...args) => this.emit('info', message, ...args));
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this._link.on('warn', (message, ...args) => this.emit('warn', message, ...args));
+
+		this._link.on("error", (message, ...args) =>
+			this.emit("error", message, ...args),
+		);
+
+		this._link.on("info", (message, ...args) =>
+			this.emit("info", message, ...args),
+		);
+
+		this._link.on("warn", (message, ...args) =>
+			this.emit("warn", message, ...args),
+		);
 	}
 
 	/**
@@ -172,7 +190,11 @@ export class Hyphen extends Hookified {
 	 * @returns {boolean} Whether to throw errors or not.
 	 */
 	public get throwErrors(): boolean {
-		return this._netInfo.throwErrors && this._toggle.throwErrors && this._link.throwErrors;
+		return (
+			this._netInfo.throwErrors &&
+			this._toggle.throwErrors &&
+			this._link.throwErrors
+		);
 	}
 
 	/**

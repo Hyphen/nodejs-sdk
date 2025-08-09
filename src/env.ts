@@ -1,7 +1,7 @@
-import process from 'node:process';
-import fs from 'node:fs';
-import path from 'node:path';
-import {config} from 'dotenv';
+import fs from "node:fs";
+import path from "node:path";
+import process from "node:process";
+import { config } from "dotenv";
 
 export type EnvOptions = {
 	path?: string;
@@ -25,17 +25,20 @@ export function env(options?: EnvOptions): void {
 	const currentWorkingDirectory = options?.path ?? process.cwd();
 
 	// Load the default .env file
-	const envPath = path.resolve(currentWorkingDirectory, '.env');
+	const envPath = path.resolve(currentWorkingDirectory, ".env");
 	if (fs.existsSync(envPath)) {
-		config({path: envPath, quiet: true, debug: false});
+		config({ path: envPath, quiet: true, debug: false });
 	}
 
 	// Load the .env.local file if it exists
 	if (local) {
-		const localEnvPath = path.resolve(currentWorkingDirectory, '.env.local');
+		const localEnvPath = path.resolve(currentWorkingDirectory, ".env.local");
 		if (fs.existsSync(localEnvPath)) {
 			config({
-				path: localEnvPath, override: true, quiet: true, debug: false,
+				path: localEnvPath,
+				override: true,
+				quiet: true,
+				debug: false,
 			});
 		}
 	}
@@ -44,19 +47,31 @@ export function env(options?: EnvOptions): void {
 	const environment = options?.environment ?? process.env.NODE_ENV;
 
 	if (environment) {
-		const envSpecificPath = path.resolve(currentWorkingDirectory, `.env.${environment}`);
+		const envSpecificPath = path.resolve(
+			currentWorkingDirectory,
+			`.env.${environment}`,
+		);
 		if (fs.existsSync(envSpecificPath)) {
 			config({
-				path: envSpecificPath, override: true, quiet: true, debug: false,
+				path: envSpecificPath,
+				override: true,
+				quiet: true,
+				debug: false,
 			});
 		}
 
 		// Load the environment specific .env.local file if it exists
 		if (local) {
-			const envLocalPath = path.resolve(currentWorkingDirectory, `.env.${environment}.local`);
+			const envLocalPath = path.resolve(
+				currentWorkingDirectory,
+				`.env.${environment}.local`,
+			);
 			if (fs.existsSync(envLocalPath)) {
 				config({
-					path: envLocalPath, override: true, quiet: true, debug: false,
+					path: envLocalPath,
+					override: true,
+					quiet: true,
+					debug: false,
 				});
 			}
 		}

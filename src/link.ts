@@ -1,13 +1,13 @@
-import process from 'node:process';
-import {Buffer} from 'node:buffer';
-import {BaseService, type BaseServiceOptions} from './base-service.js';
-import {env} from './env.js';
-import {type GetCodeStatsResponse} from './link-stats-type.js';
+import { Buffer } from "node:buffer";
+import process from "node:process";
+import { BaseService, type BaseServiceOptions } from "./base-service.js";
+import { env } from "./env.js";
+import type { GetCodeStatsResponse } from "./link-stats-type.js";
 
 env();
 
 export const defaultLinkUris = [
-	'https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/',
+	"https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/",
 ];
 
 export type CreateShortCodeOptions = {
@@ -72,9 +72,9 @@ export type GetShortCodesResponse = {
 export type GetShortCodeResponse = CreateShortCodeResponse;
 
 export enum QrSize {
-	SMALL = 'small',
-	MEDIUM = 'medium',
-	LARGE = 'large',
+	SMALL = "small",
+	MEDIUM = "medium",
+	LARGE = "large",
 }
 
 export type CreateQrCodeOptions = {
@@ -214,7 +214,7 @@ export class Link extends BaseService {
 	 * @param {string} apiKey
 	 */
 	public setApiKey(apiKey: string | undefined): void {
-		if (apiKey?.startsWith('public_')) {
+		if (apiKey?.startsWith("public_")) {
 			throw new Error('API key cannot start with "public_"');
 		}
 
@@ -229,26 +229,31 @@ export class Link extends BaseService {
 	 * @param {string} code The code to include in the URI.
 	 * @returns {string} The constructed URI.
 	 */
-	public getUri(organizationId: string, prefix1?: string, prefix2?: string, prefix3?: string): string {
+	public getUri(
+		organizationId: string,
+		prefix1?: string,
+		prefix2?: string,
+		prefix3?: string,
+	): string {
 		/* c8 ignore next 3 */
 		if (!organizationId) {
-			throw new Error('Organization ID is required to get the URI.');
+			throw new Error("Organization ID is required to get the URI.");
 		}
 
-		let url = this._uris[0].replace('{organizationId}', organizationId);
+		let url = this._uris[0].replace("{organizationId}", organizationId);
 		if (prefix1) {
-			url = url.endsWith('/') ? `${url}${prefix1}/` : `${url}/${prefix1}`;
+			url = url.endsWith("/") ? `${url}${prefix1}/` : `${url}/${prefix1}`;
 		}
 
 		if (prefix2) {
-			url = url.endsWith('/') ? `${url}${prefix2}/` : `${url}/${prefix2}`;
+			url = url.endsWith("/") ? `${url}${prefix2}/` : `${url}/${prefix2}`;
 		}
 
 		if (prefix3) {
-			url = url.endsWith('/') ? `${url}${prefix3}/` : `${url}/${prefix3}`;
+			url = url.endsWith("/") ? `${url}${prefix3}/` : `${url}/${prefix3}`;
 		}
 
-		if (url.endsWith('/')) {
+		if (url.endsWith("/")) {
 			url = url.slice(0, -1); // Remove trailing slash if present
 		}
 
@@ -262,14 +267,17 @@ export class Link extends BaseService {
 	 * @param {CreateShortCodeOptions} options Optional parameters for creating the short code.
 	 * @returns {Promise<CreateShortCodeResponse>} A promise that resolves to the created short code details.
 	 */
-	public async createShortCode(longUrl: string, domain: string, options?: CreateShortCodeOptions): Promise<CreateShortCodeResponse> {
+	public async createShortCode(
+		longUrl: string,
+		domain: string,
+		options?: CreateShortCodeOptions,
+	): Promise<CreateShortCodeResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to create a short code.');
+			throw new Error("Organization ID is required to create a short code.");
 		}
 
 		const url = this.getUri(this._organizationId);
 		const body = {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
 			long_url: longUrl,
 			domain,
 			code: options?.code,
@@ -279,11 +287,11 @@ export class Link extends BaseService {
 
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.post(url, body, {headers});
+		const response = await this.post(url, body, { headers });
 
 		if (response.status === 201) {
 			return response.data as CreateShortCodeResponse;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -297,17 +305,17 @@ export class Link extends BaseService {
 	 */
 	public async getShortCode(code: string): Promise<GetShortCodeResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get a short code.');
+			throw new Error("Organization ID is required to get a short code.");
 		}
 
 		const url = this.getUri(this._organizationId, code);
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.get(url, {headers});
+		const response = await this.get(url, { headers });
 
 		if (response.status === 200) {
 			return response.data as GetShortCodeResponse;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -322,9 +330,14 @@ export class Link extends BaseService {
 	 * @param {number} pageSize The number of short codes per page. Default is 100.
 	 * @returns {Promise<GetShortCodesResponse>} A promise that resolves to the list of short codes.
 	 */
-	public async getShortCodes(titleSearch: string, tags?: string[], pageNumber = 1, pageSize = 100): Promise<GetShortCodesResponse> {
+	public async getShortCodes(
+		titleSearch: string,
+		tags?: string[],
+		pageNumber = 1,
+		pageSize = 100,
+	): Promise<GetShortCodesResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get short codes.');
+			throw new Error("Organization ID is required to get short codes.");
 		}
 
 		const url = this.getUri(this._organizationId);
@@ -336,17 +349,17 @@ export class Link extends BaseService {
 		}
 
 		if (tags && tags.length > 0) {
-			parameters.tags = tags.join(',');
+			parameters.tags = tags.join(",");
 		}
 
 		parameters.pageNum = pageNumber.toString();
 		parameters.pageSize = pageSize.toString();
 
-		const response = await this.get(url, {headers, params: parameters});
+		const response = await this.get(url, { headers, params: parameters });
 
 		if (response.status === 200) {
 			return response.data as GetShortCodesResponse;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -359,17 +372,17 @@ export class Link extends BaseService {
 	 */
 	public async getTags(): Promise<string[]> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get tags.');
+			throw new Error("Organization ID is required to get tags.");
 		}
 
-		const url = this.getUri(this._organizationId, 'tags');
+		const url = this.getUri(this._organizationId, "tags");
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.get(url, {headers});
+		const response = await this.get(url, { headers });
 
 		if (response.status === 200) {
 			return response.data as string[];
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -381,12 +394,16 @@ export class Link extends BaseService {
 	 * @param code The short code to retrieve statistics for.
 	 * @returns {Promise<GetCodeStatsResponse>} A promise that resolves to the code statistics.
 	 */
-	public async getCodeStats(code: string, startDate: Date, endDate: Date): Promise<GetCodeStatsResponse> {
+	public async getCodeStats(
+		code: string,
+		startDate: Date,
+		endDate: Date,
+	): Promise<GetCodeStatsResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get code stats.');
+			throw new Error("Organization ID is required to get code stats.");
 		}
 
-		const url = this.getUri(this._organizationId, code, 'stats');
+		const url = this.getUri(this._organizationId, code, "stats");
 		const headers = this.createHeaders(this._apiKey);
 
 		const parameters: Record<string, string> = {
@@ -394,11 +411,11 @@ export class Link extends BaseService {
 			endDate: endDate.toISOString(),
 		};
 
-		const response = await this.get(url, {headers, params: parameters});
+		const response = await this.get(url, { headers, params: parameters });
 
 		if (response.status === 200) {
 			return response.data as GetCodeStatsResponse;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -411,19 +428,22 @@ export class Link extends BaseService {
 	 * @param {UpdateShortCodeOptions} options The options to update the short code with.
 	 * @returns {Promise<UpdateShortCodeResponse>} A promise that resolves to the updated short code details.
 	 */
-	public async updateShortCode(code: string, options: UpdateShortCodeOptions): Promise<UpdateShortCodeResponse> {
+	public async updateShortCode(
+		code: string,
+		options: UpdateShortCodeOptions,
+	): Promise<UpdateShortCodeResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to update a short code.');
+			throw new Error("Organization ID is required to update a short code.");
 		}
 
 		const url = this.getUri(this._organizationId, code);
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.patch(url, options, {headers});
+		const response = await this.patch(url, options, { headers });
 
 		if (response.status === 200) {
 			return response.data as UpdateShortCodeResponse;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -437,18 +457,18 @@ export class Link extends BaseService {
 	 */
 	public async deleteShortCode(code: string): Promise<boolean> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to delete a short code.');
+			throw new Error("Organization ID is required to delete a short code.");
 		}
 
 		const url = this.getUri(this._organizationId, code);
 
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.delete(url, {headers});
+		const response = await this.delete(url, { headers });
 
 		if (response.status === 204) {
 			return true;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -461,14 +481,18 @@ export class Link extends BaseService {
 	 * @param {CreateQrCodeOptions} options The options for creating the QR code.
 	 * @returns {Promise<CreateQrCodeResponse>} A promise that resolves to the created QR code details.
 	 */
-	public async createQrCode(code: string, options?: CreateQrCodeOptions): Promise<CreateQrCodeResponse> {
+	public async createQrCode(
+		code: string,
+		options?: CreateQrCodeOptions,
+	): Promise<CreateQrCodeResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to create a QR code.');
+			throw new Error("Organization ID is required to create a QR code.");
 		}
 
-		const url = this.getUri(this._organizationId, code, 'qrs');
+		const url = this.getUri(this._organizationId, code, "qrs");
 		const headers = this.createHeaders(this._apiKey);
 
+		// biome-ignore lint/suspicious/noExplicitAny: this is valid for body
 		const body: Record<string, any> = {
 			title: options?.title,
 			backgroundColor: options?.backgroundColor,
@@ -477,18 +501,18 @@ export class Link extends BaseService {
 			logo: options?.logo,
 		};
 
-		const response = await this.post(url, body, {headers});
+		const response = await this.post(url, body, { headers });
 
 		if (response.status === 201) {
 			const result = response.data as CreateQrCodeResponse;
 
 			if (result.qrCode) {
-				const buffer = Buffer.from(result.qrCode, 'base64');
+				const buffer = Buffer.from(result.qrCode, "base64");
 				result.qrCodeBytes = new Uint16Array(buffer);
 			}
 
 			return result;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -501,38 +525,45 @@ export class Link extends BaseService {
 	 * @param qr The ID of the QR code to retrieve.
 	 * @returns The details of the requested QR code.
 	 */
-	public async getQrCode(code: string, qr: string): Promise<CreateQrCodeResponse> {
+	public async getQrCode(
+		code: string,
+		qr: string,
+	): Promise<CreateQrCodeResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get a QR code.');
+			throw new Error("Organization ID is required to get a QR code.");
 		}
 
-		const url = this.getUri(this._organizationId, code, 'qrs', qr);
+		const url = this.getUri(this._organizationId, code, "qrs", qr);
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.get(url, {headers});
+		const response = await this.get(url, { headers });
 
 		if (response.status === 200) {
 			const result = response.data as CreateQrCodeResponse;
 
 			if (result.qrCode) {
-				const buffer = Buffer.from(result.qrCode, 'base64');
+				const buffer = Buffer.from(result.qrCode, "base64");
 				result.qrCodeBytes = new Uint16Array(buffer);
 			}
 
 			return result;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
 		throw new Error(`Failed to get QR code: ${response.statusText}`);
 	}
 
-	public async getQrCodes(code: string, pageNumber?: number, pageSize?: number): Promise<GetQrCodesResponse> {
+	public async getQrCodes(
+		code: string,
+		pageNumber?: number,
+		pageSize?: number,
+	): Promise<GetQrCodesResponse> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to get QR codes.');
+			throw new Error("Organization ID is required to get QR codes.");
 		}
 
-		const url = this.getUri(this._organizationId, code, 'qrs');
+		const url = this.getUri(this._organizationId, code, "qrs");
 		const headers = this.createHeaders(this._apiKey);
 
 		const parameters: Record<string, string> = {};
@@ -544,19 +575,19 @@ export class Link extends BaseService {
 			parameters.pageSize = pageSize.toString();
 		}
 
-		const response = await this.get(url, {headers, params: parameters});
+		const response = await this.get(url, { headers, params: parameters });
 
 		if (response.status === 200) {
 			const result = response.data as GetQrCodesResponse;
 			for (const qrCode of result.data) {
 				if (qrCode.qrCode) {
-					const buffer = Buffer.from(qrCode.qrCode, 'base64');
+					const buffer = Buffer.from(qrCode.qrCode, "base64");
 					qrCode.qrCodeBytes = new Uint16Array(buffer);
 				}
 			}
 
 			return result;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */
@@ -571,18 +602,18 @@ export class Link extends BaseService {
 	 */
 	public async deleteQrCode(code: string, qr: string): Promise<boolean> {
 		if (!this._organizationId) {
-			throw new Error('Organization ID is required to delete a QR code.');
+			throw new Error("Organization ID is required to delete a QR code.");
 		}
 
-		const url = this.getUri(this._organizationId, code, 'qrs', qr);
+		const url = this.getUri(this._organizationId, code, "qrs", qr);
 
 		const headers = this.createHeaders(this._apiKey);
 
-		const response = await this.delete(url, {headers});
+		const response = await this.delete(url, { headers });
 
 		if (response.status === 204) {
 			return true;
-		/* c8 ignore next 1 */
+			/* c8 ignore next 1 */
 		}
 
 		/* c8 ignore next 1 */

@@ -1,24 +1,30 @@
-import process from 'node:process';
-import {Hookified} from 'hookified';
-import dotenv from 'dotenv';
+import process from "node:process";
 import {
-	type JsonValue, OpenFeature, type Client, type EvaluationContext,
-} from '@openfeature/server-sdk';
-import {HyphenProvider, type HyphenProviderOptions} from '@hyphen/openfeature-server-provider';
+	HyphenProvider,
+	type HyphenProviderOptions,
+} from "@hyphen/openfeature-server-provider";
+import {
+	type Client,
+	type EvaluationContext,
+	type JsonValue,
+	OpenFeature,
+} from "@openfeature/server-sdk";
+import dotenv from "dotenv";
+import { Hookified } from "hookified";
 
 dotenv.config();
 
 export type ToggleContext = EvaluationContext;
 
 export enum ToggleHooks {
-	beforeGetBoolean = 'beforeGetBoolean',
-	afterGetBoolean = 'afterGetBoolean',
-	beforeGetString = 'beforeGetString',
-	afterGetString = 'afterGetString',
-	beforeGetNumber = 'beforeGetNumber',
-	afterGetNumber = 'afterGetNumber',
-	beforeGetObject = 'beforeGetObject',
-	afterGetObject = 'afterGetObject',
+	beforeGetBoolean = "beforeGetBoolean",
+	afterGetBoolean = "afterGetBoolean",
+	beforeGetString = "beforeGetString",
+	afterGetString = "afterGetString",
+	beforeGetNumber = "beforeGetNumber",
+	afterGetNumber = "afterGetNumber",
+	beforeGetObject = "beforeGetObject",
+	afterGetObject = "afterGetObject",
 }
 
 export type ToggleCachingOptions = {
@@ -83,7 +89,8 @@ export type ToggleGetOptions = {
 };
 
 export class Toggle extends Hookified {
-	private _applicationId: string | undefined = process.env.HYPHEN_APPLICATION_ID;
+	private _applicationId: string | undefined =
+		process.env.HYPHEN_APPLICATION_ID;
 	private _publicApiKey: string | undefined = process.env.HYPHEN_PUBLIC_API_KEY;
 	private _environment: string;
 	private _client: Client | undefined;
@@ -94,7 +101,7 @@ export class Toggle extends Hookified {
 	/*
 	 * Create a new Toggle instance. This will create a new client and set the options.
 	 * @param {ToggleOptions}
-	*/
+	 */
 	constructor(options?: ToggleOptions) {
 		super();
 
@@ -105,7 +112,8 @@ export class Toggle extends Hookified {
 			this.setPublicApiKey(options.publicApiKey);
 		}
 
-		this._environment = options?.environment ?? process.env.NODE_ENV ?? 'development';
+		this._environment =
+			options?.environment ?? process.env.NODE_ENV ?? "development";
 		this._context = options?.context;
 		this._uris = options?.uris;
 		this._caching = options?.caching;
@@ -237,10 +245,10 @@ export class Toggle extends Hookified {
 	 * @returns
 	 */
 	public setPublicApiKey(key: string): void {
-		if (!key.startsWith('public_')) {
-			this.emit('error', new Error('Public API key should start with public_'));
-			if (process.env.NODE_ENV !== 'production') {
-				console.error('Public API key should start with public_');
+		if (!key.startsWith("public_")) {
+			this.emit("error", new Error("Public API key should start with public_"));
+			if (process.env.NODE_ENV !== "production") {
+				console.error("Public API key should start with public_");
 			}
 
 			return;
@@ -268,15 +276,18 @@ export class Toggle extends Hookified {
 	 */
 	public async getClient(): Promise<Client> {
 		if (!this._client) {
-			if (this._applicationId === undefined || this._applicationId.length === 0) {
-				const errorMessage = 'Application ID is not set. You must set it before using the client or have the HYPHEN_APPLICATION_ID environment variable set.';
-				this.emit('error', new Error(errorMessage));
+			if (
+				this._applicationId === undefined ||
+				this._applicationId.length === 0
+			) {
+				const errorMessage =
+					"Application ID is not set. You must set it before using the client or have the HYPHEN_APPLICATION_ID environment variable set.";
+				this.emit("error", new Error(errorMessage));
 				if (this._throwErrors) {
 					throw new Error(errorMessage);
 				}
 			}
 
-			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 			const options = {
 				application: this._applicationId,
 				environment: this._environment,
@@ -285,11 +296,18 @@ export class Toggle extends Hookified {
 			} as HyphenProviderOptions;
 
 			if (this._publicApiKey && this._publicApiKey.length > 0) {
-				await OpenFeature.setProviderAndWait(new HyphenProvider(this._publicApiKey, options));
+				await OpenFeature.setProviderAndWait(
+					new HyphenProvider(this._publicApiKey, options),
+				);
 			} else {
-				this.emit('error', new Error('Public API key is not set. You must set it before using the client or have the HYPHEN_PUBLIC_API_KEY environment variable set.'));
+				this.emit(
+					"error",
+					new Error(
+						"Public API key is not set. You must set it before using the client or have the HYPHEN_PUBLIC_API_KEY environment variable set.",
+					),
+				);
 				if (this._throwErrors) {
-					throw new Error('Public API key is not set');
+					throw new Error("Public API key is not set");
 				}
 			}
 
@@ -307,23 +325,42 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<T>}
 	 */
-	public async get<T>(key: string, defaultValue: T, options?: ToggleGetOptions): Promise<T> {
-		// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+	public async get<T>(
+		key: string,
+		defaultValue: T,
+		options?: ToggleGetOptions,
+	): Promise<T> {
 		switch (typeof defaultValue) {
-			case 'boolean': {
-				return this.getBoolean(key, defaultValue as boolean, options) as Promise<T>;
+			case "boolean": {
+				return this.getBoolean(
+					key,
+					defaultValue as boolean,
+					options,
+				) as Promise<T>;
 			}
 
-			case 'string': {
-				return this.getString(key, defaultValue as string, options) as Promise<T>;
+			case "string": {
+				return this.getString(
+					key,
+					defaultValue as string,
+					options,
+				) as Promise<T>;
 			}
 
-			case 'number': {
-				return this.getNumber(key, defaultValue as number, options) as Promise<T>;
+			case "number": {
+				return this.getNumber(
+					key,
+					defaultValue as number,
+					options,
+				) as Promise<T>;
 			}
 
 			default: {
-				return this.getObject(key, defaultValue as JsonValue, options) as Promise<T>;
+				return this.getObject(
+					key,
+					defaultValue as JsonValue,
+					options,
+				) as Promise<T>;
 			}
 		}
 	}
@@ -336,7 +373,11 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<boolean>} - The value of the feature flag
 	 */
-	public async getBoolean(key: string, defaultValue: boolean, options?: ToggleGetOptions): Promise<boolean> {
+	public async getBoolean(
+		key: string,
+		defaultValue: boolean,
+		options?: ToggleGetOptions,
+	): Promise<boolean> {
 		try {
 			const data = {
 				key,
@@ -348,7 +389,11 @@ export class Toggle extends Hookified {
 
 			const client = await this.getClient();
 
-			const result = await client.getBooleanValue(data.key, data.defaultValue, data.options?.context);
+			const result = await client.getBooleanValue(
+				data.key,
+				data.defaultValue,
+				data.options?.context,
+			);
 
 			const resultData = {
 				key,
@@ -359,9 +404,9 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetBoolean, resultData);
 
 			return resultData.result;
-		/* c8 ignore next 8 */
+			/* c8 ignore next 8 */
 		} catch (error) {
-			this.emit('error', error);
+			this.emit("error", error);
 			if (this._throwErrors) {
 				throw error;
 			}
@@ -377,7 +422,11 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<string>} - The value of the feature flag
 	 */
-	public async getString(key: string, defaultValue: string, options?: ToggleGetOptions): Promise<string> {
+	public async getString(
+		key: string,
+		defaultValue: string,
+		options?: ToggleGetOptions,
+	): Promise<string> {
 		try {
 			const data = {
 				key,
@@ -387,7 +436,11 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.beforeGetString, data);
 			const client = await this.getClient();
 
-			const result = await client.getStringValue(data.key, data.defaultValue, data.options?.context);
+			const result = await client.getStringValue(
+				data.key,
+				data.defaultValue,
+				data.options?.context,
+			);
 			const resultData = {
 				key,
 				defaultValue,
@@ -396,9 +449,9 @@ export class Toggle extends Hookified {
 			};
 			await this.hook(ToggleHooks.afterGetString, resultData);
 			return resultData.result;
-		/* c8 ignore next 8 */
+			/* c8 ignore next 8 */
 		} catch (error) {
-			this.emit('error', error);
+			this.emit("error", error);
 			if (this._throwErrors) {
 				throw error;
 			}
@@ -407,7 +460,11 @@ export class Toggle extends Hookified {
 		return defaultValue;
 	}
 
-	public async getNumber(key: string, defaultValue: number, options?: ToggleGetOptions): Promise<number> {
+	public async getNumber(
+		key: string,
+		defaultValue: number,
+		options?: ToggleGetOptions,
+	): Promise<number> {
 		try {
 			const data = {
 				key,
@@ -417,7 +474,11 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.beforeGetNumber, data);
 			const client = await this.getClient();
 
-			const result = await client.getNumberValue(data.key, data.defaultValue, data.options?.context);
+			const result = await client.getNumberValue(
+				data.key,
+				data.defaultValue,
+				data.options?.context,
+			);
 			const resultData = {
 				key,
 				defaultValue,
@@ -427,9 +488,9 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetNumber, resultData);
 
 			return resultData.result;
-		/* c8 ignore next 8 */
+			/* c8 ignore next 8 */
 		} catch (error) {
-			this.emit('error', error);
+			this.emit("error", error);
 			if (this._throwErrors) {
 				throw error;
 			}
@@ -446,7 +507,11 @@ export class Toggle extends Hookified {
 	 * @param {ToggleRequestOptions} options - The options to use for the request. This can be used to override the context.
 	 * @returns {Promise<T>} - The value of the feature flag
 	 */
-	public async getObject<T>(key: string, defaultValue: T, options?: ToggleGetOptions): Promise<T> {
+	public async getObject<T>(
+		key: string,
+		defaultValue: T,
+		options?: ToggleGetOptions,
+	): Promise<T> {
 		try {
 			const data = {
 				key,
@@ -456,7 +521,11 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.beforeGetObject, data);
 			const client = await this.getClient();
 
-			const result = await client.getObjectValue(key, defaultValue as JsonValue, data.options?.context);
+			const result = await client.getObjectValue(
+				key,
+				defaultValue as JsonValue,
+				data.options?.context,
+			);
 			const resultData = {
 				key,
 				defaultValue,
@@ -466,9 +535,9 @@ export class Toggle extends Hookified {
 			await this.hook(ToggleHooks.afterGetObject, resultData);
 
 			return resultData.result as T;
-		/* c8 ignore next 8 */
+			/* c8 ignore next 8 */
 		} catch (error) {
-			this.emit('error', error);
+			this.emit("error", error);
 			if (this._throwErrors) {
 				throw error;
 			}
