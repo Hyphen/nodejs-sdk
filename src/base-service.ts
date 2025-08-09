@@ -1,15 +1,16 @@
-import {Hookified, type HookifiedOptions} from 'hookified';
-import {Cacheable} from 'cacheable';
-import axios, {type AxiosRequestConfig} from 'axios';
-import pino from 'pino';
+// biome-ignore-all lint/suspicious/noExplicitAny: this is for axios and helpers
+import axios, { type AxiosRequestConfig } from "axios";
+import { Cacheable } from "cacheable";
+import { Hookified, type HookifiedOptions } from "hookified";
+import pino from "pino";
 
 export type BaseServiceOptions = {
 	throwErrors?: boolean;
 } & HookifiedOptions;
 
 export enum ErrorMessages {
-	API_KEY_REQUIRED = 'API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.',
-	PUBLIC_API_KEY_SHOULD_NOT_BE_USED = 'The provided API key is a public API key. Please provide a valid non public API key for authentication.',
+	API_KEY_REQUIRED = "API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.",
+	PUBLIC_API_KEY_SHOULD_NOT_BE_USED = "The provided API key is a public API key. Please provide a valid non public API key for authentication.",
 }
 
 export class BaseService extends Hookified {
@@ -52,7 +53,7 @@ export class BaseService extends Hookified {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._log.error(message, ...args);
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this.emit('error', message, ...args);
+		this.emit("error", message, ...args);
 		if (this.throwErrors) {
 			throw new Error(message);
 		}
@@ -62,14 +63,12 @@ export class BaseService extends Hookified {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._log.warn(message, ...args);
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this.emit('warn', message, ...args);
+		this.emit("warn", message, ...args);
 	}
 
 	public info(message: string, ...args: any[]): void {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		this._log.info(message, ...args);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-		this.emit('info', message, ...args);
+		this.emit("info", message, ...args);
 	}
 
 	public async get<T>(url: string, config?: AxiosRequestConfig) {
@@ -86,7 +85,7 @@ export class BaseService extends Hookified {
 
 	public async delete<T>(url: string, config?: AxiosRequestConfig) {
 		if (config?.headers) {
-			delete config.headers['content-type'];
+			delete config.headers["content-type"];
 		}
 
 		return axios.delete<T>(url, config);
@@ -98,11 +97,11 @@ export class BaseService extends Hookified {
 
 	public createHeaders(apiKey?: string): Record<string, string> {
 		const headers: Record<string, string> = {
-			'content-type': 'application/json',
-			accept: 'application/json',
+			"content-type": "application/json",
+			accept: "application/json",
 		};
 		if (apiKey) {
-			headers['x-api-key'] = apiKey;
+			headers["x-api-key"] = apiKey;
 		}
 
 		return headers;

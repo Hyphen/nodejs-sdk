@@ -13,8 +13,8 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "xo --fix && vitest run --coverage",
-    "test:ci": "xo && vitest run --coverage",
+    "test": "biome check --write && vitest run --coverage",
+    "test:ci": "biome check && vitest run --coverage",
     "build": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean",
     "clean": "rimraf ./dist pnpm-lock.yaml node_modules coverage",
     "prepublishOnly": "rimraf ./dist && tsup src/index.ts --format esm,cjs --dts --clean"

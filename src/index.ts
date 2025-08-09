@@ -1,9 +1,10 @@
+export { type EnvOptions, env, type LoadEnvOptions, loadEnv } from "./env.js";
+export { Hyphen, type HyphenOptions } from "./hyphen.js";
 export {
-	Toggle, type ToggleContext, ToggleHooks, type ToggleOptions, type ToggleGetOptions, type ToggleCachingOptions,
-} from './toggle.js';
-
-export {
-	env, loadEnv, type EnvOptions, type LoadEnvOptions,
-} from './env.js';
-
-export {Hyphen, type HyphenOptions} from './hyphen.js';
+	Toggle,
+	type ToggleCachingOptions,
+	type ToggleContext,
+	type ToggleGetOptions,
+	ToggleHooks,
+	type ToggleOptions,
+} from "./toggle.js";
