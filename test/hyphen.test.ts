@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { Hyphen } from "../src/hyphen.js";
 import { Link } from "../src/link.js";
 import { NetInfo } from "../src/net-info.js";
@@ -63,5 +63,77 @@ describe("Hyphen", () => {
 		expect(hyphen.toggle.throwErrors).toBe(false);
 		expect(hyphen.netInfo.throwErrors).toBe(false);
 		expect(hyphen.throwErrors).toBe(false);
+	});
+});
+
+describe("Hyphen Emitters", () => {
+	test("should emit link error events", () => {
+		const hyphen = new Hyphen();
+		const errorSpy = vi.spyOn(hyphen.link, "emit");
+		hyphen.link.error("Test error");
+		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
+	});
+
+	test("should emit link warn events", () => {
+		const hyphen = new Hyphen();
+		const warnSpy = vi.spyOn(hyphen, "emit");
+		hyphen.link.warn("Test warn");
+		expect(warnSpy).toHaveBeenCalledWith("warn", "Test warn");
+	});
+
+	test("should emit link info events", () => {
+		const hyphen = new Hyphen();
+		const infoSpy = vi.spyOn(hyphen, "emit");
+		hyphen.link.info("Test info");
+		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
+	});
+
+	test("should emit netInfo error events", () => {
+		const hyphen = new Hyphen();
+		const errorSpy = vi.spyOn(hyphen, "emit");
+		hyphen.netInfo.error("Test error");
+		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
+	});
+
+	test("should emit netInfo warn events", () => {
+		const hyphen = new Hyphen();
+		const warnSpy = vi.spyOn(hyphen, "emit");
+		hyphen.netInfo.warn("Test warn");
+		expect(warnSpy).toHaveBeenCalledWith("warn", "Test warn");
+	});
+
+	test("should emit netInfo info events", () => {
+		const hyphen = new Hyphen();
+		const infoSpy = vi.spyOn(hyphen, "emit");
+		hyphen.netInfo.info("Test info");
+		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
+	});
+
+	test("should emit toggle error events", () => {
+		const hyphen = new Hyphen();
+		const errorSpy = vi.spyOn(hyphen, "emit");
+		hyphen.toggle.emit("error", "Test error");
+		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
+	});
+
+	test("should emit toggle warn events", () => {
+		const hyphen = new Hyphen();
+		const warnSpy = vi.spyOn(hyphen, "emit");
+		hyphen.toggle.emit("warn", "Test warn");
+		expect(warnSpy).toHaveBeenCalledWith("warn", "Test warn");
+	});
+
+	test("should emit toggle info events", () => {
+		const hyphen = new Hyphen();
+		const infoSpy = vi.spyOn(hyphen, "emit");
+		hyphen.toggle.emit("info", "Test info");
+		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
+	});
+
+	test("should emit toggle info events", () => {
+		const hyphen = new Hyphen();
+		const infoSpy = vi.spyOn(hyphen, "emit");
+		hyphen.toggle.emit("info", "Test info");
+		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
 	});
 });

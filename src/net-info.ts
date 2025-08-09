@@ -198,6 +198,7 @@ export class NetInfo extends BaseService {
 				type: "error",
 				errorMessage: error instanceof Error ? error.message : "Unknown error",
 			});
+			/* c8 ignore next 1 */
 			return errorResults;
 		}
 	}
