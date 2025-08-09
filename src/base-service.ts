@@ -85,7 +85,7 @@ export class BaseService extends Hookified {
 	}
 
 	public async delete<T>(url: string, config?: AxiosRequestConfig) {
-		if (config && config.headers) {
+		if (config?.headers) {
 			delete config.headers['content-type'];
 		}
 
