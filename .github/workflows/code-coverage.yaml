@@ -43,4 +43,5 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: Hyphen/nodejs-sdk
+        files: ./coverage/lcov.info
 
