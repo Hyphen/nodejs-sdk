@@ -50,7 +50,7 @@
     "axios": "^1.11.0",
     "cacheable": "^1.10.3",
     "dotenv": "^17.2.1",
-    "hookified": "^1.10.0",
+    "hookified": "^1.11.0",
     "pino": "^9.8.0"
   }
 }
