@@ -6,6 +6,8 @@ import { Toggle, type ToggleContext } from "../src/toggle.js";
 
 dotenv.config();
 
+const DEFAULT_TIMEOUT = 10_000;
+
 const { HYPHEN_PUBLIC_API_KEY } = process.env;
 const { HYPHEN_APPLICATION_ID } = process.env;
 
@@ -165,17 +167,21 @@ describe("Toggle", () => {
 });
 
 describe("Toggle Integration", () => {
-	test("should get a client and evaluate a feature flag", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
+	test(
+		"should get a client and evaluate a feature flag",
+		async () => {
+			const toggle = new Toggle({
+				applicationId: HYPHEN_APPLICATION_ID,
+				publicApiKey: HYPHEN_PUBLIC_API_KEY,
+				environment: "production",
+			});
+			toggle.setContext(context);
 
-		const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value).toBe(true);
-	});
+			const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
+			expect(value).toBe(true);
+		},
+		DEFAULT_TIMEOUT,
+	);
 
 	test("should get a string value from a feature flag", async () => {
 		const toggle = new Toggle({
