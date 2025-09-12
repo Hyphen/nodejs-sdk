@@ -48,7 +48,7 @@
     "@faker-js/faker": "^9.9.0",
     "@hyphen/openfeature-server-provider": "^1.0.7",
     "@openfeature/server-sdk": "^1.18.0",
-    "axios": "^1.11.0",
+    "axios": "^1.12.1",
     "cacheable": "^1.10.3",
     "dotenv": "^17.2.2",
     "hookified": "^1.12.0",
