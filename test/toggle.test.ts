@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { describe, expect, test } from "vitest";
 import { Toggle, type ToggleContext } from "../src/toggle.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const DEFAULT_TIMEOUT = 10_000;
 
