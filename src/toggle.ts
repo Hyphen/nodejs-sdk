@@ -12,7 +12,7 @@ import {
 import dotenv from "dotenv";
 import { Hookified } from "hookified";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export type ToggleContext = EvaluationContext;
 
