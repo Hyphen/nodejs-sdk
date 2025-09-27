@@ -106,4 +106,39 @@ describe("BaseService", () => {
 		const response = await service.patch(url, data);
 		expect(response).toBeDefined();
 	});
+
+	test("should handle a delete request with string data", async () => {
+		const service = new BaseService();
+		// Using httpbin.org which accepts all methods and returns JSON
+		const url = "https://httpbin.org/delete";
+		const data = "plain text string";
+		const response = await service.delete(url, { data });
+		expect(response).toBeDefined();
+		expect(response.status).toBe(200);
+	});
+
+	test("should handle a delete request with non-JSON text response", async () => {
+		const service = new BaseService();
+
+		// Mock the fetch to return non-JSON text
+		const mockFetch = vi.fn().mockResolvedValue({
+			status: 200,
+			statusText: "OK",
+			headers: {},
+			text: vi.fn().mockResolvedValue("This is plain text, not JSON"),
+		});
+
+		// Replace the _net.fetch with our mock
+		// @ts-expect-error - accessing private property for testing
+		service._net.fetch = mockFetch;
+
+		const url = "https://example.com/test";
+		const response = await service.delete(url);
+
+		expect(response).toBeDefined();
+		expect(response.status).toBe(200);
+		// The plain text should be stored as the data since JSON.parse will fail
+		expect(response.data).toBe("This is plain text, not JSON");
+		expect(typeof response.data).toBe("string");
+	});
 });
