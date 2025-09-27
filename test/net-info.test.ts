@@ -9,6 +9,8 @@ const invalidIpAddresses = ["256.256.256.256", "123.456.789.0", "::1"];
 
 const mixedIpAddresses = [...validIpAddresses, ...invalidIpAddresses];
 
+const testTimeout = 10_000;
+
 describe("NetInfo", () => {
 	test("should create an instance of NetInfo", () => {
 		const netInfo = new NetInfo();
@@ -102,17 +104,23 @@ describe("NetInfo", () => {
 		}
 	});
 
-	test("should fetch IP info failure", async () => {
-		// API key should be set in the environment variable HYPHEN_API_KEY
-		const netInfo = new NetInfo();
-		const invalidIpAddress =
-			invalidIpAddresses[Math.floor(Math.random() * invalidIpAddresses.length)];
-		const ipInfo = await netInfo.getIpInfo(invalidIpAddress);
-		expect(ipInfo).toBeDefined();
-		expect(ipInfo).toHaveProperty("ip", invalidIpAddress);
-		expect(ipInfo).toHaveProperty("type", "error");
-		expect(ipInfo).toHaveProperty("errorMessage");
-	});
+	test(
+		"should fetch IP info failure",
+		async () => {
+			// API key should be set in the environment variable HYPHEN_API_KEY
+			const netInfo = new NetInfo();
+			const invalidIpAddress =
+				invalidIpAddresses[
+					Math.floor(Math.random() * invalidIpAddresses.length)
+				];
+			const ipInfo = await netInfo.getIpInfo(invalidIpAddress);
+			expect(ipInfo).toBeDefined();
+			expect(ipInfo).toHaveProperty("ip", invalidIpAddress);
+			expect(ipInfo).toHaveProperty("type", "error");
+			expect(ipInfo).toHaveProperty("errorMessage");
+		},
+		testTimeout,
+	);
 
 	test("should fetch IP info successfully", async () => {
 		// API key should be set in the environment variable HYPHEN_API_KEY

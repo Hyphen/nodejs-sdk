@@ -45,11 +45,11 @@
     "LICENSE"
   ],
   "dependencies": {
+    "@cacheable/net": "^1.0.2",
     "@faker-js/faker": "^10.0.0",
     "@hyphen/openfeature-server-provider": "^1.0.7",
     "@openfeature/core": "^1.9.0",
     "@openfeature/server-sdk": "^1.19.0",
-    "axios": "^1.12.1",
     "cacheable": "^2.0.2",
     "dotenv": "^17.2.2",
     "hookified": "^1.12.1",
