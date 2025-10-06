@@ -69,12 +69,6 @@ export class Hyphen extends Hookified {
 			linkOptions.apiKey = options.apiKey;
 		}
 
-		if (options?.throwErrors !== undefined) {
-			toggleOptions.throwErrors = options.throwErrors;
-			netInfoOptions.throwErrors = options.throwErrors;
-			linkOptions.throwErrors = options.throwErrors;
-		}
-
 		this._netInfo = new NetInfo(netInfoOptions);
 		// Set error, info, warn emitters for netInfo
 
@@ -182,29 +176,5 @@ export class Hyphen extends Hookified {
 		this._apiKey = value;
 		this._netInfo.apiKey = value;
 		this._link.apiKey = value;
-	}
-
-	/**
-	 * Get whether to throw errors or not.
-	 * If set to true, errors will be thrown instead of logged.
-	 * @returns {boolean} Whether to throw errors or not.
-	 */
-	public get throwErrors(): boolean {
-		return (
-			this._netInfo.throwErrors &&
-			this._toggle.throwErrors &&
-			this._link.throwErrors
-		);
-	}
-
-	/**
-	 * Set whether to throw errors or not. If set to true, errors will be thrown instead of logged.
-	 * This will update the underlying services as well.
-	 * @param {boolean} value - Whether to throw errors or not.
-	 */
-	public set throwErrors(value: boolean) {
-		this._netInfo.throwErrors = value;
-		this._toggle.throwErrors = value;
-		this._link.throwErrors = value;
 	}
 }
