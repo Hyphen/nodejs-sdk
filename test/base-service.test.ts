@@ -5,7 +5,7 @@ import { describe, expect, test, vi } from "vitest";
 import { BaseService } from "../src/base-service.js";
 
 const mockHttpUrl = process.env.MOCK_HTTP_URL ?? "https://mockhttp.org";
-const customTimeout = 10_000;
+const testTimeout = 20_000;
 
 describe("BaseService", () => {
 	test("should create an instance of BaseService", () => {
@@ -108,15 +108,19 @@ describe("BaseService", () => {
 		expect(response).toBeDefined();
 	});
 
-	test("should handle a delete request with string data", async () => {
-		const service = new BaseService();
-		// Using httpbin.org which accepts all methods and returns JSON
-		const url = "https://httpbin.org/delete";
-		const data = "plain text string";
-		const response = await service.delete(url, { data });
-		expect(response).toBeDefined();
-		expect(response.status).toBe(200);
-	}, customTimeout);
+	test(
+		"should handle a delete request with string data",
+		async () => {
+			const service = new BaseService();
+			// Using httpbin.org which accepts all methods and returns JSON
+			const url = "https://httpbin.org/delete";
+			const data = "plain text string";
+			const response = await service.delete(url, { data });
+			expect(response).toBeDefined();
+			expect(response.status).toBe(200);
+		},
+		testTimeout,
+	);
 
 	test("should handle a delete request with non-JSON text response", async () => {
 		const service = new BaseService();
