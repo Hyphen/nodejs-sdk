@@ -138,3 +138,6 @@ pnpm-lock.yaml
 .DS_Store
 
 !test/fixtures/**
+
+# AI
+.claude

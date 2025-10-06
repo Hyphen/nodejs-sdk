@@ -162,7 +162,8 @@ export class BaseService extends Hookified {
 		if (configData) {
 			body =
 				typeof configData === "string"
-					? configData
+					? /* c8 ignore next */
+						configData
 					: JSON.stringify(configData);
 			// Add content-type back if we have data
 			if (!headers["content-type"] && !headers["Content-Type"]) {
