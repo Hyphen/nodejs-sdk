@@ -112,9 +112,9 @@ describe("BaseService", () => {
 		"should handle a delete request with string data",
 		async () => {
 			const service = new BaseService();
-			// Using httpbin.org which accepts all methods and returns JSON
-			const url = "https://httpbin.org/delete";
-			const data = "plain text string";
+			// Using mockhttp.org which accepts all methods and returns JSON
+			const url = `${mockHttpUrl}/delete`;
+			const data = { message: "plain text string" };
 			const response = await service.delete(url, { data });
 			expect(response).toBeDefined();
 			expect(response.status).toBe(200);
