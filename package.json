@@ -50,7 +50,7 @@
     "@hyphen/openfeature-server-provider": "^1.0.7",
     "@openfeature/core": "^1.9.0",
     "@openfeature/server-sdk": "^1.19.0",
-    "cacheable": "^2.0.2",
+    "cacheable": "^2.1.0",
     "dotenv": "^17.2.3",
     "hookified": "^1.12.1",
     "pino": "^9.11.0"
