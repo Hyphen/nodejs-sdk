@@ -127,23 +127,12 @@ export class BaseService extends Hookified {
 		data: any,
 		config?: FetchRequestInit,
 	): Promise<HttpResponse<T>> {
-		// @cacheable/net doesn't have a put method, so we'll use fetch with method: 'PUT'
-		const requestInit: FetchRequestInit = {
-			...config,
-			method: "PUT",
-			body: typeof data === "string" ? data : JSON.stringify(data),
-			headers: {
-				"Content-Type": "application/json",
-				...(config?.headers as any),
-			},
-		};
-		const response = await this._net.fetch(url, requestInit);
-		const responseData = (await response.json()) as T;
+		const response = await this._net.put<T>(url, data, config);
 		return {
-			data: responseData,
-			status: response.status,
-			statusText: response.statusText,
-			headers: response.headers,
+			data: response.data,
+			status: response.response.status,
+			statusText: response.response.statusText,
+			headers: response.response.headers,
 			config: config as any,
 			request: undefined,
 		};
