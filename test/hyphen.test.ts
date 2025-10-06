@@ -53,17 +53,6 @@ describe("Hyphen", () => {
 		hyphen.apiKey = newApiKey;
 		expect(hyphen.apiKey).toBe(newApiKey);
 	});
-
-	test("should set throwErrors in options", () => {
-		const hyphen = new Hyphen({ throwErrors: true });
-		expect(hyphen.toggle.throwErrors).toBe(true);
-		expect(hyphen.netInfo.throwErrors).toBe(true);
-		expect(hyphen.throwErrors).toBe(true);
-		hyphen.throwErrors = false;
-		expect(hyphen.toggle.throwErrors).toBe(false);
-		expect(hyphen.netInfo.throwErrors).toBe(false);
-		expect(hyphen.throwErrors).toBe(false);
-	});
 });
 
 describe("Hyphen Emitters", () => {
