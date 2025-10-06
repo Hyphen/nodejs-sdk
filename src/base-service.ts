@@ -34,7 +34,9 @@ export class BaseService extends Hookified {
 		if (options && options.throwErrors !== undefined) {
 			this._throwErrors = options.throwErrors;
 		}
-		this._net = new CacheableNet({ cache: this._cache, useHttpCache: false });
+		this._net = new CacheableNet({
+			cache: this._cache,
+		});
 	}
 
 	public get log(): pino.Logger {
