@@ -324,12 +324,13 @@ console.log('Boolean toggle value:', result); // true
 | Property | Type | Description |
 |----------------|----------------|----------------|
 | *publicApiKey* | `string \| undefined` | Get or set the public API key. |
-| *defaultContext* or *context* | `ToggleContext \| undefined` | Get or set the default context for toggle evaluations. |
+| *defaultContext* | `ToggleContext \| undefined` | Get or set the default context for toggle evaluations. |
 | *applicationId* | `string \| undefined` | Get or set the application ID. |
 | *environment* | `string \| undefined` | Get or set the environment. |
-| *horizonUrls* or *uris* | `string[]` | Get or set the Horizon endpoint URLs for load balancing. |
+| *horizonUrls* | `string[]` | Get or set the Horizon endpoint URLs for load balancing. |
 | *defaultTargetingKey* | `string` | Get or set the default targeting key. |
 | *organizationId* | `string \| undefined` | Get the organization ID (read-only, extracted from public key). |
+| *cache* | `Cacheable` | Get or set the Cacheable instance used for caching fetch operations. |
 
 ### GetOptions
 
