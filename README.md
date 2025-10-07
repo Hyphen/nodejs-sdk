@@ -139,6 +139,39 @@ The rest of the examples for each service show you accessing the service instanc
 
 [Toggle](https://hyphen.ai/toggle) is our feature flag service that allows you to control the rollout of new features to your users. You can access your feature flags using the `Toggle` class.
 
+## Breaking Changes (v2.0)
+
+**⚠️ The Toggle API has been simplified in v2.0. Please review the changes below:**
+
+### Removed Methods
+- ❌ `setContext(context)` - Use property setter instead: `toggle.defaultContext = context`
+- ❌ `setPublicApiKey(key)` - Use property setter instead: `toggle.publicApiKey = key`
+- ❌ `getClient()` - No longer needed, use the Toggle instance directly
+
+### Removed Options
+- ❌ `throwErrors` - Errors are now always emitted via events and default values are returned
+
+### Changed Behavior
+- Hooks removed from convenience methods (`getBoolean`, `getString`, etc.)
+- Hooks now only available via event system (`toggle.on('error', ...)`)
+- All toggle methods now return default values on error instead of throwing
+
+### Migration Guide
+
+**Before (v1.x):**
+```javascript
+const toggle = new Toggle(options);
+toggle.setContext(context);
+const client = await toggle.getClient();
+```
+
+**After (v2.0):**
+```javascript
+const toggle = new Toggle(options);
+toggle.defaultContext = context;
+// Use toggle directly - no getClient() needed
+```
+
 ```javascript
 import { Toggle, ToggleContext } from '@hyphen/sdk';
 
@@ -172,7 +205,7 @@ const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 console.log('Boolean toggle value:', result); // true
 ```
 
-if you want to set the context you can do it like this:
+You can also set or update the context after initialization using the `defaultContext` property:
 
 ```javascript
 import { Toggle, ToggleContext } from '@hyphen/sdk';
@@ -201,14 +234,15 @@ const toggleOptions = {
 
 const toggle = new Toggle(toggleOptions);
 
-toggle.setContext(context);
+// Set the default context
+toggle.defaultContext = context;
 
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
 
 console.log('Boolean toggle value:', result); // true
 ```
 
-if you would like to override the context for a single request you can do it like this:
+If you would like to override the context for a single request you can do it like this:
 
 ```javascript
 import { Toggle, ToggleContext } from '@hyphen/sdk';
@@ -264,79 +298,98 @@ console.log('Boolean toggle value:', result); // true
 
 | Option | Type | Description |
 |----------------|----------------|----------------|
-| *publicApiKey* | ` string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *publicApiKey* | `string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
 | *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
-| *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV`  |
-| *context?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
-| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Whether to use the cache or not and a function to set the key. The `ttl` is in seconds |
+| *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV` |
+| *context?* or *defaultContext?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
+| *horizonUrls?* or *uris?* | `string[]` | Array of Horizon endpoint URLs for load balancing. If not provided, defaults to Hyphen's hosted service. |
+| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Cache configuration. The `ttl` is in milliseconds. |
 
 ## Toggle API
 
+### Methods
+
 | Method | Parameters | Description |
 |----------------|----------------|----------------|
-| *setContext* | `context: ToggleContext` | Set the context for the toggle. This is optional. |
-| *get<Type>* | `key: string, defaultValue: T, options?: ToggleGetOptions` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
-| *getBoolean* | `key: string, defaultValue: boolean, options?: ToggleGetOptions` | Get the value of a boolean toggle. |
-| *getNumber* | `key: string, defaultValue: number, options?: ToggleGetOptions` | Get the value of a number toggle. |
-| *getString* | `key: string, defaultValue: string, options?: ToggleGetOptions` | Get the value of a string toggle. |
-| *getObject<Type>* | `key: string, defaultValue: any, options?: ToggleGetOptions` | Get the value of a object toggle. |
+| *get<T>* | `key: string, defaultValue: T, options?: GetOptions` | Get the value of a toggle. This is a generic method that can be used to get any type from toggle. |
+| *getBoolean* | `key: string, defaultValue: boolean, options?: GetOptions` | Get the value of a boolean toggle. |
+| *getNumber* | `key: string, defaultValue: number, options?: GetOptions` | Get the value of a number toggle. |
+| *getString* | `key: string, defaultValue: string, options?: GetOptions` | Get the value of a string toggle. |
+| *getObject<T>* | `key: string, defaultValue: T, options?: GetOptions` | Get the value of an object toggle. |
+| *fetch<T>* | `path: string, payload?: unknown, options?: RequestInit` | Make a raw HTTP POST request to Horizon endpoints. |
+
+### Properties (Getters/Setters)
+
+| Property | Type | Description |
+|----------------|----------------|----------------|
+| *publicApiKey* | `string \| undefined` | Get or set the public API key. |
+| *defaultContext* or *context* | `ToggleContext \| undefined` | Get or set the default context for toggle evaluations. |
+| *applicationId* | `string \| undefined` | Get or set the application ID. |
+| *environment* | `string \| undefined` | Get or set the environment. |
+| *horizonUrls* or *uris* | `string[]` | Get or set the Horizon endpoint URLs for load balancing. |
+| *defaultTargetingKey* | `string` | Get or set the default targeting key. |
+| *organizationId* | `string \| undefined` | Get the organization ID (read-only, extracted from public key). |
+
+### GetOptions
+
+The `GetOptions` type is used in toggle getter methods:
+
+```typescript
+type GetOptions = {
+  context?: ToggleContext;  // Override the default context for this request
+  cache?: boolean;          // Whether to use caching (if configured)
+};
+```
 
 ## Toggle Hooks
 
-The following hooks are available for Toggle:
-| Hook | object | Description |
-|----------------|----------------|----------------|
-| *beforeGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleGetOptions }` | Called before the boolean toggle is fetched. |
-| *afterGetBoolean* | `{ key: string, defaultValue:boolean, options?: ToggleGetOptions, result: boolean }` | Called after the boolean toggle is fetched. |
-| *beforeGetNumber* | `{ key: string, defaultValue:number, options?: ToggleGetOptions }` | Called before the number toggle is fetched. |
-| *afterGetNumber* | `{ key: string, defaultValue:number, options?: ToggleGetOptions, result: number }` | Called after the number toggle is fetched. |
-| *beforeGetString* | `{ key: string, defaultValue:string, options?: ToggleGetOptions }` | Called before the string toggle is fetched. |
-| *afterGetString* | `{ key: string, defaultValue:string, options?: ToggleGetOptions, result: string }` | Called after the string toggle is fetched. |
-| *beforeGetObject* | `{ key: string, defaultValue:any, options?: ToggleGetOptions }` | Called before the object toggle is fetched. |
-| *afterGetObject* | `{ key: string, defaultValue:any, options?: ToggleGetOptions, result: any }` | Called after the object toggle is fetched. |
+Toggle extends the Hookified class, which provides a flexible hook system for intercepting and modifying behavior. You can register hooks using the `onHook()` method.
 
-You can use the hooks to modify the request or the response. For example, you can use the `beforeGetBoolean` hook to log the request before it is sent to the server.
+**Note:** Hooks are currently only implemented on the base `get<T>()` method and event emitters.
+
+### Available Hooks
+
+You can listen to errors using the `error` event:
 
 ```javascript
-import { Toggle, ToggleHooks, ToggleContext } from '@hyphen/sdk';
+import { Toggle } from '@hyphen/sdk';
 
-const context: ToggleContext = {
-	targetingKey: 'user-123',
-	ipAddress: '203.0.113.42',
-	customAttributes: {
-		subscriptionLevel: 'premium',
-		region: 'us-east',
-	},
-	user: {
-		id: 'user-123',
-		email: 'john.doe@example.com',
-		name: 'John Doe',
-		customAttributes: {
-			role: 'admin',
-		},
-	},
-};
-
-const toggleOptions = {
+const toggle = new Toggle({
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
-  context: context,
-};
-
-const toggle = new Toggle(toggleOptions);
-
-toggle.onHook(ToggleHooks.beforeGetBoolean, (data) => {
-  console.log('Before get boolean toggle:', data); // { key: 'hyphen-sdk-boolean', defaultValue: false }
 });
 
-const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
+toggle.on('error', (error) => {
+  console.error('Toggle error:', error);
+});
 
-console.log('Boolean toggle value:', result); // true
+const result = await toggle.getBoolean('my-feature', false);
+```
+
+### Custom Hooks (Advanced)
+
+Since Toggle extends Hookified, you can create custom hooks for advanced use cases:
+
+```javascript
+import { Toggle } from '@hyphen/sdk';
+
+const toggle = new Toggle({
+  publicApiKey: 'your_public_api_key',
+  applicationId: 'your_application_id',
+});
+
+// Register a custom hook
+toggle.onHook('myCustomHook', (data) => {
+  console.log('Custom hook called:', data);
+});
+
+// Trigger the hook (in your own code)
+await toggle.hook('myCustomHook', { someData: 'value' });
 ```
 
 ## Toggle Error Handling
 
-The SDK provides a way to handle errors that occur during the toggle request. You can use the `.on` method to handle errors globally.
+The SDK provides a way to handle errors that occur during toggle requests. You can use the `.on` method to listen for errors globally. When an error occurs, the toggle methods will return the default value provided.
 
 ```javascript
 import { Toggle, ToggleContext } from '@hyphen/sdk';
@@ -370,46 +423,7 @@ toggle.on('error', (error) => {
 });
 
 const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
-console.log('Boolean toggle value:', result); // true
-```
-
-If you would like to have the errors thrown you can use the `throwErrors` option in the constructor:
-
-```javascript
-import { Toggle, ToggleContext } from '@hyphen/sdk';
-
-const context: ToggleContext = {
-	targetingKey: 'user-123',
-	ipAddress: '203.0.113.42',
-	customAttributes: {
-		subscriptionLevel: 'premium',
-		region: 'us-east',
-	},
-	user: {
-		id: 'user-123',
-		email: 'john.doe@example.com',
-		name: 'John Doe',
-		customAttributes: {
-			role: 'admin',
-		},
-	},
-};
-
-const toggleOptions = {
-  publicApiKey: 'your_public_api_key',
-  applicationId: 'your_application_id',
-  context: context,
-  throwErrors: true,
-};
-
-const toggle = new Toggle(toggleOptions);
-
-try {
-  const result = await toggle.getBoolean('hyphen-sdk-boolean', false);
-  console.log('Boolean toggle value:', result); // true
-} catch (error) {
-  console.error('Error fetching toggle:', error);
-}
+console.log('Boolean toggle value:', result); // Returns false (default) if error occurs
 ```
 
 ## Toggle Caching
@@ -439,11 +453,9 @@ const toggleOptions = {
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
   context: context,
-  uris: [
-	'https://your-self-hosted-horizon-url',
-  ],
   caching: {
-	ttl: 60, // Cache for 60 seconds
+	ttl: 60000, // Cache for 60 seconds (in milliseconds)
+  },
 };
 
 const toggle = new Toggle(toggleOptions);
@@ -478,11 +490,8 @@ const toggleOptions = {
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
   context: context,
-  uris: [
-	'https://your-self-hosted-horizon-url',
-  ],
   caching: {
-	ttl: 60, // Cache for 60 seconds
+	ttl: 60000, // Cache for 60 seconds (in milliseconds)
 	generateCacheKeyFn: (context) => {
 		return `toggle-${context?.targetingKey || 'default'}-hyphen-sdk-boolean`;
 	},
@@ -508,7 +517,7 @@ On initialization of the `Toggle` class, the SDK will automatically check for th
 
 ## Toggle Self-Hosted
 
-Toggle uses [Horizon](https://hyphen.ai/horizon) to fetch the feature flags. If you are using a self-hosted version of Hyphen you can use the `uris` option in the constructor to set the url of your self-hosted version:
+Toggle uses [Horizon](https://hyphen.ai/horizon) to fetch the feature flags. If you are using a self-hosted version of Hyphen you can use the `horizonUrls` (or `uris` for backward compatibility) option in the constructor to set the URL of your self-hosted version:
 
 ```javascript
 import { Toggle, ToggleContext } from '@hyphen/sdk';
@@ -534,7 +543,7 @@ const toggleOptions = {
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
   context: context,
-  uris: [
+  horizonUrls: [
 	'https://your-self-hosted-horizon-url',
   ],
 };
@@ -571,7 +580,7 @@ const toggleOptions = {
   publicApiKey: 'your_public_api_key',
   applicationId: 'your_application_id',
   context: context,
-  uris: [
+  horizonUrls: [
 	'https://your-self-hosted-horizon-url',
 	'https://toggle.hyphen.cloud',
   ],
