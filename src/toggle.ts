@@ -75,58 +75,171 @@ export type ToggleContext = {
 	user?: ToggleUser;
 };
 
+/**
+ * Internal type combining application info with toggle context for evaluation.
+ */
 export type ToggleEvaluation = {
 	application: string;
 	environment: string;
 } & ToggleContext;
 
+/**
+ * Represents a single toggle evaluation result.
+ */
 export interface Evaluation {
+	/**
+	 * The toggle key.
+	 */
 	key: string;
+
+	/**
+	 * The evaluated value of the toggle.
+	 */
 	value: boolean | string | number | Record<string, unknown>;
+
+	/**
+	 * The type of the toggle value.
+	 */
 	type: "boolean" | "string" | "number" | "object";
+
+	/**
+	 * Optional reason for the evaluation result.
+	 */
 	reason?: unknown;
+
+	/**
+	 * Error message if evaluation failed.
+	 */
 	errorMessage?: string;
 }
 
+/**
+ * Response from the toggle evaluation API.
+ */
 export interface EvaluationResponse {
+	/**
+	 * Map of toggle keys to their evaluation results.
+	 */
 	toggles: Record<string, Evaluation>;
 }
 
+/**
+ * Options for toggle getter methods.
+ */
 export type GetOptions = {
+	/**
+	 * Override the default context for this request.
+	 */
 	context?: ToggleContext;
+
+	/**
+	 * Whether to use caching for this request (if caching is configured).
+	 */
 	cache?: boolean;
 };
 
+/**
+ * Events emitted by the Toggle class.
+ */
 export enum ToggleEvents {
+	/**
+	 * Emitted when an error occurs during toggle evaluation.
+	 */
 	Error = "error",
 }
 
+/**
+ * Configuration options for the Toggle class.
+ */
 export type ToggleOptions = {
 	/**
-	 * public api key
+	 * Public API key for authentication.
+	 * Can be found in your Hyphen dashboard.
+	 * Must start with "public_".
 	 */
 	publicApiKey?: string;
 
 	/**
-	 * The default context to use when once is not passed
+	 * The default context to use when one is not passed to getter methods.
+	 * Can be overridden per-request using the GetOptions parameter.
 	 */
 	defaultContext?: ToggleContext;
 
 	/**
-	 * Horizon Endpoint Urls to use for Toggle. This will place these urls to be
-	 * load balanced. If endpoints fail it will attempt to use the default horizon
-	 * endpoint service.
+	 * Horizon endpoint URLs for load balancing and failover.
+	 * If provided, requests will be attempted in order. If all fail,
+	 * defaults to Hyphen's hosted service.
 	 * @see {@link https://hyphen.ai/horizon} for more information
 	 */
 	horizonUrls?: string[];
 
+	/**
+	 * Application ID for your Hyphen project.
+	 * Can be found in your Hyphen dashboard.
+	 */
 	applicationId?: string;
 
+	/**
+	 * Environment name (e.g., "production", "development", "staging").
+	 * Defaults to "development" if not provided.
+	 */
 	environment?: string;
 
+	/**
+	 * Default targeting key to use if one cannot be derived from context.
+	 * If not provided, a random key will be generated.
+	 */
 	defaultTargetKey?: string;
 };
 
+/**
+ * Toggle class for feature flag management with Hyphen.
+ *
+ * This class provides methods to retrieve feature toggle values with support for
+ * multiple value types (boolean, string, number, object), context-based targeting,
+ * and load-balanced requests across multiple Horizon endpoints.
+ *
+ * @extends Hookified - Provides event and hook system capabilities
+ *
+ * @example
+ * Basic usage:
+ * ```typescript
+ * const toggle = new Toggle({
+ *   publicApiKey: 'public_your-key-here',
+ *   applicationId: 'app-123',
+ *   environment: 'production'
+ * });
+ *
+ * const isEnabled = await toggle.getBoolean('new-feature', false);
+ * ```
+ *
+ * @example
+ * With context:
+ * ```typescript
+ * const toggle = new Toggle({
+ *   publicApiKey: 'public_your-key-here',
+ *   applicationId: 'app-123',
+ *   defaultContext: {
+ *     targetingKey: 'user-456',
+ *     user: { id: 'user-456', email: 'user@example.com' }
+ *   }
+ * });
+ *
+ * const message = await toggle.getString('welcome-message', 'Hello!');
+ * ```
+ *
+ * @example
+ * With error handling:
+ * ```typescript
+ * const toggle = new Toggle({ publicApiKey: 'public_key', applicationId: 'app' });
+ *
+ * toggle.on('error', (error) => {
+ *   console.error('Toggle error:', error);
+ * });
+ *
+ * const value = await toggle.getNumber('max-items', 10);
+ * ```
+ */
 export class Toggle extends Hookified {
 	private _publicApiKey?: string;
 	private _organizationId: string | undefined;
@@ -138,6 +251,29 @@ export class Toggle extends Hookified {
 	private _defaultTargetingKey: string =
 		`${Math.random().toString(36).substring(7)}`;
 
+	/**
+	 * Creates a new Toggle instance.
+	 *
+	 * @param options - Configuration options for the toggle client
+	 *
+	 * @example
+	 * ```typescript
+	 * // Minimal configuration
+	 * const toggle = new Toggle({
+	 *   publicApiKey: 'public_your-key',
+	 *   applicationId: 'app-123'
+	 * });
+	 *
+	 * // With full options
+	 * const toggle = new Toggle({
+	 *   publicApiKey: 'public_your-key',
+	 *   applicationId: 'app-123',
+	 *   environment: 'production',
+	 *   defaultContext: { targetingKey: 'user-456' },
+	 *   horizonUrls: ['https://my-horizon.example.com']
+	 * });
+	 * ```
+	 */
 	constructor(options?: ToggleOptions) {
 		super();
 
@@ -312,6 +448,35 @@ export class Toggle extends Hookified {
 		this._defaultTargetingKey = value;
 	}
 
+	/**
+	 * Retrieves a toggle value with generic type support.
+	 *
+	 * This is the core method for fetching toggle values. All convenience methods
+	 * (getBoolean, getString, getNumber, getObject) delegate to this method.
+	 *
+	 * @template T - The expected type of the toggle value
+	 * @param toggleKey - The key of the toggle to retrieve
+	 * @param defaultValue - The value to return if the toggle is not found or an error occurs
+	 * @param options - Optional configuration including context override
+	 * @returns Promise resolving to the toggle value or defaultValue
+	 *
+	 * @example
+	 * ```typescript
+	 * const toggle = new Toggle({ publicApiKey: 'public_key', applicationId: 'app-id' });
+	 *
+	 * // Get a boolean
+	 * const enabled = await toggle.get<boolean>('feature-flag', false);
+	 *
+	 * // Get an object with type safety
+	 * interface Config { theme: string; }
+	 * const config = await toggle.get<Config>('app-config', { theme: 'light' });
+	 *
+	 * // Override context for a single request
+	 * const value = await toggle.get('key', 'default', {
+	 *   context: { targetingKey: 'user-456' }
+	 * });
+	 * ```
+	 */
 	public async get<T>(
 		toggleKey: string,
 		defaultValue: T,
@@ -569,10 +734,28 @@ export class Toggle extends Hookified {
 	}
 
 	/**
-	 * Validates and sets the public API key. This is used internally
+	 * Validates and sets the public API key.
+	 *
+	 * This method is used internally by the publicApiKey setter to validate
+	 * that the key starts with "public_" prefix. If the key is invalid,
+	 * an error is thrown.
 	 *
 	 * @param key - The public API key string or undefined to clear
 	 * @throws {Error} If the key doesn't start with "public_"
+	 *
+	 * @example
+	 * ```typescript
+	 * const toggle = new Toggle();
+	 *
+	 * // Valid key
+	 * toggle.setPublicKey('public_abc123'); // OK
+	 *
+	 * // Invalid key
+	 * toggle.setPublicKey('invalid_key'); // Throws error
+	 *
+	 * // Clear key
+	 * toggle.setPublicKey(undefined); // OK
+	 * ```
 	 */
 	public setPublicKey(key: string | undefined): void {
 		if (key !== undefined && !key.startsWith("public_")) {
@@ -646,9 +829,27 @@ export class Toggle extends Hookified {
 	}
 
 	/**
-	 * Will get the urls. If you pass in the public key it will provide two urls.
-	 * @param publicKey
-	 * @returns
+	 * Gets the default Horizon URLs for load balancing and failover.
+	 *
+	 * If a public key is provided, returns an array with the organization-specific
+	 * URL as primary and the default Hyphen URL as fallback. Without a public key,
+	 * returns only the default Hyphen URL.
+	 *
+	 * @param publicKey - Optional public API key to derive organization-specific URL
+	 * @returns Array of Horizon URLs for load balancing
+	 *
+	 * @example
+	 * ```typescript
+	 * const toggle = new Toggle();
+	 *
+	 * // Without public key - returns default only
+	 * const defaultUrls = toggle.getDefaultHorizonUrls();
+	 * // ['https://toggle.hyphen.cloud']
+	 *
+	 * // With public key - returns org-specific + fallback
+	 * const urls = toggle.getDefaultHorizonUrls('public_dGVzdC1vcmc6c2VjcmV0');
+	 * // ['https://test-org.toggle.hyphen.cloud', 'https://toggle.hyphen.cloud']
+	 * ```
 	 */
 	public getDefaultHorizonUrls(publicKey?: string): string[] {
 		let result = [this.getDefaultHorizonUrl()];
