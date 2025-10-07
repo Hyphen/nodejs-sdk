@@ -1,428 +1,634 @@
-// biome-ignore-all lint/suspicious/noExplicitAny: any is ok in test files
-import process from "node:process";
-import dotenv from "dotenv";
 import { describe, expect, test } from "vitest";
-import { Toggle, type ToggleContext } from "../src/toggle.js";
+import { Toggle, type ToggleOptions } from "../src/toggle.js";
+import { getRandomToggleContext, mockToggleContexts } from "./mock-contexts.js";
 
-dotenv.config({ quiet: true });
-
-const DEFAULT_TIMEOUT = 10_000;
-
-const { HYPHEN_PUBLIC_API_KEY } = process.env;
-const { HYPHEN_APPLICATION_ID } = process.env;
-
-if (!HYPHEN_PUBLIC_API_KEY || !HYPHEN_APPLICATION_ID) {
-	throw new Error(
-		"HYPHEN_PUBLIC_API_KEY and HYPHEN_APPLICATION_ID must be set for tests to run.",
-	);
-}
-
-const defaultOptions = {
-	applicationId: "my-app",
-	publicApiKey: "public_my-public-key",
-	environment: "development",
-};
-
-const context: ToggleContext = {
-	targetingKey: "user-123",
-	ipAddress: "203.0.113.42",
-	customAttributes: {
-		subscriptionLevel: "premium",
-		region: "us-east",
-	},
-	user: {
-		id: "user-123",
-		email: "john.doe@example.com",
-		name: "John Doe",
-		customAttributes: {
-			role: "admin",
-		},
-	},
-};
-
-const overrideContext: ToggleContext = {
-	targetingKey: "user-123",
-	ipAddress: "203.0.113.42",
-	customAttributes: {
-		subscriptionLevel: "premium",
-		region: "us-east",
-	},
-	user: {
-		id: "user-123",
-		email: "john.doe@example.com",
-		name: "John Doe",
-		customAttributes: {
-			role: "admin",
-		},
-	},
-};
-
-describe("Toggle", () => {
+describe("Hyphen sdk", () => {
 	test("should create an instance of Toggle", () => {
-		const toggle = new Toggle(defaultOptions);
+		const toggle = new Toggle();
 		expect(toggle).toBeInstanceOf(Toggle);
 	});
 
-	test("should have environment set by NODE_ENV", () => {
-		const toggle = new Toggle({
-			applicationId: "my-app",
-			publicApiKey: "public_my-public-key",
+	describe("constructor", () => {
+		test("should create Toggle with no options", () => {
+			const toggle = new Toggle();
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.publicApiKey).toBeUndefined();
+			expect(toggle.defaultContext).toBeUndefined();
 		});
-		expect(toggle.environment).toEqual("test");
+
+		test("should create Toggle with undefined options", () => {
+			const toggle = new Toggle(undefined);
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.publicApiKey).toBeUndefined();
+			expect(toggle.defaultContext).toBeUndefined();
+		});
+
+		test("should create Toggle with empty options object", () => {
+			const options: ToggleOptions = {};
+			const toggle = new Toggle(options);
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.publicApiKey).toBeUndefined();
+			expect(toggle.defaultContext).toBeUndefined();
+		});
+
+		test("should create Toggle with defaultContext option", () => {
+			const customContext = getRandomToggleContext();
+			const options: ToggleOptions = {
+				defaultContext: customContext,
+			};
+			const toggle = new Toggle(options);
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.defaultContext).toBe(customContext);
+			expect(toggle.defaultContext?.targetingKey).toBe(
+				customContext.targetingKey,
+			);
+			expect(toggle.defaultContext?.ipAddress).toBe(customContext.ipAddress);
+			expect(toggle.publicApiKey).toBeUndefined();
+		});
+
+		test("should create Toggle with publicApiKey option", () => {
+			const options: ToggleOptions = {
+				publicApiKey: "public_test-api-key",
+			};
+			const toggle = new Toggle(options);
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.publicApiKey).toBe("public_test-api-key");
+			expect(toggle.defaultContext).toBeUndefined();
+		});
+
+		test("should create Toggle with both defaultContext and publicApiKey options", () => {
+			const customContext = getRandomToggleContext();
+			const options: ToggleOptions = {
+				defaultContext: customContext,
+				publicApiKey: "public_comprehensive-key",
+			};
+			const toggle = new Toggle(options);
+			expect(toggle).toBeInstanceOf(Toggle);
+			expect(toggle.publicApiKey).toBe("public_comprehensive-key");
+			expect(toggle.defaultContext).toBe(customContext);
+			expect(toggle.defaultContext?.targetingKey).toBe(
+				customContext.targetingKey,
+			);
+			expect(toggle.defaultContext?.user?.email).toBe(
+				customContext.user?.email,
+			);
+		});
+
+		test("should not validate publicApiKey in constructor", () => {
+			const options: ToggleOptions = {
+				publicApiKey: "invalid-key-without-prefix",
+			};
+			expect(() => {
+				new Toggle(options);
+			}).not.toThrow();
+			const toggle = new Toggle(options);
+			expect(toggle.publicApiKey).toBe("invalid-key-without-prefix");
+		});
 	});
 
-	test("should set options correctly", () => {
-		const toggle = new Toggle(defaultOptions);
-		expect(toggle.environment).toEqual("development");
-		expect(toggle.applicationId).toEqual("my-app");
+	describe("publicApiKey property", () => {
+		test("should return undefined by default", () => {
+			const toggle = new Toggle();
+			expect(toggle.publicApiKey).toBeUndefined();
+		});
+
+		test("should allow getting the publicApiKey property", () => {
+			const toggle = new Toggle();
+			const apiKey = toggle.publicApiKey;
+			expect(apiKey).toBeUndefined();
+		});
+
+		test("should allow setting the publicApiKey property", () => {
+			const toggle = new Toggle();
+			const testApiKey = "public_test-api-key-123";
+			toggle.publicApiKey = testApiKey;
+			expect(toggle.publicApiKey).toBe(testApiKey);
+		});
+
+		test("should allow setting publicApiKey to undefined", () => {
+			const toggle = new Toggle();
+			toggle.publicApiKey = "public_test-key";
+			toggle.publicApiKey = undefined;
+			expect(toggle.publicApiKey).toBeUndefined();
+		});
+
+		test("should maintain the same publicApiKey value when accessed multiple times", () => {
+			const toggle = new Toggle();
+			const testApiKey = "public_consistent-api-key";
+			toggle.publicApiKey = testApiKey;
+			const key1 = toggle.publicApiKey;
+			const key2 = toggle.publicApiKey;
+			expect(key1).toBe(key2);
+			expect(key1).toBe(testApiKey);
+		});
+
+		test("should update publicApiKey property when set to a new value", () => {
+			const toggle = new Toggle();
+			const originalKey = "public_original-key";
+			const newKey = "public_new-key";
+			toggle.publicApiKey = originalKey;
+			expect(toggle.publicApiKey).toBe(originalKey);
+			toggle.publicApiKey = newKey;
+			expect(toggle.publicApiKey).toBe(newKey);
+			expect(toggle.publicApiKey).not.toBe(originalKey);
+		});
+
+		test("should throw error when publicApiKey does not start with 'public_'", () => {
+			const toggle = new Toggle();
+			expect(() => {
+				toggle.publicApiKey = "invalid-key";
+			}).toThrow("Public API key must start with 'public_'");
+		});
+
+		test("should throw error when publicApiKey starts with different prefix", () => {
+			const toggle = new Toggle();
+			expect(() => {
+				toggle.publicApiKey = "private_some-key";
+			}).toThrow("Public API key must start with 'public_'");
+		});
+
+		test("should throw error when publicApiKey is empty string", () => {
+			const toggle = new Toggle();
+			expect(() => {
+				toggle.publicApiKey = "";
+			}).toThrow("Public API key must start with 'public_'");
+		});
+
+		test("should accept publicApiKey that starts with 'public_'", () => {
+			const toggle = new Toggle();
+			const validKey = "public_valid-key-123";
+			expect(() => {
+				toggle.publicApiKey = validKey;
+			}).not.toThrow();
+			expect(toggle.publicApiKey).toBe(validKey);
+		});
+
+		test("should accept undefined publicApiKey without throwing", () => {
+			const toggle = new Toggle();
+			expect(() => {
+				toggle.publicApiKey = undefined;
+			}).not.toThrow();
+			expect(toggle.publicApiKey).toBeUndefined();
+		});
 	});
 
-	test("should update application and environment properties", () => {
-		const toggle = new Toggle(defaultOptions);
-		expect(toggle.applicationId).toEqual("my-app");
-		expect(toggle.environment).toEqual("development");
-		toggle.applicationId = "new-app";
-		toggle.environment = "production";
-		expect(toggle.applicationId).toEqual("new-app");
-		expect(toggle.environment).toEqual("production");
+	describe("defaultContext property", () => {
+		test("should return undefined when no defaultContext is set", () => {
+			const toggle = new Toggle();
+			const context = toggle.defaultContext;
+			expect(context).toBeUndefined();
+		});
+
+		test("should allow getting the defaultContext property", () => {
+			const toggle = new Toggle();
+			const context = toggle.defaultContext;
+			expect(context).toBeUndefined();
+		});
+
+		test("should allow setting the defaultContext property", () => {
+			const toggle = new Toggle();
+			const customContext = getRandomToggleContext();
+			toggle.defaultContext = customContext;
+			expect(toggle.defaultContext).toBe(customContext);
+			expect(toggle.defaultContext?.targetingKey).toBe(
+				customContext.targetingKey,
+			);
+			expect(toggle.defaultContext?.ipAddress).toBe(customContext.ipAddress);
+		});
+
+		test("should maintain the same defaultContext when accessed multiple times", () => {
+			const toggle = new Toggle();
+			const customContext = getRandomToggleContext();
+			toggle.defaultContext = customContext;
+			const context1 = toggle.defaultContext;
+			const context2 = toggle.defaultContext;
+			expect(context1).toBe(context2);
+		});
+
+		test("should update defaultContext property when set to a new value", () => {
+			const toggle = new Toggle();
+			const originalContext = toggle.defaultContext; // undefined
+			const newContext = getRandomToggleContext();
+			toggle.defaultContext = newContext;
+			expect(toggle.defaultContext).not.toBe(originalContext);
+			expect(toggle.defaultContext).toBe(newContext);
+			expect(toggle.defaultContext?.targetingKey).toBe(newContext.targetingKey);
+		});
+
+		test("should handle complex defaultContext with all properties", () => {
+			const toggle = new Toggle();
+			// Using specific index for edge case user to test complex nested data structures
+			const complexContext = mockToggleContexts[9];
+			toggle.defaultContext = complexContext;
+			expect(toggle.defaultContext).toBe(complexContext);
+			expect(toggle.defaultContext?.user?.customAttributes?.tags).toEqual([
+				"vip",
+				"beta-tester",
+				"early-adopter",
+			]);
+			expect(toggle.defaultContext?.customAttributes?.complexData).toEqual({
+				nested: {
+					value: "deep-nested-value",
+					array: [1, 2, 3],
+				},
+			});
+		});
 	});
 
-	test("should set the uris", () => {
-		const options = { ...defaultOptions, uris: ["https://toggle.hyphen.ai"] };
-		const toggle = new Toggle(options);
-		expect(toggle.uris).toEqual(["https://toggle.hyphen.ai"]);
-		toggle.uris = ["https://new-uri.com"];
-		expect(toggle.uris).toEqual(["https://new-uri.com"]);
-	});
+	describe("horizonUrls property", () => {
+		test("should return default url", () => {
+			const toggle = new Toggle();
+			expect(toggle.horizonUrls).toEqual(["https://toggle.hyphen.cloud"]);
+		});
 
-	test("should set the public key", () => {
-		const toggle = new Toggle(defaultOptions);
-		expect(toggle.publicApiKey).toEqual("public_my-public-key");
-		toggle.publicApiKey = "public_new-public-key";
-		expect(toggle.publicApiKey).toEqual("public_new-public-key");
-	});
+		test("should be set when constructor receives horizonUrls option", () => {
+			const testUrls = [
+				"https://org1.toggle.hyphen.cloud",
+				"https://org2.toggle.hyphen.cloud",
+			];
+			const toggle = new Toggle({ horizonUrls: testUrls });
+			expect(toggle.horizonUrls).toEqual(testUrls);
+		});
 
-	test("should warn if it is not a public key", () => {
-		const toggle = new Toggle(defaultOptions);
-		toggle.setPublicApiKey("new-public-key");
-		expect(toggle.publicApiKey).toEqual("public_my-public-key");
-	});
+		test("should remain empty when constructor receives no horizonUrls", () => {
+			const toggle = new Toggle({ publicApiKey: "public_test-key" });
+			expect(toggle.horizonUrls).toEqual(["https://toggle.hyphen.cloud"]);
+		});
 
-	test("should set the context", () => {
-		const toggle = new Toggle(defaultOptions);
-		toggle.context = context;
-		expect(toggle.context).toEqual(context);
-	});
+		test("should allow getting the horizonUrls property", () => {
+			const toggle = new Toggle();
+			const urls = toggle.horizonUrls;
+			expect(urls).toEqual(["https://toggle.hyphen.cloud"]);
+			expect(Array.isArray(urls)).toBe(true);
+		});
 
-	test("should set throwErrors", () => {
-		const options = {
-			applicationId: "my-app",
-			publicApiKey: "public_my-public-key",
-			environment: "development",
-			throwErrors: true,
-		};
-		const toggle = new Toggle(options);
-		expect(toggle.throwErrors).toEqual(true);
-		toggle.throwErrors = false;
-		expect(toggle.throwErrors).toEqual(false);
-	});
+		test("should allow setting the horizonUrls property", () => {
+			const toggle = new Toggle();
+			const testUrls = ["https://test.toggle.hyphen.cloud"];
+			toggle.horizonUrls = testUrls;
+			expect(toggle.horizonUrls).toEqual(testUrls);
+		});
 
-	test("should be able to set context and reset client", async () => {
-		const toggle = new Toggle(defaultOptions);
-		toggle.setContext({ userId: "123" });
-		const client = await toggle.getClient();
-		expect(client).toBeDefined();
-	});
+		test("should allow setting horizonUrls to empty array", () => {
+			const toggle = new Toggle();
+			const testUrls = ["https://test.toggle.hyphen.cloud"];
+			toggle.horizonUrls = testUrls;
+			toggle.horizonUrls = [];
+			expect(toggle.horizonUrls).toEqual([]);
+		});
 
-	test("should throw an error if no applicationId is set", async () => {
-		const toggle = new Toggle();
-		toggle.applicationId = undefined;
-		toggle.throwErrors = true;
-		let didThrow = false;
-		try {
-			await toggle.getClient();
-		} catch (error) {
-			didThrow = true;
-			expect(error).toBeInstanceOf(Error);
-		}
+		test("should maintain the same horizonUrls array when accessed multiple times", () => {
+			const toggle = new Toggle();
+			const testUrls = [
+				"https://endpoint1.hyphen.cloud",
+				"https://endpoint2.hyphen.cloud",
+			];
+			toggle.horizonUrls = testUrls;
+			const urls1 = toggle.horizonUrls;
+			const urls2 = toggle.horizonUrls;
+			expect(urls1).toBe(urls2);
+			expect(urls1).toEqual(testUrls);
+		});
 
-		expect(didThrow).toBe(true);
-	});
+		test("should update horizonUrls property when set to a new array", () => {
+			const toggle = new Toggle();
+			const originalUrls = ["https://original.hyphen.cloud"];
+			const newUrls = [
+				"https://new1.hyphen.cloud",
+				"https://new2.hyphen.cloud",
+			];
+			toggle.horizonUrls = originalUrls;
+			expect(toggle.horizonUrls).toEqual(originalUrls);
+			toggle.horizonUrls = newUrls;
+			expect(toggle.horizonUrls).toEqual(newUrls);
+			expect(toggle.horizonUrls).not.toEqual(originalUrls);
+		});
 
-	test("should throw an error if no publicApiKey is set", async () => {
-		const toggle = new Toggle();
-		toggle.applicationId = defaultOptions.applicationId;
-		toggle.publicApiKey = undefined;
-		toggle.throwErrors = true;
-		let didThrow = false;
-		try {
-			await toggle.getClient();
-		} catch (error) {
-			didThrow = true;
-			expect(error).toBeInstanceOf(Error);
-		}
+		test("should handle single URL in array", () => {
+			const toggle = new Toggle();
+			const singleUrl = ["https://single.toggle.hyphen.cloud"];
+			toggle.horizonUrls = singleUrl;
+			expect(toggle.horizonUrls).toEqual(singleUrl);
+			expect(toggle.horizonUrls.length).toBe(1);
+		});
 
-		expect(didThrow).toBe(true);
-	});
-});
+		test("should handle multiple URLs with different formats", () => {
+			const toggle = new Toggle();
+			const mixedUrls = [
+				"https://prod.toggle.hyphen.cloud",
+				"http://staging.toggle.hyphen.cloud",
+				"https://org-123.toggle.hyphen.cloud",
+				"https://api.custom-domain.com/toggle",
+			];
+			toggle.horizonUrls = mixedUrls;
+			expect(toggle.horizonUrls).toEqual(mixedUrls);
+			expect(toggle.horizonUrls.length).toBe(4);
+		});
 
-describe("Toggle Integration", () => {
-	test(
-		"should get a client and evaluate a feature flag",
-		async () => {
+		test("should handle very large URL array", () => {
+			const toggle = new Toggle();
+			const largeUrlArray = Array.from(
+				{ length: 100 },
+				(_, i) => `https://endpoint-${i}.toggle.hyphen.cloud`,
+			);
+			toggle.horizonUrls = largeUrlArray;
+			expect(toggle.horizonUrls).toEqual(largeUrlArray);
+			expect(toggle.horizonUrls.length).toBe(100);
+		});
+
+		test("should not interfere with other properties", () => {
+			const testOrgId = "test-org";
+			const validKey = `public_${Buffer.from(`${testOrgId}:some-secret`).toString("base64")}`;
+			const toggle = new Toggle({ publicApiKey: validKey });
+			const testUrls = ["https://test.hyphen.cloud"];
+			const testContext = getRandomToggleContext();
+
+			toggle.horizonUrls = testUrls;
+			toggle.defaultContext = testContext;
+
+			expect(toggle.horizonUrls).toEqual(testUrls);
+			expect(toggle.defaultContext).toBe(testContext);
+			expect(toggle.organizationId).toBe(testOrgId);
+		});
+
+		test("should work with constructor containing all options", () => {
+			const testUrls = [
+				"https://primary.toggle.hyphen.cloud",
+				"https://secondary.toggle.hyphen.cloud",
+			];
+			const testContext = getRandomToggleContext();
 			const toggle = new Toggle({
-				applicationId: HYPHEN_APPLICATION_ID,
-				publicApiKey: HYPHEN_PUBLIC_API_KEY,
+				publicApiKey: "public_test-comprehensive-key",
+				defaultContext: testContext,
+				horizonUrls: testUrls,
+			});
+
+			expect(toggle.horizonUrls).toEqual(testUrls);
+			expect(toggle.defaultContext).toBe(testContext);
+			expect(toggle.publicApiKey).toBe("public_test-comprehensive-key");
+		});
+
+		test("should handle URLs with query parameters and paths", () => {
+			const toggle = new Toggle();
+			const complexUrls = [
+				"https://api.hyphen.cloud/v1/toggle?version=latest",
+				"https://cdn.hyphen.cloud/toggle/endpoint",
+				"https://backup.hyphen.cloud:8443/api/toggle",
+			];
+			toggle.horizonUrls = complexUrls;
+			expect(toggle.horizonUrls).toEqual(complexUrls);
+		});
+	});
+
+	describe("applicationId property", () => {
+		test("should return undefined by default", () => {
+			const toggle = new Toggle();
+			expect(toggle.applicationId).toBeUndefined();
+		});
+
+		test("should be set when constructor receives applicationId option", () => {
+			const toggle = new Toggle({ applicationId: "test-app" });
+			expect(toggle.applicationId).toBe("test-app");
+		});
+
+		test("should allow getting the applicationId property", () => {
+			const toggle = new Toggle();
+			const appId = toggle.applicationId;
+			expect(appId).toBeUndefined();
+		});
+
+		test("should allow setting the applicationId property", () => {
+			const toggle = new Toggle();
+			const testAppId = "my-application";
+			toggle.applicationId = testAppId;
+			expect(toggle.applicationId).toBe(testAppId);
+		});
+
+		test("should allow setting applicationId to undefined", () => {
+			const toggle = new Toggle();
+			toggle.applicationId = "test-app";
+			toggle.applicationId = undefined;
+			expect(toggle.applicationId).toBeUndefined();
+		});
+	});
+
+	describe("defaultTargetingKey property", () => {
+		test("should generate random key by default", () => {
+			const toggle = new Toggle();
+			expect(toggle.defaultTargetingKey).toBeDefined();
+			expect(typeof toggle.defaultTargetingKey).toBe("string");
+			expect(toggle.defaultTargetingKey.length).toBeGreaterThan(0);
+		});
+
+		test("should be set when constructor receives defaultTargetKey option", () => {
+			const toggle = new Toggle({
+				defaultTargetKey: "explicit-key",
+			});
+			expect(toggle.defaultTargetingKey).toBe("explicit-key");
+		});
+
+		test("should be set from defaultContext with targetingKey", () => {
+			const toggle = new Toggle({
+				defaultContext: { targetingKey: "context-key" },
+			});
+			expect(toggle.defaultTargetingKey).toBe("context-key");
+		});
+
+		test("should be set from defaultContext with user.id", () => {
+			const toggle = new Toggle({
+				defaultContext: {
+					user: { id: "user-123" },
+				},
+			});
+			expect(toggle.defaultTargetingKey).toBe("user-123");
+		});
+
+		test("should generate key with applicationId and environment when no context", () => {
+			const toggle = new Toggle({
+				applicationId: "test-app",
 				environment: "production",
 			});
-			toggle.setContext(context);
-
-			const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
-			expect(value).toBe(true);
-		},
-		DEFAULT_TIMEOUT,
-	);
-
-	test("should get a string value from a feature flag", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.getString("hyphen-sdk-string", "default");
-		expect(value).toBe("Hyphen!");
-	});
-
-	test("should get a number value from a feature flag", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.getNumber("hyphen-sdk-number", 0);
-		expect(value).toBe(42);
-	});
-
-	test("should get a json / object value from a feature flag", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.getObject("hyphen-sdk-json", {
-			default: "value",
-		});
-		expect(value).toEqual({ id: "Hello World!" });
-	});
-
-	test("should be able to use type inference for boolean", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.get<boolean>("hyphen-sdk-boolean", false);
-		expect(value).toBe(true);
-	});
-
-	test("should be able to use type inference for string", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.get<string>("hyphen-sdk-string", "default");
-		expect(value).toBe("Hyphen!");
-	});
-
-	test("should be able to use type inference for json", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.get<{ id: string }>("hyphen-sdk-json", {
-			id: "value",
-		});
-		expect(value).toEqual({ id: "Hello World!" });
-	});
-
-	test("should be able to use type inference for number", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-		});
-		toggle.setContext(context);
-
-		const value = await toggle.get<number>("hyphen-sdk-number", 0);
-		expect(value).toEqual(42);
-	});
-});
-
-describe("Toggle Context", async () => {
-	test("should get a client with context and eval", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-			context,
+			expect(toggle.defaultTargetingKey).toMatch(
+				/^test-app-production-[a-z0-9]+$/,
+			);
 		});
 
-		const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value).toBe(true);
-	});
-
-	test("should get a boolean with context override", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should prefer defaultTargetKey option over defaultContext", () => {
+			const toggle = new Toggle({
+				defaultTargetKey: "explicit-key",
+				defaultContext: {
+					targetingKey: "context-key",
+				},
+			});
+			expect(toggle.defaultTargetingKey).toBe("explicit-key");
 		});
 
-		const value = await toggle.getBoolean("hyphen-sdk-boolean", false, {
-			context: overrideContext,
-		});
-		expect(value).toBe(true);
-	});
-
-	test("should get a string with context override", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should prefer targetingKey over user.id in context", () => {
+			const toggle = new Toggle({
+				defaultContext: {
+					targetingKey: "targeting-key",
+					user: { id: "user-123" },
+				},
+			});
+			expect(toggle.defaultTargetingKey).toBe("targeting-key");
 		});
 
-		const value = await toggle.getString("hyphen-sdk-string", "default", {
-			context: overrideContext,
-		});
-		expect(value).toBe("Hyphen!");
-	});
-	test("should get a number with context override", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should allow setting defaultTargetingKey property", () => {
+			const toggle = new Toggle();
+			const originalKey = toggle.defaultTargetingKey;
+			toggle.defaultTargetingKey = "custom-key";
+			expect(toggle.defaultTargetingKey).toBe("custom-key");
+			expect(toggle.defaultTargetingKey).not.toBe(originalKey);
 		});
 
-		const value = await toggle.getNumber("hyphen-sdk-number", 0, {
-			context: overrideContext,
-		});
-		expect(value).toBe(42);
-	});
-	test("should get a json with context override", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should generate different keys for different instances", () => {
+			const toggle1 = new Toggle();
+			const toggle2 = new Toggle();
+			expect(toggle1.defaultTargetingKey).not.toBe(toggle2.defaultTargetingKey);
 		});
 
-		const value = await toggle.getObject(
-			"hyphen-sdk-json",
-			{ default: "value" },
-			{ context: overrideContext },
-		);
-		expect(value).toEqual({ id: "Hello World!" });
-	});
-});
-
-describe("Toggle Hooks", () => {
-	test("should call beforeGetBoolean hook", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should generate key with applicationId and default environment", () => {
+			const toggle = new Toggle({
+				applicationId: "test-app",
+			});
+			expect(toggle.defaultTargetingKey).toMatch(
+				/^test-app-development-[a-z0-9]+$/,
+			);
 		});
 
-		let beforeHookCalled = false;
-		const beforeHook = (data: any) => {
-			data.defaultValue = true;
-			beforeHookCalled = true;
-		};
-
-		toggle.onHook("beforeGetBoolean", beforeHook);
-
-		const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value).toBe(true);
-		expect(beforeHookCalled).toBe(true);
-	});
-
-	test("should call afterGetBoolean hook", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
+		test("should generate key with environment only", () => {
+			const toggle = new Toggle({
+				environment: "staging",
+			});
+			expect(toggle.defaultTargetingKey).toMatch(/^staging-[a-z0-9]+$/);
 		});
 
-		let hookCalled = false;
-		const afterGetBooleanHook = (data: any) => {
-			data.result = false;
-			hookCalled = true;
-		};
-
-		toggle.onHook("afterGetBoolean", afterGetBooleanHook);
-
-		const value = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value).toBe(false);
-		expect(hookCalled).toBe(true);
-	});
-});
-
-describe("Toggle Caching", () => {
-	test("should be able to set caching options", () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-			caching: {
-				ttl: 60_000, // 1 minute
-			},
-		});
-		expect(toggle.caching).toEqual({
-			ttl: 60_000,
+		test("should fall back to getTargetingKey when defaultContext returns to default", () => {
+			const toggle = new Toggle({
+				defaultContext: {},
+			});
+			expect(toggle.defaultTargetingKey).toBeDefined();
+			expect(typeof toggle.defaultTargetingKey).toBe("string");
 		});
 
-		toggle.caching = {
-			ttl: 120_000, // 2 minutes
-			generateCacheKeyFn(context?: { targetingKey?: string }) {
-				return `custom-cache-key-${context?.targetingKey ?? ""}`;
-			},
-		};
+		test("should generate key with environment when no applicationId", () => {
+			const toggle = new Toggle();
+			// This triggers generateTargetKey() since no defaultContext is provided
+			expect(toggle.defaultTargetingKey).toMatch(/^development-[a-z0-9]+$/);
+		});
 
-		expect(toggle.caching).toEqual({
-			ttl: 120_000,
+		test("should handle empty string values in key generation", () => {
+			const toggle = new Toggle({
+				applicationId: "",
+				environment: "",
+			});
+			// Empty environment defaults to "development", empty app is filtered out
+			expect(toggle.defaultTargetingKey).toMatch(/^development-[a-z0-9]+$/);
+		});
 
-			generateCacheKeyFn: expect.any(Function),
+		test("should generate key when environment is explicitly set to empty", () => {
+			const toggle = new Toggle({
+				applicationId: "test-app",
+				environment: "",
+			});
+			// Empty environment defaults to "development"
+			expect(toggle.defaultTargetingKey).toMatch(
+				/^test-app-development-[a-z0-9]+$/,
+			);
+		});
+
+		test("should handle environment set to undefined after construction", () => {
+			const toggle = new Toggle({
+				applicationId: "test-app",
+			});
+
+			// Set environment to undefined to trigger the fallback branch
+			toggle.environment = undefined;
+
+			// Set a new defaultContext to trigger regeneration via getTargetingKey
+			toggle.defaultContext = {};
+
+			// This should eventually trigger generateTargetKey with undefined environment
+			expect(toggle.defaultTargetingKey).toBeDefined();
+			expect(typeof toggle.defaultTargetingKey).toBe("string");
 		});
 	});
-	test("should cache boolean value", async () => {
-		const toggle = new Toggle({
-			applicationId: HYPHEN_APPLICATION_ID,
-			publicApiKey: HYPHEN_PUBLIC_API_KEY,
-			environment: "production",
-			caching: {
-				ttl: 60_000, // 1 minute
-			},
+
+	describe("environment property", () => {
+		test("should return 'development' by default", () => {
+			const toggle = new Toggle();
+			expect(toggle.environment).toBe("development");
 		});
 
-		toggle.setContext(context);
+		test("should be set when constructor receives environment option", () => {
+			const toggle = new Toggle({ environment: "production" });
+			expect(toggle.environment).toBe("production");
+		});
 
-		const value1 = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value1).toBe(true);
+		test("should allow getting the environment property", () => {
+			const toggle = new Toggle();
+			const env = toggle.environment;
+			expect(env).toBe("development");
+		});
 
-		const value2 = await toggle.getBoolean("hyphen-sdk-boolean", false);
-		expect(value2).toBe(true); // Should be cached
+		test("should allow setting the environment property", () => {
+			const toggle = new Toggle();
+			const testEnv = "staging";
+			toggle.environment = testEnv;
+			expect(toggle.environment).toBe(testEnv);
+		});
+
+		test("should allow setting environment to undefined", () => {
+			const toggle = new Toggle();
+			toggle.environment = "production";
+			toggle.environment = undefined;
+			expect(toggle.environment).toBeUndefined();
+		});
+	});
+
+	describe("organizationId property", () => {
+		test("should return undefined by default", () => {
+			const toggle = new Toggle();
+			expect(toggle.organizationId).toBeUndefined();
+		});
+
+		test("should be set when constructor receives valid publicApiKey", () => {
+			const orgId = "test-org";
+			const validKey = `public_${Buffer.from(`${orgId}:some-secret`).toString("base64")}`;
+			const toggle = new Toggle({ publicApiKey: validKey });
+			expect(toggle.organizationId).toBe(orgId);
+		});
+
+		test("should remain undefined when constructor receives invalid publicApiKey", () => {
+			const toggle = new Toggle({ publicApiKey: "invalid-key" });
+			expect(toggle.organizationId).toBeUndefined();
+		});
+
+		test("should allow getting the organizationId property", () => {
+			const toggle = new Toggle();
+			const orgId = toggle.organizationId;
+			expect(orgId).toBeUndefined();
+		});
+
+		test("should maintain the same organizationId value when accessed multiple times", () => {
+			const testOrgId = "consistent-org-id";
+			const validKey = `public_${Buffer.from(`${testOrgId}:some-secret`).toString("base64")}`;
+			const toggle = new Toggle({ publicApiKey: validKey });
+			const orgId1 = toggle.organizationId;
+			const orgId2 = toggle.organizationId;
+			expect(orgId1).toBe(orgId2);
+			expect(orgId1).toBe(testOrgId);
+		});
+	});
+
+	describe("get method", () => {
+		test("should return defaultValue when error occurs", async () => {
+			const toggle = new Toggle({
+				horizonUrls: ["https://api.test.com"],
+			});
+
+			const result = await toggle.get("feature-flag", false);
+			expect(result).toBe(false); // Returns defaultValue when error occurs
+		});
 	});
 });
