@@ -318,7 +318,7 @@ export class Toggle extends Hookified {
 		}
 
 		if (options?.cache) {
-			this._net.cache = this.cache;
+			this._net.cache = options.cache;
 		}
 	}
 

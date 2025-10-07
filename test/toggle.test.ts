@@ -1,3 +1,4 @@
+import { Cacheable } from "cacheable";
 import { describe, expect, test } from "vitest";
 import { Toggle, type ToggleOptions } from "../src/toggle.js";
 import { getRandomToggleContext, mockToggleContexts } from "./mock-contexts.js";
@@ -618,6 +619,36 @@ describe("Hyphen sdk", () => {
 			const orgId2 = toggle.organizationId;
 			expect(orgId1).toBe(orgId2);
 			expect(orgId1).toBe(testOrgId);
+		});
+	});
+
+	describe("cache property", () => {
+		test("should get the cache instance", () => {
+			const toggle = new Toggle();
+			const cache = toggle.cache;
+			expect(cache).toBeInstanceOf(Cacheable);
+		});
+
+		test("should set the cache instance", () => {
+			const toggle = new Toggle();
+			const customCache = new Cacheable({ ttl: 5000 });
+			toggle.cache = customCache;
+			expect(toggle.cache).toBe(customCache);
+		});
+
+		test("should accept cache in constructor options", () => {
+			const customCache = new Cacheable({ ttl: 10000 });
+			const toggle = new Toggle({ cache: customCache });
+			expect(toggle.cache).toBe(customCache);
+		});
+
+		test("should allow updating cache after construction", () => {
+			const toggle = new Toggle();
+			const firstCache = toggle.cache;
+			const newCache = new Cacheable({ ttl: 3000 });
+			toggle.cache = newCache;
+			expect(toggle.cache).toBe(newCache);
+			expect(toggle.cache).not.toBe(firstCache);
 		});
 	});
 
