@@ -1,3 +1,5 @@
+import { CacheableNet, type FetchOptions } from "@cacheable/net";
+import type { Cacheable } from "cacheable";
 import { Hookified } from "hookified";
 
 /**
@@ -190,6 +192,8 @@ export type ToggleOptions = {
 	 * If not provided, a random key will be generated.
 	 */
 	defaultTargetKey?: string;
+
+	cache?: Cacheable;
 };
 
 /**
@@ -247,6 +251,7 @@ export class Toggle extends Hookified {
 	private _environment: string | undefined;
 	private _horizonUrls: string[] = [];
 
+	private _net: CacheableNet = new CacheableNet();
 	private _defaultContext: ToggleContext | undefined;
 	private _defaultTargetingKey: string =
 		`${Math.random().toString(36).substring(7)}`;
@@ -310,6 +315,10 @@ export class Toggle extends Hookified {
 			} else {
 				this._defaultTargetingKey = this.generateTargetKey();
 			}
+		}
+
+		if (options?.cache) {
+			this._net.cache = options.cache;
 		}
 	}
 
@@ -446,6 +455,24 @@ export class Toggle extends Hookified {
 	 */
 	public set defaultTargetingKey(value: string) {
 		this._defaultTargetingKey = value;
+	}
+
+	/**
+	 * Gets the Cacheable instance used for caching fetch operations.
+	 *
+	 * @returns The current Cacheable instance
+	 */
+	public get cache(): Cacheable {
+		return this._net.cache;
+	}
+
+	/**
+	 * Sets the Cacheable instance for caching fetch operations.
+	 *
+	 * @param cache - The Cacheable instance to use for caching
+	 */
+	public set cache(cache: Cacheable) {
+		this._net.cache = cache;
 	}
 
 	/**
@@ -646,7 +673,7 @@ export class Toggle extends Hookified {
 	 * @template T - The expected response type
 	 * @param path - The API path to request (e.g., '/api/toggles')
 	 * @param payload - The JSON payload to send in the request body
-	 * @param options - Optional fetch configuration
+	 * @param options - Optional fetch configuration. Cache is set at .cache
 	 * @returns Promise resolving to the parsed JSON response
 	 * @throws {Error} If no horizon URLs are configured or all requests fail
 	 *
@@ -671,7 +698,7 @@ export class Toggle extends Hookified {
 	public async fetch<T>(
 		path: string,
 		payload?: unknown,
-		options?: RequestInit,
+		options?: Omit<FetchOptions, "cache">,
 	): Promise<T> {
 		if (this._horizonUrls.length === 0) {
 			throw new Error(
@@ -701,7 +728,7 @@ export class Toggle extends Hookified {
 			headers["x-api-key"] = this._publicApiKey;
 		}
 
-		const fetchOptions: RequestInit = {
+		const fetchOptions: FetchOptions = {
 			method: "POST",
 			...options,
 			headers,
@@ -713,8 +740,9 @@ export class Toggle extends Hookified {
 		for (const baseUrl of this._horizonUrls) {
 			try {
 				const url = `${baseUrl.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
-				const response = await fetch(url, fetchOptions);
+				const response = await this._net.fetch(url, fetchOptions);
 
+				/* c8 ignore next 3 */
 				if (!response.ok) {
 					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 				}
@@ -724,7 +752,15 @@ export class Toggle extends Hookified {
 			} catch (error) {
 				const fetchError =
 					error instanceof Error ? error : new Error("Unknown fetch error");
-				errors.push(fetchError);
+
+				// Extract status code from CacheableNet error messages
+				const statusMatch = fetchError.message.match(/status (\d{3})/);
+				if (statusMatch) {
+					const status = statusMatch[1];
+					errors.push(new Error(`HTTP ${status}: ${fetchError.message}`));
+				} else {
+					errors.push(fetchError);
+				}
 			}
 		}
 

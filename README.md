@@ -298,12 +298,13 @@ console.log('Boolean toggle value:', result); // true
 
 | Option | Type | Description |
 |----------------|----------------|----------------|
-| *publicApiKey* | `string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. |
+| *publicApiKey* | `string` | The public API key for your Hyphen project. You can find this in the Hyphen dashboard. Must start with "public_". |
 | *applicationId* | `string` | The application ID for your Hyphen project. You can find this in the Hyphen dashboard. |
-| *environment?* | `string` | The environment for your Hyphen project such as `production`. Default uses `process.env.NODE_ENV` |
-| *context?* or *defaultContext?* | `ToggleContext` | The context object that contains the user and custom attributes. This is optional. |
-| *horizonUrls?* or *uris?* | `string[]` | Array of Horizon endpoint URLs for load balancing. If not provided, defaults to Hyphen's hosted service. |
-| *caching?* | `{ ttl: number, generateCacheKeyFn: (context?: ToggleContext) => string}` | Cache configuration. The `ttl` is in milliseconds. |
+| *environment?* | `string` | The environment for your Hyphen project such as `production`. Defaults to `development` if not provided. |
+| *defaultContext?* | `ToggleContext` | The default context to use when one is not passed to getter methods. Can be overridden per-request using the GetOptions parameter. |
+| *horizonUrls?* | `string[]` | Array of Horizon endpoint URLs for load balancing and failover. If not provided, defaults to Hyphen's hosted service. |
+| *defaultTargetKey?* | `string` | Default targeting key to use if one cannot be derived from context. If not provided, a random key will be generated. |
+| *cache?* | `Cacheable` | Cacheable instance for caching fetch operations. See [@cacheable/cacheable](https://github.com/jaredwray/cacheable) for more information. |
 
 ## Toggle API
 
@@ -316,19 +317,20 @@ console.log('Boolean toggle value:', result); // true
 | *getNumber* | `key: string, defaultValue: number, options?: GetOptions` | Get the value of a number toggle. |
 | *getString* | `key: string, defaultValue: string, options?: GetOptions` | Get the value of a string toggle. |
 | *getObject<T>* | `key: string, defaultValue: T, options?: GetOptions` | Get the value of an object toggle. |
-| *fetch<T>* | `path: string, payload?: unknown, options?: RequestInit` | Make a raw HTTP POST request to Horizon endpoints. |
+| *fetch<T>* | `path: string, payload?: unknown, options?: FetchOptions` | Make a raw HTTP POST request to Horizon endpoints with automatic authentication and load balancing. |
 
 ### Properties (Getters/Setters)
 
 | Property | Type | Description |
 |----------------|----------------|----------------|
 | *publicApiKey* | `string \| undefined` | Get or set the public API key. |
-| *defaultContext* or *context* | `ToggleContext \| undefined` | Get or set the default context for toggle evaluations. |
+| *defaultContext* | `ToggleContext \| undefined` | Get or set the default context for toggle evaluations. |
 | *applicationId* | `string \| undefined` | Get or set the application ID. |
 | *environment* | `string \| undefined` | Get or set the environment. |
-| *horizonUrls* or *uris* | `string[]` | Get or set the Horizon endpoint URLs for load balancing. |
+| *horizonUrls* | `string[]` | Get or set the Horizon endpoint URLs for load balancing. |
 | *defaultTargetingKey* | `string` | Get or set the default targeting key. |
 | *organizationId* | `string \| undefined` | Get the organization ID (read-only, extracted from public key). |
+| *cache* | `Cacheable` | Get or set the Cacheable instance used for caching fetch operations. |
 
 ### GetOptions
 
