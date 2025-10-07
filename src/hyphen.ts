@@ -26,21 +26,21 @@ export type HyphenOptions = {
 	 * @see ToggleOptions
 	 * @default {Toggle}
 	 */
-	toggle?: Omit<ToggleOptions, "publicApiKey" | "throwErrors">;
+	toggle?: Omit<ToggleOptions, "publicApiKey">;
 	/**
 	 * Options for the NetInfo service.
 	 * Excludes apiKey and throwErrors from NetInfoOptions.
 	 * @see NetInfoOptions
 	 * @default {NetInfo}
 	 */
-	netInfo?: Omit<NetInfoOptions, "apiKey" | "throwErrors">;
+	netInfo?: Omit<NetInfoOptions, "apiKey">;
 	/**
 	 * Options for the Link service.
 	 * Excludes apiKey and throwErrors from LinkOptions.
 	 * @see LinkOptions
 	 * @default {Link}
 	 */
-	link?: Omit<LinkOptions, "apiKey" | "throwErrors">;
+	link?: Omit<LinkOptions, "apiKey">;
 } & HookifiedOptions;
 
 export class Hyphen extends Hookified {
