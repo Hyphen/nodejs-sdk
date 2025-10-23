@@ -236,7 +236,7 @@ export class Link extends BaseService {
 		prefix2?: string,
 		prefix3?: string,
 	): string {
-		/* v8 ignore -- @preserve */
+		/* v8 ignore next -- @preserve */
 		if (!organizationId) {
 			throw new Error("Organization ID is required to get the URI.");
 		}
@@ -316,12 +316,12 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			return response.data as GetShortCodeResponse;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get short code: ${response.statusText}`);
 	}
 
@@ -360,12 +360,12 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers, params: parameters });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			return response.data as GetShortCodesResponse;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get short codes: ${response.statusText}`);
 	}
 
@@ -383,12 +383,12 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			return response.data as string[];
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get tags: ${response.statusText}`);
 	}
 
@@ -416,12 +416,12 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers, params: parameters });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			return response.data as GetCodeStatsResponse;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get code stats: ${response.statusText}`);
 	}
 
@@ -444,12 +444,12 @@ export class Link extends BaseService {
 
 		const response = await this.patch(url, options, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			return response.data as UpdateShortCodeResponse;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to update short code: ${response.statusText}`);
 	}
 
@@ -469,12 +469,12 @@ export class Link extends BaseService {
 
 		const response = await this.delete(url, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 204) {
 			return true;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to delete short code: ${response.statusText}`);
 	}
 
@@ -506,6 +506,7 @@ export class Link extends BaseService {
 
 		const response = await this.post(url, body, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 201) {
 			const result = response.data as CreateQrCodeResponse;
 
@@ -515,10 +516,9 @@ export class Link extends BaseService {
 			}
 
 			return result;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to create QR code: ${response.statusText}`);
 	}
 
@@ -541,6 +541,7 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			const result = response.data as CreateQrCodeResponse;
 
@@ -550,10 +551,9 @@ export class Link extends BaseService {
 			}
 
 			return result;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get QR code: ${response.statusText}`);
 	}
 
@@ -580,6 +580,7 @@ export class Link extends BaseService {
 
 		const response = await this.get(url, { headers, params: parameters });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 200) {
 			const result = response.data as GetQrCodesResponse;
 			for (const qrCode of result.data) {
@@ -590,10 +591,9 @@ export class Link extends BaseService {
 			}
 
 			return result;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to get QR codes: ${response.statusText}`);
 	}
 
