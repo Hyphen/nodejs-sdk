@@ -742,7 +742,7 @@ export class Toggle extends Hookified {
 				const url = `${baseUrl.replace(/\/$/, "")}${path.startsWith("/") ? path : `/${path}`}`;
 				const response = await this._net.fetch(url, fetchOptions);
 
-				/* c8 ignore next 3 */
+				/* v8 ignore next 3 -- @preserve */
 				if (!response.ok) {
 					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 				}

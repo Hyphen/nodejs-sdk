@@ -4,6 +4,8 @@ import { Toggle } from "../src/toggle.js";
 
 const baseMockUrl = process.env.BASE_MOCK_URL ?? "https://mockhttp.org";
 
+const testTimeout = 10_000;
+
 describe("getOrgIdFromPublicKey", () => {
 	test("should extract org ID from valid public key", () => {
 		const toggle = new Toggle();
@@ -150,22 +152,26 @@ describe("fetch method", () => {
 		);
 	});
 
-	test("should successfully make POST request to mockhttp.org", async () => {
-		const toggle = new Toggle({ horizonUrls: [baseMockUrl] });
+	test(
+		"should successfully make POST request to mockhttp.org",
+		async () => {
+			const toggle = new Toggle({ horizonUrls: [baseMockUrl] });
 
-		interface MockHttpResponse {
-			method: string;
-			headers: Record<string, string>;
-			body: Record<string, unknown>;
-		}
+			interface MockHttpResponse {
+				method: string;
+				headers: Record<string, string>;
+				body: Record<string, unknown>;
+			}
 
-		const result = await toggle.fetch<MockHttpResponse>("/post", {
-			test: "data",
-		});
-		expect(result.method).toBe("POST");
-		expect(result.headers).toBeDefined();
-		expect(result.body).toBeDefined();
-	});
+			const result = await toggle.fetch<MockHttpResponse>("/post", {
+				test: "data",
+			});
+			expect(result.method).toBe("POST");
+			expect(result.headers).toBeDefined();
+			expect(result.body).toBeDefined();
+		},
+		testTimeout,
+	);
 
 	test("should handle 404 error response from mockhttp.org", async () => {
 		const toggle = new Toggle({ horizonUrls: [baseMockUrl] });

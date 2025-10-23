@@ -69,12 +69,16 @@ describe("BaseService", () => {
 		expect(emitSpy).toHaveBeenCalledWith("info", "Test info");
 	});
 
-	test("should do a get request", async () => {
-		const service = new BaseService();
-		const url = `${mockHttpUrl}/get`;
-		const response = await service.get(url);
-		expect(response).toBeDefined();
-	});
+	test(
+		"should do a get request",
+		async () => {
+			const service = new BaseService();
+			const url = `${mockHttpUrl}/get`;
+			const response = await service.get(url);
+			expect(response).toBeDefined();
+		},
+		testTimeout,
+	);
 
 	test("should handle a post request", async () => {
 		const service = new BaseService();
