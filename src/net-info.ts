@@ -119,7 +119,7 @@ export class NetInfo extends BaseService {
 	 */
 	public async getIpInfo(ip: string): Promise<ipInfo | ipInfoError> {
 		try {
-			/* v8 ignore next 3 -- @preserve */
+			/* v8 ignore next -- @preserve */
 			if (!this._apiKey) {
 				throw new Error(ErrorMessages.API_KEY_REQUIRED);
 			}
@@ -130,7 +130,7 @@ export class NetInfo extends BaseService {
 				headers,
 			});
 
-			/* v8 ignore next 8 -- @preserve */
+			/* v8 ignore next -- @preserve */
 			if (response.status !== 200) {
 				const errorResult: ipInfoError = {
 					ip,
@@ -142,7 +142,7 @@ export class NetInfo extends BaseService {
 
 			return response.data as ipInfo;
 		} catch (error) {
-			/* v8 ignore next 6 -- @preserve */
+			/* v8 ignore next -- @preserve */
 			this.error(
 				`Failed to fetch ip info: ${error instanceof Error ? error.message : "Unknown error"}`,
 			);
@@ -163,7 +163,7 @@ export class NetInfo extends BaseService {
 
 		const errorResults: Array<ipInfo | ipInfoError> = [];
 		try {
-			/* v8 ignore next 3 -- @preserve */
+			/* v8 ignore next -- @preserve */
 			if (!this._apiKey) {
 				throw new Error(ErrorMessages.API_KEY_REQUIRED);
 			}
@@ -174,7 +174,7 @@ export class NetInfo extends BaseService {
 				headers,
 			});
 
-			/* v8 ignore next 8 -- @preserve */
+			/* v8 ignore next -- @preserve */
 			if (response.status !== 200) {
 				errorResults.push({
 					ip: "",

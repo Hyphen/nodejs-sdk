@@ -614,12 +614,12 @@ export class Link extends BaseService {
 
 		const response = await this.delete(url, { headers });
 
+		/* v8 ignore next -- @preserve */
 		if (response.status === 204) {
 			return true;
-			/* v8 ignore next 1 -- @preserve */
 		}
 
-		/* v8 ignore next 1 -- @preserve */
+		/* v8 ignore next -- @preserve */
 		throw new Error(`Failed to delete QR code: ${response.statusText}`);
 	}
 }
