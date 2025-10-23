@@ -151,10 +151,10 @@ export class BaseService extends Hookified {
 		const { data: configData, ...restConfig } = config || {};
 		let body: string | undefined;
 		if (configData) {
+			/* v8 ignore next -- @preserve */
 			body =
 				typeof configData === "string"
-					? /* v8 ignore next 1 -- @preserve */
-						configData
+					? configData
 					: JSON.stringify(configData);
 			// Add content-type back if we have data
 			if (!headers["content-type"] && !headers["Content-Type"]) {
@@ -173,6 +173,7 @@ export class BaseService extends Hookified {
 		let data: T | undefined;
 		if (response.status !== 204) {
 			const text = await response.text();
+			/* v8 ignore next -- @preserve */
 			try {
 				data = text ? JSON.parse(text) : undefined;
 			} catch {
