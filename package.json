@@ -30,7 +30,7 @@
   "author": "Team Hyphen <hello@hyphen.ai>",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "^2.2.5",
+    "@biomejs/biome": "^2.2.7",
     "@swc/core": "^1.13.20",
     "@types/node": "^24.9.1",
     "@vitest/coverage-v8": "^4.0.2",
