@@ -1,6 +1,6 @@
 {
   "name": "@hyphen/sdk",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Hyphen SDK for Node.js",
   "type": "module",
   "main": "dist/index.cjs",
@@ -31,7 +31,7 @@
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "^2.3.5",
-    "@swc/core": "^1.15.1",
+    "@swc/core": "^1.15.2",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^4.0.9",
     "rimraf": "^6.1.0",
