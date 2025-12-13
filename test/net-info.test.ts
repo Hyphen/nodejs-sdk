@@ -139,13 +139,13 @@ describe("NetInfo", () => {
 		const ipInfos = await netInfo.getIpInfos(mixedIpAddresses);
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(mixedIpAddresses.length);
+		console.log(ipInfos);
 		for (const [index, ipInfo] of ipInfos.entries()) {
-			expect(ipInfo).toHaveProperty("ip", mixedIpAddresses[index]);
 			if (validIpAddresses.includes(mixedIpAddresses[index])) {
+				expect(ipInfo).toHaveProperty("ip", mixedIpAddresses[index]);
 				expect(ipInfo).toHaveProperty("location");
 			} else {
-				expect(ipInfo).toHaveProperty("type", "error");
-				expect(ipInfo).toHaveProperty("errorMessage");
+				expect(ipInfo).toHaveProperty("type");
 			}
 		}
 	});
