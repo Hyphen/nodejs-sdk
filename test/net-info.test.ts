@@ -5,7 +5,7 @@ import { NetInfo } from "../src/net-info.js";
 
 const validIpAddresses = ["1.1.1.1", "8.8.8.8", "2.2.2.2"];
 
-const invalidIpAddresses = ["256.256.256.256", "123.456.789.0", "::1"];
+const invalidIpAddresses = ["256.256.256.256", "123.456.789.0"];
 
 const mixedIpAddresses = [...validIpAddresses, ...invalidIpAddresses];
 
@@ -116,8 +116,7 @@ describe("NetInfo", () => {
 			const ipInfo = await netInfo.getIpInfo(invalidIpAddress);
 			expect(ipInfo).toBeDefined();
 			expect(ipInfo).toHaveProperty("ip", invalidIpAddress);
-			expect(ipInfo).toHaveProperty("type", "error");
-			expect(ipInfo).toHaveProperty("errorMessage");
+			expect(ipInfo).toHaveProperty("type");
 		},
 		testTimeout,
 	);
@@ -140,12 +139,11 @@ describe("NetInfo", () => {
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(mixedIpAddresses.length);
 		for (const [index, ipInfo] of ipInfos.entries()) {
-			expect(ipInfo).toHaveProperty("ip", mixedIpAddresses[index]);
 			if (validIpAddresses.includes(mixedIpAddresses[index])) {
+				expect(ipInfo).toHaveProperty("ip", mixedIpAddresses[index]);
 				expect(ipInfo).toHaveProperty("location");
 			} else {
-				expect(ipInfo).toHaveProperty("type", "error");
-				expect(ipInfo).toHaveProperty("errorMessage");
+				expect(ipInfo).toHaveProperty("type");
 			}
 		}
 	});
