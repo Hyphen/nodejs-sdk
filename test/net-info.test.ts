@@ -139,7 +139,6 @@ describe("NetInfo", () => {
 		const ipInfos = await netInfo.getIpInfos(mixedIpAddresses);
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(mixedIpAddresses.length);
-		console.log(ipInfos);
 		for (const [index, ipInfo] of ipInfos.entries()) {
 			if (validIpAddresses.includes(mixedIpAddresses[index])) {
 				expect(ipInfo).toHaveProperty("ip", mixedIpAddresses[index]);
