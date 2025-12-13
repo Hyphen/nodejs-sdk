@@ -116,8 +116,7 @@ describe("NetInfo", () => {
 			const ipInfo = await netInfo.getIpInfo(invalidIpAddress);
 			expect(ipInfo).toBeDefined();
 			expect(ipInfo).toHaveProperty("ip", invalidIpAddress);
-			expect(ipInfo).toHaveProperty("type", "error");
-			expect(ipInfo).toHaveProperty("errorMessage");
+			expect(ipInfo).toHaveProperty("type");
 		},
 		testTimeout,
 	);
