@@ -45,9 +45,9 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@cacheable/net": "^2.0.2",
+    "@cacheable/net": "^2.0.4",
     "@faker-js/faker": "^10.1.0",
-    "cacheable": "^2.1.1",
+    "cacheable": "^2.3.0",
     "dotenv": "^17.2.3",
     "hookified": "^1.14.0",
     "pino": "^10.1.0"
