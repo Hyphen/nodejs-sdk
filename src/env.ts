@@ -1,13 +1,27 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { config } from "dotenv";
+import { parseEnv } from "node:util";
 
 export type EnvOptions = {
 	path?: string;
 	environment?: string;
 	local?: boolean;
 };
+
+function loadEnvFile(filePath: string, override: boolean): void {
+	try {
+		const content = fs.readFileSync(filePath, "utf8");
+		const parsed = parseEnv(content);
+		for (const [key, value] of Object.entries(parsed)) {
+			if (override || process.env[key] === undefined) {
+				process.env[key] = value;
+			}
+		}
+	} catch {
+		// File doesn't exist or can't be read, skip silently
+	}
+}
 
 /**
  * @description Helper function to load your environment variables based on your default .env file
@@ -26,21 +40,12 @@ export function env(options?: EnvOptions): void {
 
 	// Load the default .env file
 	const envPath = path.resolve(currentWorkingDirectory, ".env");
-	if (fs.existsSync(envPath)) {
-		config({ path: envPath, quiet: true, debug: false });
-	}
+	loadEnvFile(envPath, false);
 
 	// Load the .env.local file if it exists
 	if (local) {
 		const localEnvPath = path.resolve(currentWorkingDirectory, ".env.local");
-		if (fs.existsSync(localEnvPath)) {
-			config({
-				path: localEnvPath,
-				override: true,
-				quiet: true,
-				debug: false,
-			});
-		}
+		loadEnvFile(localEnvPath, true);
 	}
 
 	// Load the environment specific .env file
@@ -51,14 +56,7 @@ export function env(options?: EnvOptions): void {
 			currentWorkingDirectory,
 			`.env.${environment}`,
 		);
-		if (fs.existsSync(envSpecificPath)) {
-			config({
-				path: envSpecificPath,
-				override: true,
-				quiet: true,
-				debug: false,
-			});
-		}
+		loadEnvFile(envSpecificPath, true);
 
 		// Load the environment specific .env.local file if it exists
 		if (local) {
@@ -66,14 +64,7 @@ export function env(options?: EnvOptions): void {
 				currentWorkingDirectory,
 				`.env.${environment}.local`,
 			);
-			if (fs.existsSync(envLocalPath)) {
-				config({
-					path: envLocalPath,
-					override: true,
-					quiet: true,
-					debug: false,
-				});
-			}
+			loadEnvFile(envLocalPath, true);
 		}
 	}
 }
