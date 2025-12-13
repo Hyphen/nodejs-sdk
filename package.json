@@ -1,6 +1,6 @@
 {
   "name": "@hyphen/sdk",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "Hyphen SDK for Node.js",
   "type": "module",
   "main": "dist/index.cjs",
