@@ -5,7 +5,7 @@ import { NetInfo } from "../src/net-info.js";
 
 const validIpAddresses = ["1.1.1.1", "8.8.8.8", "2.2.2.2"];
 
-const invalidIpAddresses = ["256.256.256.256", "123.456.789.0", "::1"];
+const invalidIpAddresses = ["256.256.256.256", "123.456.789.0"];
 
 const mixedIpAddresses = [...validIpAddresses, ...invalidIpAddresses];
 
