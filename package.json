@@ -49,9 +49,9 @@
   ],
   "dependencies": {
     "@cacheable/net": "^2.0.4",
-    "@faker-js/faker": "^10.1.0",
+    "@faker-js/faker": "^10.2.0",
     "cacheable": "^2.3.0",
     "hookified": "^1.14.0",
-    "pino": "^10.1.0"
+    "pino": "^10.1.1"
   }
 }
