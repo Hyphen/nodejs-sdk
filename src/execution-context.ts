@@ -1,5 +1,5 @@
 import { CacheableNet } from "@cacheable/net";
-import { Cacheable } from "cacheable";
+import type { Cacheable } from "cacheable";
 
 export type ExecutionContextOptions = {
 	/**
@@ -12,10 +12,9 @@ export type ExecutionContextOptions = {
 	 */
 	baseUri?: string;
 	/**
-	 * Whether to enable caching for the request.
-	 * @default false
+	 * The Cacheable instance to use for caching requests.
 	 */
-	cache?: boolean;
+	cache?: Cacheable;
 };
 
 export type ExecutionContextRequest = {
@@ -100,9 +99,11 @@ export async function getExecutionContext(
 		url += `?organizationId=${encodeURIComponent(options.organizationId)}`;
 	}
 
-	const net = new CacheableNet({
-		cache: options?.cache ? new Cacheable() : undefined,
-	});
+	const net = options?.cache
+		? new CacheableNet({ cache: options.cache })
+		: new CacheableNet();
+
+	const caching = options?.cache !== undefined;
 
 	const response = await net.get<ExecutionContext>(url, {
 		headers: {
@@ -110,6 +111,7 @@ export async function getExecutionContext(
 			"content-type": "application/json",
 			accept: "application/json",
 		},
+		caching,
 	});
 
 	if (response.response.status !== 200) {
