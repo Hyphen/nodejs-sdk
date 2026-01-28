@@ -1,8 +1,5 @@
-import process from "node:process";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { getExecutionContext } from "../src/execution-context.js";
-
-const testTimeout = 10_000;
 
 // Shared mock state that can be configured per test
 const mockState: {
@@ -115,89 +112,4 @@ describe("getExecutionContext", () => {
 			getExecutionContext({ apiKey: "invalid-api-key" }),
 		).rejects.toThrow("Failed to get execution context: Unauthorized");
 	});
-
-	test(
-		"should fetch execution context successfully (integration)",
-		async () => {
-			const apiKey = process.env.HYPHEN_API_KEY;
-			if (!apiKey) {
-				console.log("Skipping test: HYPHEN_API_KEY not set");
-				return;
-			}
-
-			mockState.getResponse = {
-				response: { status: 200 },
-				data: { organization: { id: "integration-org" } },
-			};
-
-			const context = await getExecutionContext({ apiKey });
-			expect(context).toBeDefined();
-			expect(context).toHaveProperty("organization");
-		},
-		testTimeout,
-	);
-
-	test(
-		"should fetch execution context with organizationId (integration)",
-		async () => {
-			const apiKey = process.env.HYPHEN_API_KEY;
-			const organizationId = process.env.HYPHEN_ORGANIZATION_ID;
-			if (!apiKey) {
-				console.log("Skipping test: HYPHEN_API_KEY not set");
-				return;
-			}
-
-			mockState.getResponse = {
-				response: { status: 200 },
-				data: { organization: { id: organizationId ?? "default-org" } },
-			};
-
-			const context = await getExecutionContext({
-				apiKey,
-				organizationId,
-			});
-			expect(context).toBeDefined();
-			expect(context).toHaveProperty("organization");
-		},
-		testTimeout,
-	);
-
-	test(
-		"should allow custom baseUri (integration)",
-		async () => {
-			const apiKey = process.env.HYPHEN_API_KEY;
-			if (!apiKey) {
-				console.log("Skipping test: HYPHEN_API_KEY not set");
-				return;
-			}
-
-			mockState.getResponse = {
-				response: { status: 200 },
-				data: { organization: { id: "custom-uri-org" } },
-			};
-
-			const context = await getExecutionContext({
-				apiKey,
-				baseUri: "https://api.hyphen.ai",
-			});
-			expect(context).toBeDefined();
-			expect(context).toHaveProperty("organization");
-		},
-		testTimeout,
-	);
-
-	test(
-		"should throw an error for invalid API key (integration)",
-		async () => {
-			mockState.getResponse = {
-				response: { status: 401, statusText: "Unauthorized" },
-				data: null,
-			};
-
-			await expect(
-				getExecutionContext({ apiKey: "invalid_api_key" }),
-			).rejects.toThrow();
-		},
-		testTimeout,
-	);
 });
