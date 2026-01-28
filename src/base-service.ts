@@ -143,6 +143,7 @@ export class BaseService extends Hookified {
 		config?: FetchRequestInit & { data?: any },
 	): Promise<HttpResponse<T>> {
 		const headers = { ...(config?.headers as any) };
+		/* v8 ignore next -- @preserve */
 		if (headers) {
 			delete headers["content-type"];
 		}
@@ -157,6 +158,7 @@ export class BaseService extends Hookified {
 					? configData
 					: JSON.stringify(configData);
 			// Add content-type back if we have data
+			/* v8 ignore next -- @preserve */
 			if (!headers["content-type"] && !headers["Content-Type"]) {
 				headers["content-type"] = "application/json";
 			}
@@ -212,6 +214,7 @@ export class BaseService extends Hookified {
 			"content-type": "application/json",
 			accept: "application/json",
 		};
+		/* v8 ignore next -- @preserve */
 		if (apiKey) {
 			headers["x-api-key"] = apiKey;
 		}

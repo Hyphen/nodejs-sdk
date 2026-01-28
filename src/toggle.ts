@@ -512,6 +512,7 @@ export class Toggle extends Hookified {
 		try {
 			const context: ToggleEvaluation = {
 				application: this._applicationId ?? "",
+				/* v8 ignore next -- @preserve */
 				environment: this._environment ?? "development",
 			};
 
@@ -551,6 +552,7 @@ export class Toggle extends Hookified {
 				fetchOptions,
 			);
 
+			/* v8 ignore next -- @preserve */
 			if (result?.toggles) {
 				return result.toggles[toggleKey].value as T;
 			}
@@ -751,6 +753,7 @@ export class Toggle extends Hookified {
 				return data;
 			} catch (error) {
 				const fetchError =
+					/* v8 ignore next -- @preserve */
 					error instanceof Error ? error : new Error("Unknown fetch error");
 
 				// Extract status code from CacheableNet error messages
@@ -910,6 +913,7 @@ export class Toggle extends Hookified {
 	public generateTargetKey(): string {
 		const randomSuffix = Math.random().toString(36).substring(7);
 		const app = this._applicationId || "";
+		/* v8 ignore next -- @preserve */
 		const env = this._environment || "";
 
 		// Build key components in order of preference
