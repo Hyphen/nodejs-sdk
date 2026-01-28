@@ -1,3 +1,4 @@
+import { Cacheable } from "cacheable";
 import { describe, expect, test } from "vitest";
 import { env } from "../src/env.js";
 import { getExecutionContext } from "../src/execution-context.js";
@@ -26,6 +27,7 @@ describe("getExecutionContext integration", () => {
 		async () => {
 			const context = await getExecutionContext(apiKey as string, {
 				organizationId,
+				cache: new Cacheable(),
 			});
 			expect(context).toBeDefined();
 			expect(context.user).toBeDefined();
