@@ -39,7 +39,7 @@ describe("getExecutionContext", () => {
 	});
 
 	test("should throw an error if apiKey is not provided", async () => {
-		await expect(getExecutionContext({ apiKey: "" })).rejects.toThrow(
+		await expect(getExecutionContext("")).rejects.toThrow(
 			"API key is required",
 		);
 	});
@@ -53,7 +53,7 @@ describe("getExecutionContext", () => {
 			},
 		};
 
-		const context = await getExecutionContext({ apiKey: "test-api-key" });
+		const context = await getExecutionContext("test-api-key");
 
 		expect(context).toBeDefined();
 		expect(context.organization).toEqual({ id: "org-123", name: "Test Org" });
@@ -76,10 +76,7 @@ describe("getExecutionContext", () => {
 			data: { organization: { id: "org-456" } },
 		};
 
-		await getExecutionContext({
-			apiKey: "test-api-key",
-			organizationId: "org-456",
-		});
+		await getExecutionContext("test-api-key", { organizationId: "org-456" });
 
 		expect(mockState.getCalls[0][0]).toBe(
 			"https://api.hyphen.ai/api/execution-context?organizationId=org-456",
@@ -92,8 +89,7 @@ describe("getExecutionContext", () => {
 			data: { organization: { id: "org-789" } },
 		};
 
-		await getExecutionContext({
-			apiKey: "test-api-key",
+		await getExecutionContext("test-api-key", {
 			baseUri: "https://custom.api.com",
 		});
 
@@ -108,8 +104,8 @@ describe("getExecutionContext", () => {
 			data: null,
 		};
 
-		await expect(
-			getExecutionContext({ apiKey: "invalid-api-key" }),
-		).rejects.toThrow("Failed to get execution context: Unauthorized");
+		await expect(getExecutionContext("invalid-api-key")).rejects.toThrow(
+			"Failed to get execution context: Unauthorized",
+		);
 	});
 });

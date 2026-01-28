@@ -3,10 +3,6 @@ import { Cacheable } from "cacheable";
 
 export type ExecutionContextOptions = {
 	/**
-	 * The API key for the Hyphen API.
-	 */
-	apiKey: string;
-	/**
 	 * The organization ID for the Hyphen API.
 	 */
 	organizationId?: string;
@@ -73,7 +69,8 @@ export type ExecutionContext = {
  * Get the execution context for the provided API key.
  * This validates the API key and returns information about the organization, user, and request context.
  *
- * @param options - The options for getting the execution context.
+ * @param apiKey - The API key for the Hyphen API.
+ * @param options - Additional options for the request.
  * @returns The execution context.
  * @throws Error if the API key is not provided or if the request fails.
  *
@@ -81,8 +78,7 @@ export type ExecutionContext = {
  * ```typescript
  * import { getExecutionContext } from '@hyphen/sdk';
  *
- * const context = await getExecutionContext({
- *   apiKey: 'your-api-key',
+ * const context = await getExecutionContext('your-api-key', {
  *   organizationId: 'optional-org-id',
  * });
  *
@@ -90,26 +86,27 @@ export type ExecutionContext = {
  * ```
  */
 export async function getExecutionContext(
-	options: ExecutionContextOptions,
+	apiKey: string,
+	options?: ExecutionContextOptions,
 ): Promise<ExecutionContext> {
-	if (!options.apiKey) {
+	if (!apiKey) {
 		throw new Error("API key is required");
 	}
 
-	const baseUri = options.baseUri ?? "https://api.hyphen.ai";
+	const baseUri = options?.baseUri ?? "https://api.hyphen.ai";
 	let url = `${baseUri}/api/execution-context`;
 
-	if (options.organizationId) {
+	if (options?.organizationId) {
 		url += `?organizationId=${encodeURIComponent(options.organizationId)}`;
 	}
 
 	const net = new CacheableNet({
-		cache: options.cache ? new Cacheable() : undefined,
+		cache: options?.cache ? new Cacheable() : undefined,
 	});
 
 	const response = await net.get<ExecutionContext>(url, {
 		headers: {
-			"x-api-key": options.apiKey,
+			"x-api-key": apiKey,
 			"content-type": "application/json",
 			accept: "application/json",
 		},
