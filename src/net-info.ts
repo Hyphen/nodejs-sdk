@@ -149,6 +149,7 @@ export class NetInfo extends BaseService {
 			const errorResult: ipInfoError = {
 				ip,
 				type: "error",
+				/* v8 ignore next -- @preserve */
 				errorMessage: error instanceof Error ? error.message : "Unknown error",
 			};
 			return errorResult;

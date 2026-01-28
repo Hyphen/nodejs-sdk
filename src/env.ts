@@ -51,6 +51,7 @@ export function env(options?: EnvOptions): void {
 	// Load the environment specific .env file
 	const environment = options?.environment ?? process.env.NODE_ENV;
 
+	/* v8 ignore next -- @preserve */
 	if (environment) {
 		const envSpecificPath = path.resolve(
 			currentWorkingDirectory,

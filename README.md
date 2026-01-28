@@ -24,6 +24,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 - [ENV - Secret Management Service](#env---secret-management-service)
 	- [Loading Environment Variables](#loading-environment-variables)
 - [Net Info - Geo Information Service](#net-info---geo-information-service)
+- [Execution Context - API Key Validation](#execution-context---api-key-validation)
 - [Link - Short Code Service](#link---short-code-service)
 	- [Creating a Short Code](#creating-a-short-code)
 	- [Updating a Short Code](#updating-a-short-code)
@@ -672,6 +673,75 @@ console.log('IP Infos:', ipInfos);
 ```
 
 You can also set the API key using the `HYPHEN_API_KEY` environment variable. This is useful for keeping your API key secure and not hardcoding it in your code.
+
+# Execution Context - API Key Validation
+
+The `getExecutionContext` function validates an API key and returns information about the authenticated user, organization, and request context. This is useful for verifying API keys and getting user/organization details.
+
+## Basic Usage
+
+```javascript
+import { getExecutionContext } from '@hyphen/sdk';
+
+const context = await getExecutionContext('your-api-key');
+
+console.log('User:', context.user?.name);
+console.log('Organization:', context.member?.organization?.name);
+console.log('IP Address:', context.ipAddress);
+console.log('Location:', context.location?.city, context.location?.country);
+```
+
+## Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `organizationId` | `string` | Optional organization ID to scope the context request |
+| `baseUri` | `string` | Custom API base URI (defaults to `https://api.hyphen.ai`) |
+| `cache` | `Cacheable` | Cacheable instance for caching requests |
+
+## With Organization ID
+
+If you need to get context for a specific organization:
+
+```javascript
+import { getExecutionContext } from '@hyphen/sdk';
+
+const context = await getExecutionContext('your-api-key', {
+  organizationId: 'org_123456789',
+});
+
+console.log('Organization:', context.organization?.name);
+```
+
+## With Caching
+
+To enable caching of execution context requests:
+
+```javascript
+import { Cacheable } from 'cacheable';
+import { getExecutionContext } from '@hyphen/sdk';
+
+const cache = new Cacheable({ ttl: 60000 }); // Cache for 60 seconds
+
+const context = await getExecutionContext('your-api-key', {
+  cache,
+});
+
+console.log('User:', context.user?.name);
+```
+
+## Return Type
+
+The function returns an `ExecutionContext` object with the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `request` | `object` | Request metadata (`id`, `causationId`, `correlationId`) |
+| `user` | `object` | User info (`id`, `name`, `rules`, `type`) |
+| `member` | `object` | Member info with nested `organization` |
+| `organization` | `object` | Organization info (`id`, `name`) |
+| `ipAddress` | `string` | The IP address of the request |
+| `location` | `object` | Geo location (`country`, `region`, `city`, `lat`, `lng`, `postalCode`, `timezone`) |
 
 # Link - Short Code Service
 
