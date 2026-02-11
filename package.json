@@ -52,6 +52,6 @@
     "@faker-js/faker": "^10.3.0",
     "cacheable": "^2.3.0",
     "hookified": "^1.14.0",
-    "pino": "^10.1.1"
+    "pino": "^10.3.1"
   }
 }
