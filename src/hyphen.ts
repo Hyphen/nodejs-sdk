@@ -16,18 +16,21 @@ export type HyphenOptions = {
 	apiKey?: string;
 	/**
 	 * Options for the Toggle service.
+	 * Excludes `publicApiKey` as it's provided at the top level.
 	 * @see ToggleOptions
 	 * @default {Toggle}
 	 */
 	toggle?: Omit<ToggleOptions, "publicApiKey">;
 	/**
 	 * Options for the NetInfo service.
+	 * Excludes `apiKey` as it's provided at the top level.
 	 * @see NetInfoOptions
 	 * @default {NetInfo}
 	 */
 	netInfo?: Omit<NetInfoOptions, "apiKey">;
 	/**
 	 * Options for the Link service.
+	 * Excludes `apiKey` as it's provided at the top level.
 	 * @see LinkOptions
 	 * @default {Link}
 	 */
