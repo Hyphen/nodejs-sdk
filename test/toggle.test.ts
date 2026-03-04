@@ -657,6 +657,7 @@ describe("Hyphen sdk", () => {
 			const toggle = new Toggle({
 				horizonUrls: ["https://api.test.com"],
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("feature-flag", false);
 			expect(result).toBe(false); // Returns defaultValue when error occurs

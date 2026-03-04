@@ -36,6 +36,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Creating a QR Code from a Short Code](#creating-a-qr-code-from-a-short-code)
 	- [Get QR Codes for a Short Code](#get-qr-codes-for-a-short-code)
 	- [Deleting a QR Code](#deleting-a-qr-code)
+- [Migrating to v3](#migrating-to-v3)
 - [Contributing](#contributing)
 - [Testing Your Changes](#testing-your-changes)
 - [License and Copyright](#license-and-copyright)
@@ -957,6 +958,54 @@ const qr = 'qr_1234567890'; // It is the ID of the QR code you want to delete
 const response = await link.deleteQrCode(code, qr);
 console.log('Delete QR Code Response:', response);
 ```
+
+# Migrating to v3
+
+v3 upgrades the underlying event system to [hookified v2](https://hookified.org). There are two breaking changes:
+
+## `throwOnEmptyListeners` now defaults to `true`
+
+In v2, emitting events (`error`) without any registered listeners was silently ignored. In v3, this will throw an error by default. If your code emits events, you must register listeners:
+
+```typescript
+const hyphen = new Hyphen({ apiKey: 'your-key' });
+
+// Register listeners before triggering operations that emit events
+hyphen.on('error', (message) => {
+  console.error('Error:', message);
+});
+```
+
+If you want to restore the previous behavior where unhandled events are silently ignored, pass `throwOnEmptyListeners: false` in the options:
+
+```typescript
+const hyphen = new Hyphen({
+  apiKey: 'your-key',
+  throwOnEmptyListeners: false,
+});
+
+const toggle = new Toggle({
+  publicApiKey: 'public_your-key',
+  throwOnEmptyListeners: false,
+});
+```
+
+## `throwErrors` option removed
+
+The `throwErrors` option has been removed from `BaseServiceOptions`, `HyphenOptions`, and all service classes. Error throwing is now handled natively by hookified v2.
+
+To get the previous `throwErrors: true` behavior, use `throwOnEmitError: true` instead:
+
+```typescript
+// v2 (old)
+const netInfo = new NetInfo({ throwErrors: true });
+
+// v3 (new)
+const netInfo = new NetInfo({ throwOnEmitError: true });
+```
+
+The `throwErrors` getter/setter on service instances has also been removed as you can use `.throwOnEmitError` getter/setter now.
+
 
 # Contributing
 

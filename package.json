@@ -1,6 +1,6 @@
 {
   "name": "@hyphen/sdk",
-  "version": "2.2.1",
+  "version": "3.0.0",
   "description": "Hyphen SDK for Node.js",
   "type": "module",
   "main": "dist/index.cjs",
@@ -51,7 +51,7 @@
     "@cacheable/net": "^2.0.6",
     "@faker-js/faker": "^10.3.0",
     "cacheable": "^2.3.3",
-    "hookified": "^1.15.1",
+    "hookified": "^2.0.1",
     "pino": "^10.3.1"
   }
 }

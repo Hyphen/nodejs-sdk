@@ -14,9 +14,7 @@ export interface HttpResponse<T = any> {
 	request?: any;
 }
 
-export type BaseServiceOptions = {
-	throwErrors?: boolean;
-} & HookifiedOptions;
+export type BaseServiceOptions = HookifiedOptions;
 
 export enum ErrorMessages {
 	API_KEY_REQUIRED = "API key is required. Please provide it via options or set the HYPHEN_API_KEY environment variable.",
@@ -26,14 +24,10 @@ export enum ErrorMessages {
 export class BaseService extends Hookified {
 	private _log: pino.Logger = pino();
 	private _cache = new Cacheable();
-	private _throwErrors = false;
 	private _net: CacheableNet;
 
 	constructor(options?: BaseServiceOptions) {
 		super(options);
-		if (options && options.throwErrors !== undefined) {
-			this._throwErrors = options.throwErrors;
-		}
 		this._net = new CacheableNet({
 			cache: this._cache,
 		});
@@ -56,21 +50,9 @@ export class BaseService extends Hookified {
 		this._net.cache = value;
 	}
 
-	public get throwErrors(): boolean {
-		return this._throwErrors;
-	}
-
-	public set throwErrors(value: boolean) {
-		this._throwErrors = value;
-	}
-
 	public error(message: string, ...args: any[]): void {
 		this._log.error(message, ...args);
-
 		this.emit("error", message, ...args);
-		if (this.throwErrors) {
-			throw new Error(message);
-		}
 	}
 
 	public warn(message: string, ...args: any[]): void {

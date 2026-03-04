@@ -142,6 +142,7 @@ describe("Toggle Evaluations", () => {
 					applicationId: "test-app",
 					defaultContext: { targetingKey: "test" },
 				});
+				toggle.on("error", () => {});
 
 				const result = await toggle.get("test-toggle", "default-value");
 				expect(result).toBe("default-value");
@@ -156,6 +157,7 @@ describe("Toggle Evaluations", () => {
 					publicApiKey: "public_test-key",
 					applicationId: "test-app",
 				});
+				toggle.on("error", () => {});
 
 				const result = await toggle.get("test-toggle", "fallback");
 				expect(result).toBe("fallback");
@@ -171,6 +173,7 @@ describe("Toggle Evaluations", () => {
 					applicationId: "",
 					defaultContext: { targetingKey: "test" },
 				});
+				toggle.on("error", () => {});
 
 				const result = await toggle.get("test-toggle", "default");
 				expect(result).toBe("default");
@@ -199,6 +202,7 @@ describe("Toggle Evaluations", () => {
 				defaultContext: { targetingKey: "test" },
 				horizonUrls: ["https://invalid-domain.test"],
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("test-toggle", "fallback-value");
 			expect(result).toBe("fallback-value");
@@ -210,6 +214,7 @@ describe("Toggle Evaluations", () => {
 				applicationId: hyphenApplicationId,
 				defaultContext: { targetingKey: "test" },
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("non-existent-toggle", "not-found");
 			expect(result).toBe("not-found");
@@ -242,6 +247,7 @@ describe("Toggle Evaluations", () => {
 				applicationId: undefined, // This will cause validation to fail
 				defaultContext: { targetingKey: "test" },
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("test-toggle", "validation-failed");
 			expect(result).toBe("validation-failed");
@@ -270,6 +276,7 @@ describe("Toggle Evaluations", () => {
 				applicationId: "", // This will cause validation to fail
 				defaultContext: { targetingKey: "test" },
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("test-toggle", "validation-failed");
 			expect(result).toBe("validation-failed");
@@ -281,6 +288,7 @@ describe("Toggle Evaluations", () => {
 				// No applicationId provided, will be undefined -> ""
 				defaultContext: { targetingKey: "test" },
 			});
+			toggle.on("error", () => {});
 
 			const result = await toggle.get("test-toggle", "validation-failed");
 			expect(result).toBe("validation-failed");

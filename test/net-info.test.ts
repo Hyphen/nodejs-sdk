@@ -21,7 +21,6 @@ describe("NetInfo", () => {
 		const netInfo = new NetInfo();
 		expect(netInfo.log).toBeDefined();
 		expect(netInfo.cache).toBeDefined();
-		expect(netInfo.throwErrors).toBe(false);
 	});
 
 	test("should allow setting and getting apiKey", () => {
@@ -44,7 +43,7 @@ describe("NetInfo", () => {
 		delete process.env.HYPHEN_API_KEY;
 		let didThrow = false;
 		try {
-			new NetInfo({ throwErrors: true });
+			new NetInfo({ throwOnEmitError: true });
 		} catch (error) {
 			expect(error).toEqual(new Error(ErrorMessages.API_KEY_REQUIRED));
 			didThrow = true;
@@ -65,7 +64,7 @@ describe("NetInfo", () => {
 		let didThrow = false;
 		try {
 			new NetInfo({
-				throwErrors: true,
+				throwOnEmitError: true,
 				apiKey: "public_api_key",
 			});
 		} catch (error) {
@@ -89,7 +88,7 @@ describe("NetInfo", () => {
 		delete process.env.HYPHEN_API_KEY;
 		let didThrow = false;
 		try {
-			const netInfo = new NetInfo({ throwErrors: true });
+			const netInfo = new NetInfo({ throwOnEmitError: true });
 			netInfo.apiKey = undefined; // Explicitly set apiKey to undefined
 			await netInfo.getIpInfo("1.1.1.1");
 		} catch (error) {
@@ -109,6 +108,7 @@ describe("NetInfo", () => {
 		async () => {
 			// API key should be set in the environment variable HYPHEN_API_KEY
 			const netInfo = new NetInfo();
+			netInfo.on("error", () => {});
 			const invalidIpAddress =
 				invalidIpAddresses[
 					Math.floor(Math.random() * invalidIpAddresses.length)
@@ -150,6 +150,7 @@ describe("NetInfo", () => {
 
 	test("should handle empty IP array gracefully", async () => {
 		const netInfo = new NetInfo();
+		netInfo.on("error", () => {});
 		const ipInfos = await netInfo.getIpInfos([]);
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(0);
