@@ -17,7 +17,6 @@ describe("BaseService", () => {
 		const service = new BaseService();
 		expect(service.log).toBeDefined();
 		expect(service.cache).toBeDefined();
-		expect(service.throwErrors).toBe(false);
 	});
 
 	test("should allow setting and getting log", () => {
@@ -34,19 +33,12 @@ describe("BaseService", () => {
 		expect(service.cache).toBe(cache);
 	});
 
-	test("should allow setting and getting throwErrors", () => {
-		const service = new BaseService({ throwErrors: true });
-		service.throwErrors = true;
-		expect(service.throwErrors).toBe(true);
-	});
-
 	test("should log error and emit error event", () => {
-		const service = new BaseService({ throwErrors: true });
+		const service = new BaseService();
+		service.on("error", () => {});
 		const errorSpy = vi.spyOn(service.log, "error");
 		const emitSpy = vi.spyOn(service, "emit");
-		expect(() => {
-			service.error("Test error");
-		}).toThrow("Test error");
+		service.error("Test error");
 		expect(errorSpy).toHaveBeenCalledWith("Test error");
 		expect(emitSpy).toHaveBeenCalledWith("error", "Test error");
 	});

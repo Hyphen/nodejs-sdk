@@ -15,28 +15,19 @@ export type HyphenOptions = {
 	 */
 	apiKey?: string;
 	/**
-	 * Whether to throw errors or not.
-	 * If set to true, errors will be thrown instead of logged.
-	 * @default false
-	 */
-	throwErrors?: boolean;
-	/**
 	 * Options for the Toggle service.
-	 * Excludes publicApiKey and throwErrors from ToggleOptions.
 	 * @see ToggleOptions
 	 * @default {Toggle}
 	 */
 	toggle?: Omit<ToggleOptions, "publicApiKey">;
 	/**
 	 * Options for the NetInfo service.
-	 * Excludes apiKey and throwErrors from NetInfoOptions.
 	 * @see NetInfoOptions
 	 * @default {NetInfo}
 	 */
 	netInfo?: Omit<NetInfoOptions, "apiKey">;
 	/**
 	 * Options for the Link service.
-	 * Excludes apiKey and throwErrors from LinkOptions.
 	 * @see LinkOptions
 	 * @default {Link}
 	 */

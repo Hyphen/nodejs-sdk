@@ -58,6 +58,7 @@ describe("Hyphen", () => {
 describe("Hyphen Emitters", () => {
 	test("should emit link error events", () => {
 		const hyphen = new Hyphen();
+		hyphen.on("error", () => {});
 		const errorSpy = vi.spyOn(hyphen.link, "emit");
 		hyphen.link.error("Test error");
 		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
@@ -79,6 +80,7 @@ describe("Hyphen Emitters", () => {
 
 	test("should emit netInfo error events", () => {
 		const hyphen = new Hyphen();
+		hyphen.on("error", () => {});
 		const errorSpy = vi.spyOn(hyphen, "emit");
 		hyphen.netInfo.error("Test error");
 		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
@@ -100,6 +102,7 @@ describe("Hyphen Emitters", () => {
 
 	test("should emit toggle error events", () => {
 		const hyphen = new Hyphen();
+		hyphen.on("error", () => {});
 		const errorSpy = vi.spyOn(hyphen, "emit");
 		hyphen.toggle.emit("error", "Test error");
 		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
