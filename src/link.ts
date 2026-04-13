@@ -6,7 +6,7 @@ import type { GetCodeStatsResponse } from "./link-stats-type.js";
 
 env();
 
-export const defaultLinkUris = [
+export const defaultLinkUris: string[] = [
 	"https://api.hyphen.ai/api/organizations/{organizationId}/link/codes/",
 ];
 

@@ -103,7 +103,7 @@ export class NetInfo extends BaseService {
 		this._baseUri = value;
 	}
 
-	public setApiKey(value: string | undefined) {
+	public setApiKey(value: string | undefined): void {
 		if (value?.startsWith("public_")) {
 			this.error(ErrorMessages.PUBLIC_API_KEY_SHOULD_NOT_BE_USED);
 			return;

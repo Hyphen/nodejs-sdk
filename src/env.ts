@@ -70,5 +70,5 @@ export function env(options?: EnvOptions): void {
 	}
 }
 
-export const loadEnv = env; // Alias for backward compatibility
+export const loadEnv: (options?: EnvOptions) => void = env; // Alias for backward compatibility
 export type LoadEnvOptions = EnvOptions; // Alias for backward compatibility
