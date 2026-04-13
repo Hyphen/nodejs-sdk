@@ -2,7 +2,7 @@
     "compilerOptions": {
       "target": "ESNext",
       "module": "ESNext",
-      "moduleResolution": "node",
+      "moduleResolution": "bundler",
       "strict": true,
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true,
@@ -15,7 +15,9 @@
       "noUnusedLocals": true,
       "noUnusedParameters": true,
       "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
+      "emitDecoratorMetadata": true,
+      "declaration": true,
+      "isolatedDeclarations": true
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]
