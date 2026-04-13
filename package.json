@@ -24,7 +24,7 @@
     "test:ci": "biome check --error-on-warnings && vitest run --coverage",
     "build": "tsdown src/index.ts --format esm,cjs --dts",
     "clean": "rimraf ./dist pnpm-lock.yaml node_modules coverage",
-    "prepublishOnly": "tsdown src/index.ts --format esm,cjs --dts"
+    "prepublishOnly": "pnpm build"
   },
   "keywords": [
     "hyphen",
