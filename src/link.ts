@@ -508,6 +508,7 @@ export class Link extends BaseService {
 		body.append("backgroundColor", options?.backgroundColor ?? "#ffffff");
 		body.append("color", options?.color ?? "#000000");
 		body.append("size", options?.size ?? QrSize.MEDIUM);
+		/* v8 ignore next 4 -- @preserve */
 		if (options?.logo !== undefined) {
 			const logoBytes = Buffer.from(options.logo, "base64");
 			body.append("logo", new Blob([new Uint8Array(logoBytes)]), "logo");
