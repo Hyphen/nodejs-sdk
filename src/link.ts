@@ -494,15 +494,27 @@ export class Link extends BaseService {
 
 		const url = this.getUri(this._organizationId, code, "qrs");
 		const headers = this.createHeaders(this._apiKey);
+		// The QR endpoint requires multipart/form-data; let fetch set the
+		// Content-Type with the correct boundary by removing the JSON default.
+		delete headers["content-type"];
 
-		// biome-ignore lint/suspicious/noExplicitAny: this is valid for body
-		const body: Record<string, any> = {
-			title: options?.title,
-			backgroundColor: options?.backgroundColor,
-			color: options?.color,
-			size: options?.size,
-			logo: options?.logo,
-		};
+		const body = new FormData();
+		if (options?.title !== undefined) {
+			body.append("title", options.title);
+		}
+		if (options?.backgroundColor !== undefined) {
+			body.append("backgroundColor", options.backgroundColor);
+		}
+		if (options?.color !== undefined) {
+			body.append("color", options.color);
+		}
+		if (options?.size !== undefined) {
+			body.append("size", options.size);
+		}
+		if (options?.logo !== undefined) {
+			const logoBytes = Buffer.from(options.logo, "base64");
+			body.append("logo", new Blob([new Uint8Array(logoBytes)]), "logo");
+		}
 
 		const response = await this.post(url, body, { headers });
 
