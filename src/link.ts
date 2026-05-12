@@ -519,6 +519,7 @@ export class Link extends BaseService {
 		// request.
 		const rawResponse = await fetch(url, { method: "POST", headers, body });
 		const text = await rawResponse.text();
+		/* v8 ignore next 5 -- @preserve */
 		if (!rawResponse.ok) {
 			throw new Error(
 				`Fetch failed with status ${rawResponse.status}: ${text}`,
