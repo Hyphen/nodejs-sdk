@@ -221,11 +221,9 @@ export class BaseService extends Hookified {
 		config: FetchRequestInit | undefined,
 		originalError: unknown,
 	): Promise<Error> {
-		const error =
-			/* v8 ignore next -- @preserve */
-			originalError instanceof Error
-				? originalError
-				: new Error(String(originalError));
+		// `@cacheable/net` always throws `Error` instances; this cast keeps
+		// the helper focused on the diagnostic flow.
+		const error = originalError as Error;
 		// `@cacheable/net` discards the response body when a request returns a
 		// non-2xx status, leaving only "Fetch failed with status N". Re-issue
 		// the request with native fetch so the body is available for diagnostics.
