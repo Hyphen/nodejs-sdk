@@ -154,15 +154,34 @@ export class BaseService extends Hookified {
 			}
 		}
 
-		let response: Response;
 		try {
 			// Use fetch directly for DELETE to handle 204 status codes properly
-			response = await this._net.fetch(url, {
+			const response = await this._net.fetch(url, {
 				...restConfig,
 				headers,
 				body,
 				method: "DELETE",
 			});
+
+			let data: T | undefined;
+			if (response.status !== 204) {
+				const text = await response.text();
+				/* v8 ignore next -- @preserve */
+				try {
+					data = text ? JSON.parse(text) : undefined;
+				} catch {
+					data = text as any;
+				}
+			}
+
+			return {
+				data: data as T,
+				status: response.status,
+				statusText: response.statusText,
+				headers: response.headers,
+				config: config as any,
+				request: undefined,
+			};
 		} catch (error) {
 			throw await this._enrichFetchError(
 				"DELETE",
@@ -172,26 +191,6 @@ export class BaseService extends Hookified {
 				error,
 			);
 		}
-
-		let data: T | undefined;
-		if (response.status !== 204) {
-			const text = await response.text();
-			/* v8 ignore next -- @preserve */
-			try {
-				data = text ? JSON.parse(text) : undefined;
-			} catch {
-				data = text as any;
-			}
-		}
-
-		return {
-			data: data as T,
-			status: response.status,
-			statusText: response.statusText,
-			headers: response.headers,
-			config: config as any,
-			request: undefined,
-		};
 	}
 
 	public async patch<T>(
@@ -213,6 +212,29 @@ export class BaseService extends Hookified {
 			throw await this._enrichFetchError("PATCH", url, data, config, error);
 		}
 	}
+
+	/* v8 ignore start -- @preserve */
+	private _serializeBody(
+		data: any,
+		headers: Record<string, string>,
+	): BodyInit | undefined {
+		if (data === undefined || data === null) {
+			return undefined;
+		}
+		if (
+			typeof data === "string" ||
+			data instanceof FormData ||
+			data instanceof URLSearchParams ||
+			data instanceof Blob
+		) {
+			return data;
+		}
+		if (!headers["Content-Type"] && !headers["content-type"]) {
+			headers["content-type"] = "application/json";
+		}
+		return JSON.stringify(data);
+	}
+	/* v8 ignore stop -- @preserve */
 
 	private async _enrichFetchError(
 		method: string,
@@ -236,36 +258,21 @@ export class BaseService extends Hookified {
 			const headers: Record<string, string> = {
 				...(config?.headers as Record<string, string> | undefined),
 			};
-			let body: BodyInit | undefined;
-			if (data !== undefined && data !== null) {
-				/* v8 ignore next 8 -- @preserve */
-				if (
-					typeof data === "string" ||
-					data instanceof FormData ||
-					data instanceof URLSearchParams ||
-					data instanceof Blob
-				) {
-					body = data;
-				} else {
-					body = JSON.stringify(data);
-					/* v8 ignore next 3 -- @preserve */
-					if (!headers["Content-Type"] && !headers["content-type"]) {
-						headers["content-type"] = "application/json";
-					}
-				}
-			}
+			const body = this._serializeBody(data, headers);
 			const res = await fetch(url, { method, headers, body });
-			/* v8 ignore next 4 -- @preserve */
+			/* v8 ignore start -- @preserve */
 			if (res.ok) {
 				// The retry unexpectedly succeeded — surface the original error.
 				return error;
 			}
+			/* v8 ignore stop -- @preserve */
 			const text = await res.text();
 			return new Error(`Fetch failed with status ${res.status}: ${text}`);
-			/* v8 ignore next 3 -- @preserve */
+			/* v8 ignore start -- @preserve */
 		} catch {
 			return error;
 		}
+		/* v8 ignore stop -- @preserve */
 	}
 
 	public createHeaders(apiKey?: string): Record<string, string> {
