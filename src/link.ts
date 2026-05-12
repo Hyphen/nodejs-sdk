@@ -516,11 +516,20 @@ export class Link extends BaseService {
 			body.append("logo", new Blob([new Uint8Array(logoBytes)]), "logo");
 		}
 
-		const response = await this.post(url, body, { headers });
+		// `@cacheable/net@2.0.7` coerces `FormData` to its `toString()` value
+		// before sending, so we use native fetch directly for this multipart
+		// request.
+		const rawResponse = await fetch(url, { method: "POST", headers, body });
+		const text = await rawResponse.text();
+		if (!rawResponse.ok) {
+			throw new Error(
+				`Fetch failed with status ${rawResponse.status}: ${text}`,
+			);
+		}
 
 		/* v8 ignore next -- @preserve */
-		if (response.status === 201) {
-			const result = response.data as CreateQrCodeResponse;
+		if (rawResponse.status === 201) {
+			const result = JSON.parse(text) as CreateQrCodeResponse;
 
 			if (result.qrCode) {
 				const buffer = Buffer.from(result.qrCode, "base64");
@@ -531,7 +540,7 @@ export class Link extends BaseService {
 		}
 
 		/* v8 ignore next -- @preserve */
-		throw new Error(`Failed to create QR code: ${response.statusText}`);
+		throw new Error(`Failed to create QR code: ${rawResponse.statusText}`);
 	}
 
 	/**
