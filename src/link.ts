@@ -498,19 +498,16 @@ export class Link extends BaseService {
 		// Content-Type with the correct boundary by removing the JSON default.
 		delete headers["content-type"];
 
+		// Always send backgroundColor/color/size (their documented defaults
+		// when not overridden) — the multipart parser rejects an empty body
+		// with "body must be object". title and logo remain truly optional.
 		const body = new FormData();
 		if (options?.title !== undefined) {
 			body.append("title", options.title);
 		}
-		if (options?.backgroundColor !== undefined) {
-			body.append("backgroundColor", options.backgroundColor);
-		}
-		if (options?.color !== undefined) {
-			body.append("color", options.color);
-		}
-		if (options?.size !== undefined) {
-			body.append("size", options.size);
-		}
+		body.append("backgroundColor", options?.backgroundColor ?? "#ffffff");
+		body.append("color", options?.color ?? "#000000");
+		body.append("size", options?.size ?? QrSize.MEDIUM);
 		if (options?.logo !== undefined) {
 			const logoBytes = Buffer.from(options.logo, "base64");
 			body.append("logo", new Blob([new Uint8Array(logoBytes)]), "logo");
