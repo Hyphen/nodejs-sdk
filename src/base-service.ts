@@ -93,15 +93,19 @@ export class BaseService extends Hookified {
 		data: any,
 		config?: FetchRequestInit,
 	): Promise<HttpResponse<T>> {
-		const response = await this._net.post<T>(url, data, config);
-		return {
-			data: response.data,
-			status: response.response.status,
-			statusText: response.response.statusText,
-			headers: response.response.headers,
-			config: config as any,
-			request: undefined,
-		};
+		try {
+			const response = await this._net.post<T>(url, data, config);
+			return {
+				data: response.data,
+				status: response.response.status,
+				statusText: response.response.statusText,
+				headers: response.response.headers,
+				config: config as any,
+				request: undefined,
+			};
+		} catch (error) {
+			throw await this._enrichFetchError("POST", url, data, config, error);
+		}
 	}
 
 	public async put<T>(
@@ -109,15 +113,19 @@ export class BaseService extends Hookified {
 		data: any,
 		config?: FetchRequestInit,
 	): Promise<HttpResponse<T>> {
-		const response = await this._net.put<T>(url, data, config);
-		return {
-			data: response.data,
-			status: response.response.status,
-			statusText: response.response.statusText,
-			headers: response.response.headers,
-			config: config as any,
-			request: undefined,
-		};
+		try {
+			const response = await this._net.put<T>(url, data, config);
+			return {
+				data: response.data,
+				status: response.response.status,
+				statusText: response.response.statusText,
+				headers: response.response.headers,
+				config: config as any,
+				request: undefined,
+			};
+		} catch (error) {
+			throw await this._enrichFetchError("PUT", url, data, config, error);
+		}
 	}
 
 	public async delete<T>(
@@ -146,13 +154,24 @@ export class BaseService extends Hookified {
 			}
 		}
 
-		// Use fetch directly for DELETE to handle 204 status codes properly
-		const response = await this._net.fetch(url, {
-			...restConfig,
-			headers,
-			body,
-			method: "DELETE",
-		});
+		let response: Response;
+		try {
+			// Use fetch directly for DELETE to handle 204 status codes properly
+			response = await this._net.fetch(url, {
+				...restConfig,
+				headers,
+				body,
+				method: "DELETE",
+			});
+		} catch (error) {
+			throw await this._enrichFetchError(
+				"DELETE",
+				url,
+				configData,
+				config,
+				error,
+			);
+		}
 
 		let data: T | undefined;
 		if (response.status !== 204) {
@@ -180,15 +199,75 @@ export class BaseService extends Hookified {
 		data: any,
 		config?: FetchRequestInit,
 	): Promise<HttpResponse<T>> {
-		const response = await this._net.patch<T>(url, data, config);
-		return {
-			data: response.data,
-			status: response.response.status,
-			statusText: response.response.statusText,
-			headers: response.response.headers,
-			config: config as any,
-			request: undefined,
-		};
+		try {
+			const response = await this._net.patch<T>(url, data, config);
+			return {
+				data: response.data,
+				status: response.response.status,
+				statusText: response.response.statusText,
+				headers: response.response.headers,
+				config: config as any,
+				request: undefined,
+			};
+		} catch (error) {
+			throw await this._enrichFetchError("PATCH", url, data, config, error);
+		}
+	}
+
+	private async _enrichFetchError(
+		method: string,
+		url: string,
+		data: any,
+		config: FetchRequestInit | undefined,
+		originalError: unknown,
+	): Promise<Error> {
+		const error =
+			/* v8 ignore next -- @preserve */
+			originalError instanceof Error
+				? originalError
+				: new Error(String(originalError));
+		// `@cacheable/net` discards the response body when a request returns a
+		// non-2xx status, leaving only "Fetch failed with status N". Re-issue
+		// the request with native fetch so the body is available for diagnostics.
+		const match = error.message.match(/Fetch failed with status (\d+)/);
+		/* v8 ignore next 3 -- @preserve */
+		if (!match) {
+			return error;
+		}
+		try {
+			const headers: Record<string, string> = {
+				...(config?.headers as Record<string, string> | undefined),
+			};
+			let body: BodyInit | undefined;
+			if (data !== undefined && data !== null) {
+				/* v8 ignore next 8 -- @preserve */
+				if (
+					typeof data === "string" ||
+					data instanceof FormData ||
+					data instanceof URLSearchParams ||
+					data instanceof Blob
+				) {
+					body = data;
+				} else {
+					body = JSON.stringify(data);
+					/* v8 ignore next 3 -- @preserve */
+					if (!headers["Content-Type"] && !headers["content-type"]) {
+						headers["content-type"] = "application/json";
+					}
+				}
+			}
+			const res = await fetch(url, { method, headers, body });
+			/* v8 ignore next 4 -- @preserve */
+			if (res.ok) {
+				// The retry unexpectedly succeeded — surface the original error.
+				return error;
+			}
+			const text = await res.text();
+			return new Error(`Fetch failed with status ${res.status}: ${text}`);
+			/* v8 ignore next 3 -- @preserve */
+		} catch {
+			return error;
+		}
 	}
 
 	public createHeaders(apiKey?: string): Record<string, string> {

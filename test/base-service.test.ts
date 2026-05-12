@@ -142,4 +142,52 @@ describe("BaseService", () => {
 		expect(response.data).toBe("This is plain text, not JSON");
 		expect(typeof response.data).toBe("string");
 	});
+
+	test(
+		"post should include response body in error message on 4xx",
+		async () => {
+			const service = new BaseService();
+			const url = `${mockHttpUrl}/status/400`;
+			await expect(service.post(url, { foo: "bar" })).rejects.toThrow(
+				/Fetch failed with status 400/,
+			);
+		},
+		testTimeout,
+	);
+
+	test(
+		"put should include response body in error message on 4xx",
+		async () => {
+			const service = new BaseService();
+			const url = `${mockHttpUrl}/status/400`;
+			await expect(service.put(url, { foo: "bar" })).rejects.toThrow(
+				/Fetch failed with status 400/,
+			);
+		},
+		testTimeout,
+	);
+
+	test(
+		"patch should include response body in error message on 4xx",
+		async () => {
+			const service = new BaseService();
+			const url = `${mockHttpUrl}/status/400`;
+			await expect(service.patch(url, { foo: "bar" })).rejects.toThrow(
+				/Fetch failed with status 400/,
+			);
+		},
+		testTimeout,
+	);
+
+	test(
+		"delete should include response body in error message on 4xx",
+		async () => {
+			const service = new BaseService();
+			const url = `${mockHttpUrl}/status/400`;
+			await expect(
+				service.delete(url, { data: { foo: "bar" } }),
+			).rejects.toThrow(/Fetch failed with status 400/);
+		},
+		testTimeout,
+	);
 });
