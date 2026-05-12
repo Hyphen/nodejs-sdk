@@ -30,7 +30,7 @@ jobs:
         node-version: 22
 
     - name: Install Dependencies
-      run: npm install pnpm -g && pnpm install
+      run: npm install pnpm@10 -g && pnpm install
 
     - name: Build    
       run: pnpm build
