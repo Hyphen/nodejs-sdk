@@ -33,7 +33,6 @@ jobs:
       with:
         node-version: 22
         cache: 'pnpm'
-        registry-url: 'https://registry.npmjs.org'
 
     - name: Install Dependencies
       run: pnpm install
@@ -44,12 +43,9 @@ jobs:
     - name: Testing
       run: pnpm test
 
-    # Trusted publishing (OIDC) requires npm CLI >= 11.5.1, which is newer than
-    # the version bundled with Node.js 22.
-    - name: Update npm
-      run: npm install -g npm@latest
-
     - name: Publish
-      # No NPM_TOKEN: authentication is handled via OIDC trusted publishing.
-      # Provenance attestations are generated from the OIDC identity.
-      run: npm publish --provenance --ignore-scripts
+      # No NPM_TOKEN: pnpm authenticates via OIDC trusted publishing and
+      # generates provenance attestations from the OIDC identity.
+      # --no-git-checks is required because the release runs from a detached
+      # tag checkout rather than a branch.
+      run: pnpm publish --provenance --no-git-checks --ignore-scripts
