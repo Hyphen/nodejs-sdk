@@ -55,8 +55,8 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@cacheable/net": "^2.0.7",
-    "cacheable": "^2.3.4",
+    "@cacheable/net": "^2.0.8",
+    "cacheable": "^2.3.5",
     "hookified": "^2.1.1",
     "pino": "^10.3.1"
   }
