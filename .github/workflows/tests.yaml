@@ -24,21 +24,25 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['24']
+        node-version: ['22', '24', '26']
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'pnpm'
 
     - name: Install Dependencies
-      run: npm install pnpm -g && pnpm install
+      run: pnpm install
 
-    - name: Build    
+    - name: Build
       run: pnpm build
 
-    - name: Testing    
+    - name: Testing
       run: pnpm test
-
