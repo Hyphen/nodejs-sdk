@@ -493,16 +493,37 @@ export class Link extends BaseService {
 		}
 
 		const url = this.getUri(this._organizationId, code, "qrs");
-		const headers = this.createHeaders(this._apiKey);
 
-		// biome-ignore lint/suspicious/noExplicitAny: this is valid for body
-		const body: Record<string, any> = {
-			title: options?.title,
-			backgroundColor: options?.backgroundColor,
-			color: options?.color,
-			size: options?.size,
-			logo: options?.logo,
-		};
+		// The Hyphen API expects this endpoint as `multipart/form-data` (the logo
+		// is uploaded as a file). Sending JSON makes the API reject the custom
+		// options with HTTP 400, so build a FormData body and only append the
+		// options that were provided.
+		const body = new FormData();
+		if (options?.title !== undefined) {
+			body.append("title", options.title);
+		}
+
+		if (options?.backgroundColor !== undefined) {
+			body.append("backgroundColor", options.backgroundColor);
+		}
+
+		if (options?.color !== undefined) {
+			body.append("color", options.color);
+		}
+
+		if (options?.size !== undefined) {
+			body.append("size", options.size);
+		}
+
+		if (options?.logo !== undefined) {
+			const logoBytes = Buffer.from(options.logo, "base64");
+			body.append("logo", new Blob([logoBytes]), "logo.png");
+		}
+
+		// Drop the JSON content-type so fetch sets `multipart/form-data` with the
+		// boundary it generates for the FormData body.
+		const headers = this.createHeaders(this._apiKey);
+		delete headers["content-type"];
 
 		const response = await this.post(url, body, { headers });
 

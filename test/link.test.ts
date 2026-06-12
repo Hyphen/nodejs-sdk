@@ -380,11 +380,11 @@ describe("Link QR Code", () => {
 		testTimeout,
 	);
 
-	// TODO(#133): The Hyphen API now rejects the custom-options QR payload
-	// (title/backgroundColor/color/size) with HTTP 400; it accepted it through
-	// at least 2026-04-13. Skipped until the QR-create API contract is confirmed.
+	// Resolves #133: the QR-create endpoint expects multipart/form-data, so the
+	// custom options are now sent as form fields (and the logo as a file) rather
+	// than a JSON payload that the API rejected with HTTP 400.
 	// https://github.com/Hyphen/nodejs-sdk/issues/133
-	test.skip(
+	test(
 		"should create a QR code with custom options",
 		async () => {
 			const link = new Link({ organizationId, apiKey });
@@ -422,10 +422,9 @@ describe("Link QR Code", () => {
 	);
 
 	// Coverage for the custom-options path of createQrCode without hitting the
-	// live API (the integration test above is skipped pending #133). The network
-	// layer is stubbed so the options-defined branches of the request body are
-	// still exercised.
-	test("should build the request body when creating a QR code with options", async () => {
+	// live API. The network layer is stubbed so the multipart body that gets
+	// sent to the API is still exercised and asserted on.
+	test("should build a multipart request body when creating a QR code with options", async () => {
 		const link = new Link({ organizationId, apiKey });
 		const qrCodeOptions: CreateQrCodeOptions = {
 			title: "Custom QR Code",
@@ -435,13 +434,16 @@ describe("Link QR Code", () => {
 			logo: "bG9nbw==",
 		};
 
-		let capturedBody: Record<string, unknown> | undefined;
+		let capturedBody: FormData | undefined;
+		let capturedHeaders: Record<string, string> | undefined;
 		// biome-ignore lint/suspicious/noExplicitAny: minimal stub of the post method
 		(link as any).post = async (
 			_url: string,
-			data: Record<string, unknown>,
+			data: FormData,
+			config: { headers: Record<string, string> },
 		) => {
 			capturedBody = data;
+			capturedHeaders = config.headers;
 			return {
 				data: {
 					id: "qr_test",
@@ -458,16 +460,51 @@ describe("Link QR Code", () => {
 
 		const response = await link.createQrCode("code_test", qrCodeOptions);
 
-		expect(capturedBody).toEqual({
-			title: "Custom QR Code",
-			backgroundColor: "#ffffff",
-			color: "#000000",
-			size: "medium",
-			logo: "bG9nbw==",
-		});
+		expect(capturedBody).toBeInstanceOf(FormData);
+		expect(capturedBody?.get("title")).toBe("Custom QR Code");
+		expect(capturedBody?.get("backgroundColor")).toBe("#ffffff");
+		expect(capturedBody?.get("color")).toBe("#000000");
+		expect(capturedBody?.get("size")).toBe("medium");
+
+		const logo = capturedBody?.get("logo");
+		expect(logo).toBeInstanceOf(Blob);
+		expect(await (logo as Blob).text()).toBe("logo");
+
+		// fetch must be left to set the multipart content-type (with boundary).
+		expect(capturedHeaders?.["content-type"]).toBeUndefined();
+
 		expect(response.qrCode).toBeDefined();
 		expect(response.qrCodeBytes).toBeDefined();
 		expect(response.qrLink).toBe("https://hyphen.ai/qr");
+	});
+
+	// Coverage for the no-options path: every option is omitted, so the
+	// multipart body should be empty.
+	test("should build an empty multipart request body when creating a QR code without options", async () => {
+		const link = new Link({ organizationId, apiKey });
+
+		let capturedBody: FormData | undefined;
+		// biome-ignore lint/suspicious/noExplicitAny: minimal stub of the post method
+		(link as any).post = async (_url: string, data: FormData) => {
+			capturedBody = data;
+			return {
+				data: {
+					id: "qr_test",
+					qrCode: Buffer.from("qr").toString("base64"),
+					qrLink: "https://hyphen.ai/qr",
+				},
+				status: 201,
+				statusText: "Created",
+				headers: {},
+				config: undefined,
+				request: undefined,
+			};
+		};
+
+		await link.createQrCode("code_test");
+
+		expect(capturedBody).toBeInstanceOf(FormData);
+		expect([...(capturedBody as FormData).keys()]).toEqual([]);
 	});
 
 	test("should throw on create QR code with invalid parameters", async () => {
