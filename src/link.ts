@@ -109,7 +109,7 @@ export type CreateQrCodeResponse = {
 	id: string;
 	title?: string;
 	qrCode: string;
-	qrCodeBytes: Uint16Array;
+	qrCodeBytes: Uint8Array;
 	qrLink: string;
 };
 
@@ -538,7 +538,7 @@ export class Link extends BaseService {
 
 			if (result.qrCode) {
 				const buffer = Buffer.from(result.qrCode, "base64");
-				result.qrCodeBytes = new Uint16Array(buffer);
+				result.qrCodeBytes = new Uint8Array(buffer);
 			}
 
 			return result;
@@ -573,7 +573,7 @@ export class Link extends BaseService {
 
 			if (result.qrCode) {
 				const buffer = Buffer.from(result.qrCode, "base64");
-				result.qrCodeBytes = new Uint16Array(buffer);
+				result.qrCodeBytes = new Uint8Array(buffer);
 			}
 
 			return result;
@@ -612,7 +612,7 @@ export class Link extends BaseService {
 			for (const qrCode of result.data) {
 				if (qrCode.qrCode) {
 					const buffer = Buffer.from(qrCode.qrCode, "base64");
-					qrCode.qrCodeBytes = new Uint16Array(buffer);
+					qrCode.qrCodeBytes = new Uint8Array(buffer);
 				}
 			}
 

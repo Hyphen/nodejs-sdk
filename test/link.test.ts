@@ -15,11 +15,50 @@ const longUrl = [
 	"https://hyphen.ai/toggle",
 	"https://hyphen.ai/net-info",
 ];
-const testTimeout = 20_000;
+const testTimeout = 30_000;
 
 // biome-ignore lint/suspicious/noExportsInTest: this is used across tests
 export function getRandomLongUrl(): string {
 	return longUrl[Math.floor(Math.random() * longUrl.length)];
+}
+
+/**
+ * Retry a live API call with a backoff. The link API is eventually
+ * consistent, so operations that run immediately after a write (creating a
+ * QR code or reading, updating, or deleting a code right after it was
+ * created) can transiently fail with a 404 until the write is visible to the
+ * read path. Wrapping those calls keeps transient failures from flaking the
+ * suite. Callers can also throw from `fn` when a result is incomplete (for
+ * example a list that does not include a just-created item yet) to poll
+ * until it is.
+ */
+async function retry<T>(fn: () => Promise<T>, attempts = 5): Promise<T> {
+	let lastError: unknown;
+	for (let attempt = 1; attempt <= attempts; attempt++) {
+		try {
+			return await fn();
+		} catch (error) {
+			lastError = error;
+			if (attempt < attempts) {
+				await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+			}
+		}
+	}
+
+	throw lastError;
+}
+
+/**
+ * Best-effort removal of a short code created by a test. Cleanup is not the
+ * behavior under test (the delete tests assert deletion explicitly), so a
+ * cleanup failure logs a warning instead of failing the test.
+ */
+async function cleanupShortCode(link: Link, id: string): Promise<void> {
+	try {
+		await retry(() => link.deleteShortCode(id));
+	} catch {
+		console.warn(`Cleanup failed for ${id}`);
+	}
 }
 
 describe("Link", () => {
@@ -103,22 +142,15 @@ describe("Link Create", () => {
 			const title = faker.string.alpha(10);
 			const options = { tags, title };
 
-			const response = await link.createShortCode(longUrl, domain, options);
+			const response = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
+			);
 
 			expect(response).toBeDefined();
 			expect(response.id).toBeDefined();
 
 			if (response.id) {
-				// Small delay for eventual consistency
-				await new Promise((r) => setTimeout(r, 500));
-
-				try {
-					const deleteResponse = await link.deleteShortCode(response.id);
-					expect(deleteResponse).toBe(true);
-				} catch {
-					// Cleanup failure shouldn't fail the test
-					console.warn(`Cleanup failed for ${response.id}`);
-				}
+				await cleanupShortCode(link, response.id);
 			}
 		},
 		testTimeout,
@@ -148,10 +180,8 @@ describe("Link Get", () => {
 			const title = faker.string.alpha(10) as string;
 			const options = { tags, title };
 
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
@@ -159,7 +189,16 @@ describe("Link Get", () => {
 			expect(createResponse.title).toBe(title);
 			expect(createResponse.tags).toEqual(tags);
 
-			const response = await link.getShortCodes(title, tags);
+			// Poll until the just-created code is visible in the list, since the
+			// list can lag behind the create.
+			const response = await retry(async () => {
+				const result = await link.getShortCodes(title, tags);
+				if (result.total === 0) {
+					throw new Error(`Short code "${title}" is not visible in the list`);
+				}
+
+				return result;
+			});
 
 			expect(response).toBeDefined();
 			expect(response.total).toBeGreaterThan(0);
@@ -168,9 +207,20 @@ describe("Link Get", () => {
 
 			// Delete the created short code
 			if (createResponse.id) {
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
+		},
+		testTimeout,
+	);
+
+	test(
+		"should get short codes without a title or tag filter",
+		async () => {
+			const link = new Link({ organizationId, apiKey });
+			const response = await retry(() => link.getShortCodes("", [], 1, 10));
+			expect(response).toBeDefined();
+			expect(response.pageNum).toBe(1);
+			expect(response.pageSize).toBe(10);
 		},
 		testTimeout,
 	);
@@ -188,10 +238,8 @@ describe("Link Get", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
@@ -202,13 +250,14 @@ describe("Link Get", () => {
 
 			// Retrieve the short code by ID
 			if (createResponse.id) {
-				const getResponse = await link.getShortCode(createResponse.id);
+				const getResponse = await retry(() =>
+					link.getShortCode(createResponse.id),
+				);
 				expect(getResponse).toEqual(createResponse);
 			}
 
 			if (createResponse.id) {
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -224,6 +273,31 @@ describe("Link Get", () => {
 });
 
 describe("Link Delete", () => {
+	test(
+		"should create and delete a short code",
+		async () => {
+			const link = new Link({ organizationId, apiKey });
+			const longUrl = getRandomLongUrl();
+			const domain = linkDomain;
+			const options = { tags };
+
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
+			);
+
+			expect(createResponse).toBeDefined();
+			expect(createResponse.id).toBeDefined();
+
+			if (createResponse.id) {
+				const deleteResponse = await retry(() =>
+					link.deleteShortCode(createResponse.id),
+				);
+				expect(deleteResponse).toBe(true);
+			}
+		},
+		testTimeout,
+	);
+
 	test("should delete a short code with invalid organization Id", async () => {
 		const link = new Link({ organizationId, apiKey });
 		const fakeCodeId = "code_1234567890abcdef";
@@ -252,10 +326,8 @@ describe("Link Update", () => {
 			const title = faker.string.alpha(10);
 			const options = { tags, title };
 
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
@@ -267,9 +339,8 @@ describe("Link Update", () => {
 					tags: ["updated-tag"],
 					long_url: "https://updated.url",
 				};
-				const updateResponse = await link.updateShortCode(
-					createResponse.id,
-					updateOptions,
+				const updateResponse = await retry(() =>
+					link.updateShortCode(createResponse.id, updateOptions),
 				);
 
 				expect(updateResponse).toBeDefined();
@@ -277,8 +348,7 @@ describe("Link Update", () => {
 				expect(updateResponse.tags).toEqual(["updated-tag"]);
 				expect(updateResponse.long_url).toBe("https://updated.url");
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -290,7 +360,7 @@ describe("Link Tags", () => {
 		"should get tags for the organization",
 		async () => {
 			const link = new Link({ organizationId, apiKey });
-			const tags = await link.getTags();
+			const tags = await retry(() => link.getTags());
 			expect(tags).toBeDefined();
 			expect(Array.isArray(tags)).toBe(true);
 		},
@@ -314,19 +384,24 @@ describe("Link Stats", () => {
 		async () => {
 			const link = new Link({ organizationId, apiKey });
 
-			// Get all the short codes
-			const shortCodes = await link.getShortCodes("", [], 1, 10);
-			expect(shortCodes).toBeDefined();
-			expect(shortCodes.data.length).toBeGreaterThan(0);
+			// Use a short code owned by this test. Picking a random code from the
+			// organization is flaky: concurrent test runs (such as the CI matrix)
+			// create and delete their own temporary codes in the same
+			// organization, so a randomly picked code can be deleted by another
+			// run before the stats call resolves, which returns a 404.
+			const createResponse = await retry(() =>
+				link.createShortCode(getRandomLongUrl(), linkDomain, { tags }),
+			);
 
-			// Select a random short code
-			const randomShortCode =
-				shortCodes.data[Math.floor(Math.random() * shortCodes.data.length)];
+			expect(createResponse).toBeDefined();
+			expect(createResponse.id).toBeDefined();
 
-			const codeStats = await link.getCodeStats(
-				randomShortCode.id,
-				new Date(Date.now() - 24 * 60 * 60 * 1000),
-				new Date(),
+			const codeStats = await retry(() =>
+				link.getCodeStats(
+					createResponse.id,
+					new Date(Date.now() - 24 * 60 * 60 * 1000),
+					new Date(),
+				),
 			);
 
 			expect(codeStats).toBeDefined();
@@ -335,6 +410,10 @@ describe("Link Stats", () => {
 			expect(codeStats.browsers).toBeDefined();
 			expect(codeStats.devices).toBeDefined();
 			expect(codeStats.locations).toBeDefined();
+
+			if (createResponse.id) {
+				await cleanupShortCode(link, createResponse.id);
+			}
 		},
 		testTimeout,
 	);
@@ -358,23 +437,22 @@ describe("Link QR Code", () => {
 			const domain = linkDomain;
 			const options = { tags };
 
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				const qrCodeResponse = await link.createQrCode(createResponse.id);
+				const qrCodeResponse = await retry(() =>
+					link.createQrCode(createResponse.id),
+				);
 				expect(qrCodeResponse).toBeDefined();
 				expect(qrCodeResponse.qrCode).toBeDefined();
 				expect(qrCodeResponse.qrLink).toBeDefined();
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -390,10 +468,8 @@ describe("Link QR Code", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
@@ -405,16 +481,14 @@ describe("Link QR Code", () => {
 					color: "#000000",
 					size: QrSize.MEDIUM,
 				};
-				const qrCodeResponse = await link.createQrCode(
-					createResponse.id,
-					qrCodeOptions,
+				const qrCodeResponse = await retry(() =>
+					link.createQrCode(createResponse.id, qrCodeOptions),
 				);
 				expect(qrCodeResponse).toBeDefined();
 				expect(qrCodeResponse.qrCode).toBeDefined();
 				expect(qrCodeResponse.qrLink).toBeDefined();
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -467,7 +541,8 @@ describe("Link QR Code", () => {
 		// automatically by the underlying fetch call.
 		expect(capturedHeaders?.["content-type"]).toBeUndefined();
 		expect(response.qrCode).toBeDefined();
-		expect(response.qrCodeBytes).toBeDefined();
+		expect(response.qrCodeBytes).toBeInstanceOf(Uint8Array);
+		expect(Buffer.from(response.qrCodeBytes).toString()).toBe("qr");
 		expect(response.qrLink).toBe("https://hyphen.ai/qr");
 	});
 
@@ -517,32 +592,37 @@ describe("Link QR Code", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				const qrCode1 = await link.createQrCode(createResponse.id);
+				const qrCode1 = await retry(() => link.createQrCode(createResponse.id));
 				expect(qrCode1).toBeDefined();
 				expect(qrCode1.qrCode).toBeDefined();
 				expect(qrCode1.qrLink).toBeDefined();
 
-				const qrCode2 = await link.createQrCode(createResponse.id);
+				const qrCode2 = await retry(() => link.createQrCode(createResponse.id));
 				expect(qrCode2).toBeDefined();
 				expect(qrCode2.qrCode).toBeDefined();
 				expect(qrCode2.qrLink).toBeDefined();
 
-				const qrCodes = await link.getQrCodes(createResponse.id);
+				// Poll until both QR codes are visible in the list.
+				const qrCodes = await retry(async () => {
+					const result = await link.getQrCodes(createResponse.id);
+					if (result.data.length < 2) {
+						throw new Error("QR codes are not visible in the list");
+					}
+
+					return result;
+				});
 				expect(qrCodes).toBeDefined();
 				expect(qrCodes.data.length).toBeGreaterThanOrEqual(2);
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -562,27 +642,32 @@ describe("Link QR Code", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				await link.createQrCode(createResponse.id);
-				await link.createQrCode(createResponse.id);
+				await retry(() => link.createQrCode(createResponse.id));
+				await retry(() => link.createQrCode(createResponse.id));
 
-				const qrCodes = await link.getQrCodes(createResponse.id, 1, 10);
+				// Poll until both QR codes are visible in the list.
+				const qrCodes = await retry(async () => {
+					const result = await link.getQrCodes(createResponse.id, 1, 10);
+					if (result.data.length < 2) {
+						throw new Error("QR codes are not visible in the list");
+					}
+
+					return result;
+				});
 				expect(qrCodes).toBeDefined();
 				expect(qrCodes.data.length).toBeGreaterThanOrEqual(2);
 				expect(qrCodes.pageNum).toBe(1);
 				expect(qrCodes.pageSize).toBe(10);
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -595,29 +680,27 @@ describe("Link QR Code", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				const qrCodeResponse = await link.createQrCode(createResponse.id);
+				const qrCodeResponse = await retry(() =>
+					link.createQrCode(createResponse.id),
+				);
 				expect(qrCodeResponse).toBeDefined();
 				expect(qrCodeResponse.qrCode).toBeDefined();
 				expect(qrCodeResponse.qrLink).toBeDefined();
 
-				const qrCodeById = await link.getQrCode(
-					createResponse.id,
-					qrCodeResponse.id,
+				const qrCodeById = await retry(() =>
+					link.getQrCode(createResponse.id, qrCodeResponse.id),
 				);
 				expect(qrCodeById.id).toEqual(qrCodeResponse.id);
 
-				const deleteResponse = await link.deleteShortCode(createResponse.id);
-				expect(deleteResponse).toBe(true);
+				await cleanupShortCode(link, createResponse.id);
 			}
 		},
 		testTimeout,
@@ -638,29 +721,28 @@ describe("Link QR Code", () => {
 			const longUrl = getRandomLongUrl();
 			const domain = linkDomain;
 			const options = { tags };
-			const createResponse = await link.createShortCode(
-				longUrl,
-				domain,
-				options,
+			const createResponse = await retry(() =>
+				link.createShortCode(longUrl, domain, options),
 			);
 
 			expect(createResponse).toBeDefined();
 			expect(createResponse.id).toBeDefined();
 
 			if (createResponse.id) {
-				const qrCodeResponse = await link.createQrCode(createResponse.id);
+				const qrCodeResponse = await retry(() =>
+					link.createQrCode(createResponse.id),
+				);
 				expect(qrCodeResponse).toBeDefined();
 				expect(qrCodeResponse.qrCode).toBeDefined();
 				expect(qrCodeResponse.qrLink).toBeDefined();
 
-				const deleteQrCodeResponse = await link.deleteQrCode(
-					createResponse.id,
-					qrCodeResponse.id,
+				const deleteQrCodeResponse = await retry(() =>
+					link.deleteQrCode(createResponse.id, qrCodeResponse.id),
 				);
 				expect(deleteQrCodeResponse).toBe(true);
 
-				const deleteShortCodeResponse = await link.deleteShortCode(
-					createResponse.id,
+				const deleteShortCodeResponse = await retry(() =>
+					link.deleteShortCode(createResponse.id),
 				);
 				expect(deleteShortCodeResponse).toBe(true);
 			}
