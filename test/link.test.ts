@@ -380,11 +380,10 @@ describe("Link QR Code", () => {
 		testTimeout,
 	);
 
-	// TODO(#133): The Hyphen API now rejects the custom-options QR payload
-	// (title/backgroundColor/color/size) with HTTP 400; it accepted it through
-	// at least 2026-04-13. Skipped until the QR-create API contract is confirmed.
-	// https://github.com/Hyphen/nodejs-sdk/issues/133
-	test.skip(
+	// The QR create endpoint consumes multipart/form-data, so the custom options
+	// (title/backgroundColor/color/size) are sent as form fields. This exercises
+	// that contract end-to-end against the live API. See issue #133.
+	test(
 		"should create a QR code with custom options",
 		async () => {
 			const link = new Link({ organizationId, apiKey });
@@ -422,10 +421,9 @@ describe("Link QR Code", () => {
 	);
 
 	// Coverage for the custom-options path of createQrCode without hitting the
-	// live API (the integration test above is skipped pending #133). The network
-	// layer is stubbed so the options-defined branches of the request body are
-	// still exercised.
-	test("should build the request body when creating a QR code with options", async () => {
+	// live API. The network layer is stubbed so the multipart body is built and
+	// the options-defined branches of the request are exercised.
+	test("should build a multipart body when creating a QR code with options", async () => {
 		const link = new Link({ organizationId, apiKey });
 		const qrCodeOptions: CreateQrCodeOptions = {
 			title: "Custom QR Code",
@@ -435,13 +433,12 @@ describe("Link QR Code", () => {
 			logo: "bG9nbw==",
 		};
 
-		let capturedBody: Record<string, unknown> | undefined;
+		let capturedBody: FormData | undefined;
+		let capturedHeaders: Record<string, string> | undefined;
 		// biome-ignore lint/suspicious/noExplicitAny: minimal stub of the post method
-		(link as any).post = async (
-			_url: string,
-			data: Record<string, unknown>,
-		) => {
+		(link as any).post = async (_url: string, data: FormData, config: any) => {
 			capturedBody = data;
+			capturedHeaders = config?.headers;
 			return {
 				data: {
 					id: "qr_test",
@@ -458,16 +455,52 @@ describe("Link QR Code", () => {
 
 		const response = await link.createQrCode("code_test", qrCodeOptions);
 
-		expect(capturedBody).toEqual({
-			title: "Custom QR Code",
-			backgroundColor: "#ffffff",
-			color: "#000000",
-			size: "medium",
-			logo: "bG9nbw==",
-		});
+		expect(capturedBody).toBeInstanceOf(FormData);
+		expect(capturedBody?.get("title")).toBe("Custom QR Code");
+		expect(capturedBody?.get("backgroundColor")).toBe("#ffffff");
+		expect(capturedBody?.get("color")).toBe("#000000");
+		expect(capturedBody?.get("size")).toBe("medium");
+		const logo = capturedBody?.get("logo");
+		expect(logo).toBeInstanceOf(Blob);
+		expect(await (logo as Blob).text()).toBe("logo");
+		// The JSON content-type must be removed so the multipart boundary is set
+		// automatically by the underlying fetch call.
+		expect(capturedHeaders?.["content-type"]).toBeUndefined();
 		expect(response.qrCode).toBeDefined();
 		expect(response.qrCodeBytes).toBeDefined();
 		expect(response.qrLink).toBe("https://hyphen.ai/qr");
+	});
+
+	// Coverage for the no-options path: the API rejects an empty multipart body,
+	// so an empty JSON payload is sent instead (keeping the JSON content-type).
+	test("should send an empty JSON body when creating a QR code without options", async () => {
+		const link = new Link({ organizationId, apiKey });
+
+		let capturedBody: unknown;
+		let capturedHeaders: Record<string, string> | undefined;
+		// biome-ignore lint/suspicious/noExplicitAny: minimal stub of the post method
+		(link as any).post = async (_url: string, data: unknown, config: any) => {
+			capturedBody = data;
+			capturedHeaders = config?.headers;
+			return {
+				data: {
+					id: "qr_test",
+					qrCode: Buffer.from("qr").toString("base64"),
+					qrLink: "https://hyphen.ai/qr",
+				},
+				status: 201,
+				statusText: "Created",
+				headers: {},
+				config: undefined,
+				request: undefined,
+			};
+		};
+
+		await link.createQrCode("code_test");
+
+		expect(capturedBody).toEqual({});
+		expect(capturedBody).not.toBeInstanceOf(FormData);
+		expect(capturedHeaders?.["content-type"]).toBe("application/json");
 	});
 
 	test("should throw on create QR code with invalid parameters", async () => {

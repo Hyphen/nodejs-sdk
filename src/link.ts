@@ -495,14 +495,40 @@ export class Link extends BaseService {
 		const url = this.getUri(this._organizationId, code, "qrs");
 		const headers = this.createHeaders(this._apiKey);
 
-		// biome-ignore lint/suspicious/noExplicitAny: this is valid for body
-		const body: Record<string, any> = {
-			title: options?.title,
-			backgroundColor: options?.backgroundColor,
-			color: options?.color,
-			size: options?.size,
-			logo: options?.logo,
-		};
+		// The QR code endpoint consumes multipart/form-data, so each
+		// personalization option is sent as a form field (and the logo as a
+		// file upload) rather than as a JSON payload.
+		const form = new FormData();
+		if (options?.title !== undefined) {
+			form.append("title", options.title);
+		}
+		if (options?.backgroundColor !== undefined) {
+			form.append("backgroundColor", options.backgroundColor);
+		}
+		if (options?.color !== undefined) {
+			form.append("color", options.color);
+		}
+		if (options?.size !== undefined) {
+			form.append("size", options.size);
+		}
+		if (options?.logo !== undefined) {
+			// The logo is supplied as a base64-encoded string but the API expects
+			// a file upload, so decode it and append it as a file.
+			const logo = new Blob([Buffer.from(options.logo, "base64")]);
+			form.append("logo", logo, "logo");
+		}
+
+		// The API rejects an empty multipart body ("body must be object"), so
+		// when no options are provided fall back to an empty JSON payload, which
+		// yields a QR code with default personalization.
+		// biome-ignore lint/suspicious/noExplicitAny: body is either form data or JSON
+		let body: any = {};
+		if ([...form.keys()].length > 0) {
+			body = form;
+			// Remove the JSON content-type so the multipart boundary is set
+			// automatically by the underlying fetch call.
+			delete headers["content-type"];
+		}
 
 		const response = await this.post(url, body, { headers });
 
