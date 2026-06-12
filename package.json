@@ -2,6 +2,14 @@
   "name": "@hyphen/sdk",
   "version": "3.1.0",
   "description": "Hyphen SDK for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hyphen/nodejs-sdk.git"
+  },
+  "homepage": "https://github.com/Hyphen/nodejs-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/Hyphen/nodejs-sdk/issues"
+  },
   "type": "module",
   "packageManager": "pnpm@11.6.0",
   "main": "dist/index.cjs",

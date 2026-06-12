@@ -6,7 +6,9 @@ on:
     types: [released]
 
 permissions:
-  contents: read    
+  contents: read
+  # Required for npm trusted publishing (OIDC) and provenance attestations
+  id-token: write
 
 env:
   HYPHEN_PUBLIC_API_KEY: ${{ secrets.HYPHEN_PUBLIC_API_KEY }}
@@ -31,20 +33,23 @@ jobs:
       with:
         node-version: 22
         cache: 'pnpm'
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Install Dependencies
       run: pnpm install
 
-    - name: Build    
+    - name: Build
       run: pnpm build
 
-    - name: Testing    
+    - name: Testing
       run: pnpm test
 
-    - name: Publish
-      run: |
-        npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-        npm publish --ignore-scripts
-      env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    # Trusted publishing (OIDC) requires npm CLI >= 11.5.1, which is newer than
+    # the version bundled with Node.js 22.
+    - name: Update npm
+      run: npm install -g npm@latest
 
+    - name: Publish
+      # No NPM_TOKEN: authentication is handled via OIDC trusted publishing.
+      # Provenance attestations are generated from the OIDC identity.
+      run: npm publish --provenance --ignore-scripts
