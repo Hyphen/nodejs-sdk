@@ -1,5 +1,5 @@
 import { Cacheable } from "cacheable";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { Toggle, type ToggleOptions } from "../src/toggle.js";
 import { getRandomToggleContext, mockToggleContexts } from "./mock-contexts.js";
 
@@ -661,6 +661,23 @@ describe("Hyphen sdk", () => {
 
 			const result = await toggle.get("feature-flag", false);
 			expect(result).toBe(false); // Returns defaultValue when error occurs
+		});
+	});
+
+	describe("fetch", () => {
+		test("should extract the status code from CacheableNet error messages", async () => {
+			const toggle = new Toggle({ horizonUrls: ["https://horizon.example"] });
+			// @cacheable/net surfaces HTTP failures as errors whose message
+			// includes "status <code>"; verify that code is parsed out.
+			toggle._net.fetch = vi
+				.fn()
+				.mockRejectedValue(new Error("Request failed with status 404"));
+
+			await expect(
+				toggle.fetch("/toggle/evaluate", { key: "value" }),
+			).rejects.toThrow(
+				"All horizon URLs failed. Last errors: HTTP 404: Request failed with status 404",
+			);
 		});
 	});
 });
