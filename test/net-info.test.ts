@@ -1,5 +1,5 @@
 import process from "node:process";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { ErrorMessages } from "../src/base-service.js";
 import { NetInfo } from "../src/net-info.js";
 
@@ -154,5 +154,17 @@ describe("NetInfo", () => {
 		const ipInfos = await netInfo.getIpInfos([]);
 		expect(ipInfos).toBeDefined();
 		expect(ipInfos.length).toBe(0);
+	});
+
+	test("should return an error result when the request throws", async () => {
+		const netInfo = new NetInfo({ apiKey: "test_api_key" });
+		netInfo.on("error", () => {});
+		// With @cacheable/net returning non-2xx responses instead of throwing,
+		// force a thrown error to exercise the catch path.
+		netInfo.get = vi.fn().mockRejectedValue(new Error("network down"));
+		const ipInfo = await netInfo.getIpInfo("1.1.1.1");
+		expect(ipInfo).toHaveProperty("ip", "1.1.1.1");
+		expect(ipInfo).toHaveProperty("type", "error");
+		expect(ipInfo).toHaveProperty("errorMessage", "network down");
 	});
 });
