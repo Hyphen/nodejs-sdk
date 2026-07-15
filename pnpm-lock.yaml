@@ -15,8 +15,8 @@ importers:
         specifier: ^2.5.0
         version: 2.5.0
       hookified:
-        specifier: ^3.0.0
-        version: 3.0.0
+        specifier: ^3.0.1
+        version: 3.0.1
       pino:
         specifier: ^10.3.1
         version: 10.3.1
@@ -1050,8 +1050,8 @@ packages:
   hookified@2.1.1:
     resolution: {integrity: sha512-AHb76R16GB5EsPBE2J7Ko5kiEyXwviB9P5SMrAKcuAu4vJPZttViAbj9+tZeaQE5zjDme+1vcHP78Yj/WoAveA==}
 
-  hookified@3.0.0:
-    resolution: {integrity: sha512-x+jzDjd9CWxdgl6u/K4pjnvw7PZx6ZSpiPGAV43uXlJiJy7r2jIEUxxU1Cv7+rwy1GK5Qt5S+Jp7n81DpcUvTA==}
+  hookified@3.0.1:
+    resolution: {integrity: sha512-mtpUIV7U9reosQ16+OHWBd0Ca07fs1ryChQjBPuUMZnrRdLTCW+kEfkTcFudkaevp3gVe5H9FxDCBxYIdO+QQA==}
     engines: {node: '>=22.18.0'}
 
   hosted-git-info@2.8.9:
@@ -2494,7 +2494,7 @@ snapshots:
 
   hookified@2.1.1: {}
 
-  hookified@3.0.0: {}
+  hookified@3.0.1: {}
 
   hosted-git-info@2.8.9: {}
 
