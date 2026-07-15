@@ -65,7 +65,7 @@
   "dependencies": {
     "@cacheable/net": "^2.1.0",
     "cacheable": "^2.5.0",
-    "hookified": "^3.0.0",
+    "hookified": "^3.0.1",
     "pino": "^10.3.1"
   }
 }
