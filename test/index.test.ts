@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { Toggle } from "../src/index.js";
+import { Env, Toggle } from "../src/index.js";
 
 describe("Hyphen sdk", () => {
 	test("should create an instance of Toggle", () => {
@@ -9,5 +9,10 @@ describe("Hyphen sdk", () => {
 			environment: "development",
 		});
 		expect(toggle).toBeInstanceOf(Toggle);
+	});
+
+	test("should export the ENV service", () => {
+		const env = new Env({ apiKey: "test-api-key" });
+		expect(env).toBeInstanceOf(Env);
 	});
 });

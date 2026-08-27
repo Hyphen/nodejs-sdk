@@ -1,5 +1,9 @@
 // biome-ignore-all lint/suspicious/noExplicitAny: this is for http client and helpers
-import { CacheableNet, type FetchRequestInit } from "@cacheable/net";
+import {
+	CacheableNet,
+	type FetchRequestInit,
+	type NetFetchOptions,
+} from "@cacheable/net";
 import { Cacheable } from "cacheable";
 import { Hookified, type HookifiedOptions } from "hookified";
 import pino from "pino";
@@ -68,7 +72,7 @@ export class BaseService extends Hookified {
 
 	public async get<T>(
 		url: string,
-		config?: FetchRequestInit & { params?: any },
+		config?: NetFetchOptions & { params?: any },
 	): Promise<HttpResponse<T>> {
 		// Handle query parameters if provided
 		let finalUrl = url;

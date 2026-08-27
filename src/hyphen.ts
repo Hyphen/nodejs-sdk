@@ -1,4 +1,5 @@
 import { Hookified, type HookifiedOptions } from "hookified";
+import { Env, type EnvServiceOptions } from "./env-service.js";
 import { Link, type LinkOptions } from "./link.js";
 import { NetInfo, type NetInfoOptions } from "./net-info.js";
 import { Toggle, type ToggleOptions } from "./toggle.js";
@@ -35,9 +36,17 @@ export type HyphenOptions = {
 	 * @default {Link}
 	 */
 	link?: Omit<LinkOptions, "apiKey">;
+	/**
+	 * Options for the ENV service.
+	 * Excludes `apiKey` as it's provided at the top level.
+	 * @see EnvServiceOptions
+	 * @default {Env}
+	 */
+	env?: Omit<EnvServiceOptions, "apiKey">;
 } & HookifiedOptions;
 
 export class Hyphen extends Hookified {
+	private readonly _env: Env;
 	private readonly _netInfo: NetInfo;
 	private readonly _toggle: Toggle;
 	private readonly _link: Link;
@@ -51,6 +60,7 @@ export class Hyphen extends Hookified {
 		const toggleOptions: ToggleOptions = options?.toggle ?? {};
 		const netInfoOptions: NetInfoOptions = options?.netInfo ?? {};
 		const linkOptions: LinkOptions = options?.link ?? {};
+		const envOptions: EnvServiceOptions = { ...options?.env };
 
 		if (options?.publicApiKey) {
 			this._publicApiKey = options.publicApiKey;
@@ -61,7 +71,22 @@ export class Hyphen extends Hookified {
 			this._apiKey = options.apiKey;
 			netInfoOptions.apiKey = options.apiKey;
 			linkOptions.apiKey = options.apiKey;
+			envOptions.apiKey = options.apiKey;
 		}
+
+		this._env = new Env(envOptions);
+
+		this._env.on("error", (message, ...args) =>
+			this.emit("error", message, ...args),
+		);
+
+		this._env.on("info", (message, ...args) =>
+			this.emit("info", message, ...args),
+		);
+
+		this._env.on("warn", (message, ...args) =>
+			this.emit("warn", message, ...args),
+		);
 
 		this._netInfo = new NetInfo(netInfoOptions);
 		// Set error, info, warn emitters for netInfo
@@ -110,6 +135,14 @@ export class Hyphen extends Hookified {
 	}
 
 	/**
+	 * Get the ENV service instance.
+	 * @returns {Env} The ENV service instance.
+	 */
+	public get env(): Env {
+		return this._env;
+	}
+
+	/**
 	 * Get the NetInfo service instance.
 	 * @returns {NetInfo} The NetInfo service instance.
 	 */
@@ -154,7 +187,7 @@ export class Hyphen extends Hookified {
 
 	/**
 	 * Get the API key for the Hyphen service.
-	 * This is used for authenticated endpoints that require an API key such as the NetInfo and Link services.
+	 * This is used for authenticated endpoints that require an API key such as the ENV, NetInfo, and Link services.
 	 * @returns {string | undefined} The API key.
 	 */
 	public get apiKey(): string | undefined {
@@ -163,11 +196,12 @@ export class Hyphen extends Hookified {
 
 	/**
 	 * Set the API key for the Hyphen service. If set, this will also update the underlying services.
-	 * This is used for authenticated endpoints that require an API key such as the NetInfo and Link services.
+	 * This is used for authenticated endpoints that require an API key such as the ENV, NetInfo, and Link services.
 	 * @param {string | undefined} value - The API key to set.
 	 */
 	public set apiKey(value: string | undefined) {
 		this._apiKey = value;
+		this._env.apiKey = value;
 		this._netInfo.apiKey = value;
 		this._link.apiKey = value;
 	}
