@@ -462,8 +462,8 @@ describe("Env", () => {
 	});
 
 	test("uses custom service URIs without duplicate trailing slashes", async () => {
-		const customKeyStoreUri = "https://keys.example.test/";
-		const customHorizonUri = "https://env.example.test/";
+		const customKeyStoreUri = "https://keys.example.test///";
+		const customHorizonUri = "https://env.example.test///";
 		const service = createService({
 			keyStoreUri: customKeyStoreUri,
 			horizonUri: customHorizonUri,

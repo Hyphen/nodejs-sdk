@@ -284,7 +284,11 @@ function decodeBase64Url(value: string): Buffer {
 }
 
 function stripTrailingSlash(uri: string): string {
-	return uri.replace(/\/+$/, "");
+	let end = uri.length;
+	while (end > 0 && uri[end - 1] === "/") {
+		end -= 1;
+	}
+	return uri.slice(0, end);
 }
 
 function contextualError(message: string, error: unknown): Error {
