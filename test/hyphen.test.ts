@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
+import { Env } from "../src/env-service.js";
 import { Hyphen } from "../src/hyphen.js";
 import { Link } from "../src/link.js";
 import { NetInfo } from "../src/net-info.js";
@@ -34,6 +35,24 @@ describe("Hyphen", () => {
 		expect(hyphen.link).toBeInstanceOf(Link);
 	});
 
+	test("should have an env property", () => {
+		const hyphen = new Hyphen();
+		expect(hyphen.env).toBeDefined();
+		expect(hyphen.env).toBeInstanceOf(Env);
+	});
+
+	test("should accept nested env service options", () => {
+		const hyphen = new Hyphen({
+			env: {
+				applicationId: "app-id",
+				organizationId: "org-id",
+				projectId: "project-id",
+			},
+		});
+
+		expect(hyphen.env).toBeInstanceOf(Env);
+	});
+
 	test("should allow setting and getting publicApiKey", () => {
 		const publicApiKey = "public_api_key";
 		const hyphen = new Hyphen({ publicApiKey });
@@ -48,14 +67,38 @@ describe("Hyphen", () => {
 		const apiKey = "api_key";
 		const hyphen = new Hyphen({ apiKey });
 		expect(hyphen.apiKey).toBe(apiKey);
+		expect(hyphen.env.apiKey).toBe(apiKey);
 
 		const newApiKey = "new_api_key";
 		hyphen.apiKey = newApiKey;
 		expect(hyphen.apiKey).toBe(newApiKey);
+		expect(hyphen.env.apiKey).toBe(newApiKey);
 	});
 });
 
 describe("Hyphen Emitters", () => {
+	test("should emit env error events", () => {
+		const hyphen = new Hyphen();
+		hyphen.on("error", () => {});
+		const errorSpy = vi.spyOn(hyphen, "emit");
+		hyphen.env.error("Test error");
+		expect(errorSpy).toHaveBeenCalledWith("error", "Test error");
+	});
+
+	test("should emit env warn events", () => {
+		const hyphen = new Hyphen();
+		const warnSpy = vi.spyOn(hyphen, "emit");
+		hyphen.env.warn("Test warn");
+		expect(warnSpy).toHaveBeenCalledWith("warn", "Test warn");
+	});
+
+	test("should emit env info events", () => {
+		const hyphen = new Hyphen();
+		const infoSpy = vi.spyOn(hyphen, "emit");
+		hyphen.env.info("Test info");
+		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
+	});
+
 	test("should emit link error events", () => {
 		const hyphen = new Hyphen();
 		hyphen.on("error", () => {});

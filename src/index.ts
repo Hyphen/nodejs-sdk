@@ -1,5 +1,11 @@
 export { type EnvOptions, env, type LoadEnvOptions, loadEnv } from "./env.js";
 export {
+	Env,
+	type EnvKey,
+	type EnvLoadOptions,
+	type EnvServiceOptions,
+} from "./env-service.js";
+export {
 	type ExecutionContext,
 	type ExecutionContextLocation,
 	type ExecutionContextMember,

@@ -22,7 +22,8 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Environment Variables](#toggle-environment-variables)
 	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [ENV - Secret Management Service](#env---secret-management-service)
-	- [Loading Environment Variables](#loading-environment-variables)
+	- [Loading Environment Variables from Hyphen](#loading-environment-variables-from-hyphen)
+	- [Loading Local Environment Files](#loading-local-environment-files)
 - [Net Info - Geo Information Service](#net-info---geo-information-service)
 - [Execution Context - API Key Validation](#execution-context---api-key-validation)
 - [Link - Short Code Service](#link---short-code-service)
@@ -600,7 +601,66 @@ console.log('Boolean toggle value:', result); // true
 
 Hyphens secret management service known as [ENV](https://hyphen.ai/env) allows you to manage your environment variables in a secure way. The Hyphen Node.js SDK provides a simple way to access your environment variables.
 
-## Loading Environment Variables
+## Loading Environment Variables from Hyphen
+
+Use the authenticated `Env` service to fetch encrypted variables from Hyphen,
+decrypt them in memory, and add them to `process.env`:
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen({
+  apiKey: 'your_api_key',
+  env: {
+    organizationId: 'your_organization_id',
+    projectId: 'your_project_id',
+    applicationId: 'your_application_id',
+  },
+});
+
+const variables = await hyphen.env.load('production');
+```
+
+Loading a named environment fetches both `default` and the named environment.
+Named values take precedence, and remote values overwrite matching values in
+`process.env`. The returned object contains the merged remote values.
+
+You can change those defaults per load:
+
+```javascript
+await hyphen.env.load('production', {
+  includeDefault: false,
+  override: false,
+});
+```
+
+The service reads missing configuration from `HYPHEN_API_KEY`,
+`HYPHEN_ORGANIZATION_ID`, `HYPHEN_PROJECT_ID`, and
+`HYPHEN_APPLICATION_ID`, with `HYPHEN_APP_ID` supported as a compatibility
+fallback. When running with Hyphen Deploy, `HYPHEN_PROJECT_NAME` and
+`HYPHEN_APP_NAME` are used if their corresponding IDs are unavailable, and an
+omitted load environment uses `HYPHEN_APP_ENVIRONMENT` before falling back to
+`default`. Projects that do not use Hyphen's secure key store can provide their
+key directly with `decryptionKey: { secretKeyId, secretKey }`. Decryption keys
+and plaintext ENV data are never written to disk by this API.
+
+The `Env` class can also be used directly:
+
+```javascript
+import { Env } from '@hyphen/sdk';
+
+const remoteEnv = new Env({
+  apiKey: 'your_api_key',
+  organizationId: 'your_organization_id',
+  projectId: 'your_project_id',
+  applicationId: 'your_application_id',
+});
+
+await remoteEnv.load('production');
+```
+
+## Loading Local Environment Files
+
 To load your environment variables, you can use the `env()` function from the SDK. This function will automatically load your environment variables from the `.env` file and then override them with the environment based environment file if it exists (ex: `.env.development`). This is useful for managing different environments such as development, staging, and production. 
 
 The following override path is:
