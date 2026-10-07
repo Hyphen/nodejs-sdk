@@ -577,16 +577,16 @@ describe("Env", () => {
 				error:
 					"A project ID or decryption key is required to load Hyphen ENV data.",
 			},
-		])("rejects a missing $label before making a request", async ({
-			options,
-			error,
-		}) => {
-			const service = new Env(options);
-			const getSpy = vi.spyOn(service, "get");
+		])(
+			"rejects a missing $label before making a request",
+			async ({ options, error }) => {
+				const service = new Env(options);
+				const getSpy = vi.spyOn(service, "get");
 
-			await expect(service.load()).rejects.toThrow(error);
-			expect(getSpy).not.toHaveBeenCalled();
-		});
+				await expect(service.load()).rejects.toThrow(error);
+				expect(getSpy).not.toHaveBeenCalled();
+			},
+		);
 
 		test.each([
 			{ secretKeyId: 0, secretKey: decryptionKey.secretKey },
@@ -650,36 +650,31 @@ describe("Env", () => {
 			expect(process.env.DEFAULT_ONLY).toBeUndefined();
 		});
 
-		test.each([
-			null,
-			{},
-			{ data: null },
-			{ data: 123 },
-		])("rejects a malformed Horizon payload %#", async (payload) => {
-			const service = createService({ decryptionKey });
-			vi.spyOn(service, "get").mockResolvedValue(response(payload));
+		test.each([null, {}, { data: null }, { data: 123 }])(
+			"rejects a malformed Horizon payload %#",
+			async (payload) => {
+				const service = createService({ decryptionKey });
+				vi.spyOn(service, "get").mockResolvedValue(response(payload));
 
-			await expect(service.load()).rejects.toThrow(
-				'Failed to fetch Hyphen ENV "default":',
-			);
-			expect(process.env.DEFAULT_ONLY).toBeUndefined();
-		});
+				await expect(service.load()).rejects.toThrow(
+					'Failed to fetch Hyphen ENV "default":',
+				);
+				expect(process.env.DEFAULT_ONLY).toBeUndefined();
+			},
+		);
 
-		test.each([
-			"not-base64!",
-			"A",
-			"AA=",
-			"AB",
-			"AAECAwQFBgcICQ==",
-		])("rejects malformed or truncated ciphertext %s", async (data) => {
-			const service = createService({ decryptionKey });
-			vi.spyOn(service, "get").mockResolvedValue(response({ data }));
+		test.each(["not-base64!", "A", "AA=", "AB", "AAECAwQFBgcICQ=="])(
+			"rejects malformed or truncated ciphertext %s",
+			async (data) => {
+				const service = createService({ decryptionKey });
+				vi.spyOn(service, "get").mockResolvedValue(response({ data }));
 
-			await expect(service.load()).rejects.toThrow(
-				'Failed to decrypt or parse Hyphen ENV "default".',
-			);
-			expect(process.env.DEFAULT_ONLY).toBeUndefined();
-		});
+				await expect(service.load()).rejects.toThrow(
+					'Failed to decrypt or parse Hyphen ENV "default".',
+				);
+				expect(process.env.DEFAULT_ONLY).toBeUndefined();
+			},
+		);
 
 		test("rejects decrypted bytes that are not valid UTF-8", async () => {
 			const service = createService({ decryptionKey });
@@ -696,15 +691,18 @@ describe("Env", () => {
 		test.each([
 			"SAFE_VALUE=before\nBAD\0NAME=value\n",
 			"SAFE_VALUE=before\nBAD_VALUE=value\0suffix\n",
-		])("rejects process-incompatible variables atomically", async (contents) => {
-			const service = createService({ decryptionKey });
-			vi.spyOn(service, "get").mockResolvedValue(mockEnvResponse(contents));
+		])(
+			"rejects process-incompatible variables atomically",
+			async (contents) => {
+				const service = createService({ decryptionKey });
+				vi.spyOn(service, "get").mockResolvedValue(mockEnvResponse(contents));
 
-			await expect(service.load()).rejects.toThrow(
-				"Hyphen ENV contains a variable that cannot be added to process.env.",
-			);
-			expect(process.env.SAFE_VALUE).toBeUndefined();
-		});
+				await expect(service.load()).rejects.toThrow(
+					"Hyphen ENV contains a variable that cannot be added to process.env.",
+				);
+				expect(process.env.SAFE_VALUE).toBeUndefined();
+			},
+		);
 
 		test("accepts empty and comment-only ENV documents", async () => {
 			const service = createService({ decryptionKey });
