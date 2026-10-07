@@ -104,19 +104,31 @@ describe("BaseService", () => {
 		expect(response).toBeDefined();
 	});
 
-	test(
-		"should handle a delete request with string data",
-		async () => {
-			const service = new BaseService();
-			// Using mockhttp.org which accepts all methods and returns JSON
-			const url = `${mockHttpUrl}/delete`;
-			const data = { message: "plain text string" };
-			const response = await service.delete(url, { data });
-			expect(response).toBeDefined();
-			expect(response.status).toBe(200);
-		},
-		testTimeout,
-	);
+	test("should handle a delete request with string data", async () => {
+		const service = new BaseService();
+		const mockFetch = vi.fn().mockResolvedValue({
+			status: 200,
+			statusText: "OK",
+			headers: {},
+			text: vi.fn().mockResolvedValue(JSON.stringify({ ok: true })),
+		});
+		// @ts-expect-error - accessing private property for testing
+		service._net.fetch = mockFetch;
+
+		const url = "https://example.com/delete";
+		const data = { message: "plain text string" };
+		const response = await service.delete(url, { data });
+
+		expect(response).toBeDefined();
+		expect(response.status).toBe(200);
+		expect(mockFetch).toHaveBeenCalledWith(
+			url,
+			expect.objectContaining({
+				method: "DELETE",
+				body: JSON.stringify(data),
+			}),
+		);
+	});
 
 	test("should handle a delete request with non-JSON text response", async () => {
 		const service = new BaseService();
