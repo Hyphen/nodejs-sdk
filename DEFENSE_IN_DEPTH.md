@@ -5,11 +5,11 @@ Tracking against https://github.com/jaredwray/agentic/blob/main/skills/security/
 Profile: npm library · public
 
 ## 1. Security docs
-- [ ] `SECURITY.md` present — contact info + "How this repository is secured" summary (PR #159 pending)
-- [ ] `DEFENSE_IN_DEPTH.md` present (this file) (PR #159 pending)
+- [x] `SECURITY.md` present — contact info + "How this repository is secured" summary — PR #159
+- [x] `DEFENSE_IN_DEPTH.md` present (this file) — PR #159
 
 ## 2. CODEOWNERS and cloud bootstrap
-- [ ] `.github/CODEOWNERS` covers `/.github/`, `/.vscode/`, `/.cursor/`, `/.devcontainer/`, `/.claude/`, `/.codex/`, `/scripts/` with owners the maintainer names
+- [ ] `.github/CODEOWNERS` covers `/.github/`, `/.vscode/`, `/.cursor/`, `/.devcontainer/`, `/.claude/`, `/.codex/`, `/scripts/` with owners the maintainer names (PR pending)
 - [ ] Codespaces, Cursor Cloud Agents, and Claude Code on the web bootstrap Aikido Safe Chain via scripts/setup-cloud-environment.sh (--ci shims, frozen lockfile); Claude Code runs it from `.claude/hooks/session-start.sh` (web sessions only, install log on stderr, 600s timeout) and `.gitignore` keeps `.claude/settings.json` and `.claude/hooks/` tracked
 - [ ] Codex cloud environments use Manual setup with `bash ./scripts/setup-cloud-environment.sh` as the setup and maintenance script (manual)
 - [ ] Claude Code on the web environments allow `malware-list.aikido.dev` (Custom network access plus the default package-manager list) (manual)
@@ -44,7 +44,7 @@ Profile: npm library · public
 - [x] `package.json` `repository.url` accurate so provenance maps to this repo — verified 2026-10-08
 
 ## 6. Security tooling
-- [ ] Aikido runs on every build
+- [x] Aikido runs on every build — verified 2026-10-08
 - [ ] Aikido release gate: the release workflow's stage-publish job `needs:` a passing `scan-release`
 - [ ] Socket reviews every PR that changes dependencies
 
