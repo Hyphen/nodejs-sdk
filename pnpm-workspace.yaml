@@ -2,12 +2,12 @@ minimumReleaseAge: 10080 # 7 days, in minutes
 minimumReleaseAgeStrict: true # fail instead of falling back to a too-new version
 minimumReleaseAgeIgnoreMissingTime: false # missing publish-time metadata fails closed
 trustPolicy: no-downgrade # fail if a later version has weaker trust evidence
+strictDepBuilds: true # fail when a dependency build is not approved
+dangerouslyAllowAllBuilds: false # do not run every dependency build script
 overrides:
   # semver 5.7.2 fixes CVE-2022-25883, but it has no trust evidence.
   # semver 7.7.4 has the fix and trustedPublisher evidence.
   "normalize-package-data@2>semver": 7.7.4
 allowBuilds:
-  '@swc/core': true
-  esbuild: true
-  unrs-resolver: true
+  esbuild: false # the optional package supplies the binary
 
