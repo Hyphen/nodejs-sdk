@@ -1,6 +1,7 @@
 minimumReleaseAge: 10080 # 7 days, in minutes
 minimumReleaseAgeStrict: true # fail instead of falling back to a too-new version
 minimumReleaseAgeIgnoreMissingTime: false # missing publish-time metadata fails closed
+trustPolicy: no-downgrade # fail if a later version has weaker trust evidence
 allowBuilds:
   '@swc/core': true
   esbuild: true
