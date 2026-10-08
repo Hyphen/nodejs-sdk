@@ -2,6 +2,7 @@ minimumReleaseAge: 10080 # 7 days, in minutes
 minimumReleaseAgeStrict: true # fail instead of falling back to a too-new version
 minimumReleaseAgeIgnoreMissingTime: false # missing publish-time metadata fails closed
 trustPolicy: no-downgrade # fail if a later version has weaker trust evidence
+blockExoticSubdeps: true # fail when a subdependency uses a non-registry source
 strictDepBuilds: true # fail when a dependency build is not approved
 dangerouslyAllowAllBuilds: false # do not run every dependency build script
 overrides:
