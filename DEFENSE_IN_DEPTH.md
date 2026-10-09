@@ -21,7 +21,7 @@ Profile: npm library · public
 - [x] `trustPolicy: no-downgrade`; no first-party `trustPolicyExclude` — PR #163
 - [x] Lifecycle scripts blocked: `strictDepBuilds: true`, `dangerouslyAllowAllBuilds: false`, `allowBuilds: {}` baseline — PR #164
 - [x] `blockExoticSubdeps: true` — PR #165
-- [ ] Lockfile committed; CI installs with `pnpm install --frozen-lockfile` (PR pending)
+- [ ] Lockfile committed; CI installs with `pnpm install --frozen-lockfile` (PR #166 pending)
 - [x] No `.github/dependabot.yml`; other dependency-update tools (if any) open PRs only — never auto-merge — verified 2026-10-08
 
 ## 4. GitHub Actions
