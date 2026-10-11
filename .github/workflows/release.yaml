@@ -11,6 +11,8 @@ permissions:
 jobs:
   aikido-gate:
     runs-on: ubuntu-latest
+    # A stalled scan stops after 15 minutes.
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -31,7 +33,7 @@ jobs:
       run: sfw npm install --global @aikidosec/ci-api-client@1.0.17
 
     - name: Run Aikido release scan
-      # The scan fails when Aikido reports a new finding.
+      # The scan fails when Aikido reports a new finding at severity LOW or above.
       # The API key comes from the Aikido CI settings.
       # The key cannot publish a package.
       env:
@@ -42,6 +44,7 @@ jobs:
         "$REPO_NAME" "$GITHUB_SHA"
         --apikey "$AIKIDO_CLIENT_API_KEY"
         --fail-on-sast-scan --fail-on-iac-scan --fail-on-secrets-scan
+        --minimum-severity-level LOW
 
   build:
     needs: [aikido-gate]
