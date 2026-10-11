@@ -30,15 +30,15 @@ Profile: npm library · public
 - [x] Every action pinned to a full commit SHA (`npx actions-up`) — verified 2026-10-08
 - [x] Every job installs Socket Firewall (`SocketDev/action` SHA-pinned, `firewall-version` pinned); `pnpm install` / `npm install` run as `sfw pnpm install` / `sfw npm install` — PR #167
 - [x] `.github/workflows/check-workflows.yaml` lints workflows with zizmor on every PR — PR #168
-- [ ] Workflow `name:` and job `name:` contain no spaces (kebab-case) so they can be set as required status checks (PR #169 pending)
+- [x] Workflow `name:` and job `name:` contain no spaces (kebab-case) so they can be set as required status checks — PR #169
 - [x] `persist-credentials: false` on checkouts that don't push — PR #168
 - [x] No `pull_request_target` on workflows that run untrusted PR code — verified 2026-10-08
 - [x] Artifact-publishing workflows disable `actions/setup-node` default caching (`package-manager-cache: false`) to prevent cache poisoning — PR #168
-- [ ] No npm tokens (or other registry credentials) in Actions secrets
+- [x] No npm tokens (or other registry credentials) in Actions secrets — verified 2026-10-11
 
 ## 5. npm publishing — npm libraries only
 - [ ] OIDC trusted publishing configured **stage-only** on npmjs.com for the publish workflow — it can stage, never publish live (manual)
-- [ ] `.github/workflows/release.yaml` packs then stages with `pnpm stage publish ./packed/*.tgz --no-git-checks`
+- [ ] `.github/workflows/release.yaml` packs then stages with `pnpm stage publish ./packed/*.tgz --no-git-checks` (PR pending)
 - [ ] Maintainer promotes staged versions with 2FA (manual)
 - [ ] Drydock connected — staged releases reviewed before promotion (manual)
 - [ ] No direct publish rights: package requires 2FA and disallows tokens (manual)

@@ -51,9 +51,13 @@ jobs:
     - name: Testing
       run: pnpm test
 
-    - name: Publish
-      # No NPM_TOKEN: pnpm authenticates via OIDC trusted publishing and
-      # generates provenance attestations from the OIDC identity.
-      # --no-git-checks is required because the release runs from a detached
-      # tag checkout rather than a branch.
-      run: pnpm publish --provenance --no-git-checks --ignore-scripts
+    - name: Pack
+      run: |
+        mkdir -p packed
+        pnpm pack --pack-destination packed
+        ls -la packed
+
+    - name: Stage publish
+      # OIDC stages the tarball. This job does not use an npm token.
+      # --no-git-checks is required. The release checkout is a detached tag.
+      run: pnpm stage publish ./packed/*.tgz --access public --provenance --no-git-checks
