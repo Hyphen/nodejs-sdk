@@ -23,6 +23,7 @@ The Hyphen Node.js SDK is a JavaScript library that allows developers to easily 
 	- [Toggle Self-Hosted](#toggle-self-hosted)
 - [ENV - Secret Management Service](#env---secret-management-service)
 	- [Loading Environment Variables from Hyphen](#loading-environment-variables-from-hyphen)
+	- [Hot Loading Environment Variables](#hot-loading-environment-variables)
 	- [Loading Local Environment Files](#loading-local-environment-files)
 - [Net Info - Geo Information Service](#net-info---geo-information-service)
 - [Execution Context - API Key Validation](#execution-context---api-key-validation)
@@ -658,6 +659,90 @@ const remoteEnv = new Env({
 
 await remoteEnv.load('production');
 ```
+
+## Hot Loading Environment Variables
+
+A hot load gets the new values from Hyphen while your application runs. You do
+not start the application again. The SDK does not have a watch option. To do a
+hot load, call `load()` again. Each call fetches the current values and writes
+them to `process.env`.
+
+This example does a hot load each 60 seconds:
+
+```javascript
+import { Hyphen } from '@hyphen/sdk';
+
+const hyphen = new Hyphen({
+  apiKey: 'your_api_key',
+  env: {
+    organizationId: 'your_organization_id',
+    projectId: 'your_project_id',
+    applicationId: 'your_application_id',
+  },
+});
+
+// Load the values one time before the application starts.
+let variables = await hyphen.env.load('production');
+let active = true;
+let timer;
+
+async function hotLoad() {
+  try {
+    const next = await hyphen.env.load('production');
+
+    // Delete the variables that Hyphen does not have now.
+    for (const name of Object.keys(variables)) {
+      if (!(name in next)) {
+        delete process.env[name];
+      }
+    }
+
+    variables = next;
+  } catch (error) {
+    // The last good values stay in process.env.
+    console.error('Hyphen ENV hot load failed:', error);
+  }
+
+  // Start the timer again only after this load ends.
+  schedule();
+}
+
+function schedule() {
+  if (!active) {
+    return;
+  }
+
+  timer = setTimeout(hotLoad, 60_000);
+
+  // Do not let the timer keep the process alive.
+  timer.unref();
+}
+
+function stopHotLoad() {
+  active = false;
+  clearTimeout(timer);
+}
+
+schedule();
+```
+
+Obey these rules when you do a hot load:
+
+- Keep the default `override: true`. If you set `override: false`, `load()`
+  does not change a variable that `process.env` already has.
+- Read `process.env` each time you use a value. A value that you copied at
+  startup does not change.
+- Delete removed variables in your code, as the example shows. `load()` does
+  not delete a variable from `process.env`.
+- Catch the errors from `load()`. If a load fails, `load()` does not change
+  `process.env`.
+- Do not use a short interval. Each load sends one request for each
+  environment and one request for the key.
+- Start a load only after the last load ends. Two loads at the same time can
+  write old values to `process.env`.
+- Call `stopHotLoad()` to stop the hot load.
+
+If you supply `decryptionKey`, `load()` does not send the request for the key.
 
 ## Loading Local Environment Files
 
