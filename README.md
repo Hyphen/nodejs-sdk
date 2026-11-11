@@ -683,8 +683,10 @@ const hyphen = new Hyphen({
 
 // Load the values one time before the application starts.
 let variables = await hyphen.env.load('production');
+let active = true;
+let timer;
 
-const timer = setInterval(async () => {
+async function hotLoad() {
   try {
     const next = await hyphen.env.load('production');
 
@@ -700,10 +702,28 @@ const timer = setInterval(async () => {
     // The last good values stay in process.env.
     console.error('Hyphen ENV hot load failed:', error);
   }
-}, 60_000);
 
-// Do not let the timer keep the process alive.
-timer.unref();
+  // Start the timer again only after this load ends.
+  schedule();
+}
+
+function schedule() {
+  if (!active) {
+    return;
+  }
+
+  timer = setTimeout(hotLoad, 60_000);
+
+  // Do not let the timer keep the process alive.
+  timer.unref();
+}
+
+function stopHotLoad() {
+  active = false;
+  clearTimeout(timer);
+}
+
+schedule();
 ```
 
 Obey these rules when you do a hot load:
@@ -718,7 +738,9 @@ Obey these rules when you do a hot load:
   `process.env`.
 - Do not use a short interval. Each load sends one request for each
   environment and one request for the key.
-- Call `clearInterval(timer)` to stop the hot load.
+- Start a load only after the last load ends. Two loads at the same time can
+  write old values to `process.env`.
+- Call `stopHotLoad()` to stop the hot load.
 
 If you supply `decryptionKey`, `load()` does not send the request for the key.
 
