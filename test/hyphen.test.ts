@@ -164,11 +164,4 @@ describe("Hyphen Emitters", () => {
 		hyphen.toggle.emit("info", "Test info");
 		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
 	});
-
-	test("should emit toggle info events", () => {
-		const hyphen = new Hyphen();
-		const infoSpy = vi.spyOn(hyphen, "emit");
-		hyphen.toggle.emit("info", "Test info");
-		expect(infoSpy).toHaveBeenCalledWith("info", "Test info");
-	});
 });
